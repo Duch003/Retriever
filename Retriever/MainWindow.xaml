@@ -3,10 +3,403 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Retriever"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow" Height="700" Width="1000"
+		x:Name="mainWindow">
+	<Window.Resources>
+		<Style TargetType="DataGrid">
+			<Setter Property="FontSize" Value="18"/>
+
+		</Style>
+		<Style TargetType="Label">
+			<Setter Property="FontWeight" Value="Bold"/>
+			<Setter Property="FontSize" Value="20"/>
+			<Setter Property="Background" Value="LightSkyBlue"/>
+			<Setter Property="HorizontalContentAlignment" Value="Center"/>
+			<Setter Property="Padding" Value="5"/>
+
+		</Style>
+		<Style TargetType="TextBlock">
+			<Setter Property="FontSize" Value="18"/>
+			<Setter Property="HorizontalAlignment" Value="Stretch"/>
+			<Setter Property="TextAlignment" Value="Center"/>
+			<Setter Property="Padding" Value="5"/>
+		</Style>
+		<Style TargetType="Expander">
+			<Setter Property="FontSize" Value="18"/>
+			<Setter Property="HorizontalAlignment" Value="Center"/>
+			<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+			<Setter Property="VerticalAlignment" Value="Stretch"/>
+			<Setter Property="Padding" Value="5"/>
+		</Style>
+		<Style TargetType="Border">
+			<Setter Property="BorderBrush" Value="Black"/>
+			<Setter Property="BorderThickness" Value="2"/>
+		</Style>
+	</Window.Resources>
+
+	<!--Definicja TabControl - wewnątrz znajduje się wsyzstko inne-->
+	<TabControl Margin="5">
+
+		<!--==============================LISTA MODELI==============================-->
+		<!--Zakładka z DataGridem przechowującym wszystkie modele odczytane z pliku-->
+		<TabItem Header="Lista modeli">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<!--==============================WYSZUKIWARKA==============================-->
+				<!--Kod wyszukiwarki modeli-->
+				<TextBlock Text="Wyszukiwarka:" Margin="5" Grid.Row="0" Grid.Column="0" 
+                           VerticalAlignment="Center"/>
+				<TextBox MinHeight="25" x:Name="txtWyszukiwarka" Margin="5" Grid.Column="1" Grid.Row="0" 
+                         TextChanged="txtWyszukiwarka_TextChanged" FontSize="18"/>
+
+				<!--==============================TABELA Z MODELAMI==============================-->
+				<!--Tabele tworzone ręcznie-->
+				<DataGrid x:Name="gridModele" AutoGenerateColumns="False" IsReadOnly="True" 
+                          CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" SelectedIndex="0"
+                      CanUserSortColumns="true" AlternatingRowBackground="LightBlue"
+                          GridLinesVisibility="None" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                          Margin="5" SelectionChanged="gridModele_SelectionChanged">
+					<DataGrid.Columns>
+						<DataGridTextColumn Header="Model" Binding="{Binding MD}" Width="350"/>
+						<DataGridTextColumn Header="MSN" Binding="{Binding MSN}" Width="350"/>
+						<DataGridTextColumn Header="Rodzaj komputera" Binding="{Binding NazwaZeszytu}" Width="350"/>
+					</DataGrid.Columns>
+				</DataGrid>
+			</Grid>
+		</TabItem>
+
+		<!--==============================ZESTAWIENIE==============================-->
+		<!--Zakładka z zestawieniem danych z pliku z danymi rzeczywistymi-->
+		<TabItem Header="Zestawienie">
+			<!--Całość umieszczona w kontrolce ScrollViever dzięki której można przewijać stronę-->
+			<ScrollViewer HorizontalScrollBarVisibility="Visible">
+				<Grid x:Name="gridZestawienie">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto"/>
+						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
+					</Grid.ColumnDefinitions>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+					</Grid.RowDefinitions>
+					<!--==============================LEGENDA==============================-->
+					<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
+						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal" VerticalContentAlignment="Bottom"/>
+					</Border>
+					<Border Grid.Row="0" Grid.Column="1">
+						<Label Content="Baza danych" Background="LimeGreen"/>
+					</Border>
+					<Border Grid.Row="0" Grid.Column="2">
+						<Label Content="Rzeczywiste" Background="LimeGreen"/>
+					</Border>
+
+					<!--==============================NAGŁÓWEK - DANE PODSTAWOWE==============================-->
+					<Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="DANE PODSTAWOWE"/>
+					</Border>
+
+					<!--==============================Model==============================-->
+					<Border Grid.Row="2" Grid.Column="0" Background="LightSkyBlue">
+						<Expander x:Name="Expander1" FontWeight="Bold" MinWidth="150" >
+							<Expander.Header>
+								<TextBlock Text="  Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"/>
+							</Expander.Header>
+							<Label Content="MSN"/>
+						</Expander>
+					</Border>
+					<Border Grid.Row="2" Grid.Column="1">
+						<Expander Header="{Binding ReaderInfo.Komputer.MD}"  IsExpanded="{Binding Path=IsExpanded, ElementName=Expander1}">
+							<TextBlock Text="{Binding ReaderInfo.Komputer.MSN}"/>
+						</Expander>
+					</Border>
+					<Border Grid.Row="2" Grid.Column="2">
+						<Expander Header="{Binding GathererInfo.Komputer.MD}"  IsExpanded="{Binding Path=IsExpanded, ElementName=Expander1}">
+							<TextBlock Text="{Binding GathererInfo.Komputer.MSN}"/>
+						</Expander>
+					</Border>
+
+					<!--==============================OS==============================-->
+					<Border Grid.Row="3" Grid.Column="0">
+						<Label Content="OS"/>
+					</Border>
+					<Border  Grid.Row="3" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.System}"/>
+					</Border>
+					<Border  Grid.Row="3" Grid.Column="2">
+						<TextBlock Text="{Binding GathererInfo.Komputer.System}"/>
+					</Border>
+
+					<!--==============================SWM==============================-->
+					<Border Grid.Row="4" Grid.Column="0">
+						<Label Content="SWM"/>
+					</Border>
+					<Border Grid.Row="4" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.Swm.Swm}"/>
+					</Border>
+					<!--Dodatkowy panel do którego programowo dodawane są kontolki z informacjami-->
+					<Border Grid.Row="4" Grid.Column="2">
+						<StackPanel Orientation="Vertical" x:Name="spSwm"/>
+					</Border>
+
+					<!--==============================Wear Level==============================-->
+					<Border Grid.Row="5" Grid.Column="0">
+						<Label Content="Wear Level"/>
+					</Border>
+					<Border Grid.Row="5" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%}"/>
+					</Border>
+					<Border Grid.Row="5" Grid.Column="2">
+						<StackPanel Orientation="Vertical" x:Name="spWearLevel"/>
+					</Border>
+
+					<!--==============================NAGŁÓWEK - PŁYTA GŁÓWNA I PROCESOR==============================-->
+					<Border Grid.Row="6" Grid.Column="0">
+						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+					</Border>
+					<Border Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="PŁYTA GŁÓWNA I PROCESOR"/>
+					</Border>
+
+					<!--==============================Model i producent płyty głównej==============================-->
+					<Border Grid.Row="7" Grid.Column="0" Background="LightSkyBlue">
+						<Expander Header="Model płyty" FontWeight="Bold" x:Name="Expander2" Background="LightSkyBlue" MinWidth="150" >
+							<Label Content="Producent" FontWeight="Bold"/>
+						</Expander>
+					</Border>
+					<Border Grid.Row="7" Grid.Column="1">
+						<Expander Header="{Binding ReaderInfo.PlytaGlowna.Model}" IsExpanded="{Binding Path=IsExpanded, ElementName=Expander2}">
+							<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Producent}"/>
+						</Expander>
+					</Border>
+					<Border Grid.Row="7" Grid.Column="2">
+						<Expander Header="{Binding GathererInfo.PlytaGlowna.Model}" IsExpanded="{Binding Path=IsExpanded, ElementName=Expander2}">
+							<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Producent}"/>
+						</Expander>
+					</Border>
+
+					<!--==============================CPU==============================-->
+					<Border Grid.Row="8" Grid.Column="0">
+						<Label Content="CPU"/>
+					</Border>
+					<Border Grid.Row="8" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.ID}"/>
+					</Border>
+					<Border Grid.Row="8" Grid.Column="2">
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.CPU}"/>
+					</Border>
+
+					<!--==============================Wersja Bios==============================-->
+					<Border Grid.Row="9" Grid.Column="0">
+						<Label Content="Wersja bios"/>
+					</Border>
+					<Border Grid.Row="9" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.WersjaBios}"/>
+					</Border>
+					<Border Grid.Row="9" Grid.Column="2">
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.WersjaBios}"/>
+					</Border>
+
+					<!--==============================NAGŁÓWEK - RAM I DYSKI TWARDE==============================-->
+					<Border Grid.Row="10" Grid.Column="0">
+						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+					</Border>
+					<Border Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="RAM I DYSKI TWARDE"/>
+					</Border>
+
+					<!--==============================Pamięć RAM==============================-->
+					<Border Grid.Row="11" Grid.Column="0">
+						<Label Content="Pamięć RAM" FontWeight="Bold"/>
+					</Border>
+					<Border Grid.Row="11" Grid.Column="1">
+						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}"/>
+					</Border>
+					<Border Grid.Row="11" Grid.Column="2">
+						<Expander Padding="0" x:Name="expRam">
+							<Expander.Header>
+								<!--Header nie jest stringiem-->
+								<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}"/>
+							</Expander.Header>
+						</Expander>
+					</Border>
+
+					<!--==============================Dyski==============================-->
+					<Border Grid.Row="12" Grid.Column="0" Background="LightSkyBlue">
+						<Expander Header="              Dyski twarde" x:Name="expDyskiNazwa" FontWeight="Bold" FontSize="20" IsExpanded="True" Expanded="AddSpace" Collapsed="RemoveSpace"/>
+					</Border>
+					<Border Grid.Row="12" Grid.Column="1">
+						<Expander Header="Dyski twarde" x:Name="expDyskiReader" IsExpanded="{Binding IsExpanded, ElementName=expDyskiNazwa}"/>
+					</Border>
+					<Border Grid.Row="12" Grid.Column="2">
+						<Expander Header="Dyski twarde" x:Name="expDyskiGatherer" IsExpanded="{Binding IsExpanded, ElementName=expDyskiNazwa}"/>
+					</Border>
+
+					<!--==============================POZOSTAŁE - NAGŁÓWEK==============================-->
+					<Border Grid.Row="13" Grid.Column="0">
+						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+					</Border>
+					<Border Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="POZOSTAŁE PARAMETRY"/>
+					</Border>
+					<!--==============================Kolor==============================-->
+					<Border Grid.Row="14" Grid.Column="0">
+						<Label Content="Kolor obudowy"/>
+					</Border>
+					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.Kolor}"/>
+					</Border>
+
+					<!--==============================Obudowa==============================-->
+					<Border Grid.Row="15" Grid.Column="0">
+						<Label Content="Rodzaj obudowy"/>
+					</Border>
+					<Border Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.Obudowa}"/>
+					</Border>
+
+					<!--==============================Shipping Mode==============================-->
+					<Border Grid.Row="16" Grid.Column="0">
+						<Label Content="Shipping Mode"/>
+					</Border>
+					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.ShippingMode}"/>
+					</Border>
+
+					<!--==============================Rodzaj LCD==============================-->
+					<Border Grid.Row="17" Grid.Column="0">
+						<Label Content="Rodzaj LCD"/>
+					</Border>
+					<Border Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.LCD}"/>
+					</Border>
+
+					<!--==============================Pełny model==============================-->
+					<Border Grid.Row="18" Grid.Column="0">
+						<Label Content="Pełny model"/>
+					</Border>
+					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2">
+						<TextBlock Text="{Binding ReaderInfo.Komputer.PelnyModel}"/>
+					</Border>
+				</Grid>
+			</ScrollViewer>
+		</TabItem>
+
+		<!--==============================TESTY==============================-->
+		<!--Zakładka z narzędziami do testów-->
+		<TabItem Header="Testy">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+				<!--==============================NARZĘDZIA DO TESOTWANIA==============================-->
+				<Label Content="Narzędzia do testowania" Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" VerticalContentAlignment="Center"/>
+
+				<!--==============================Skrypt Aktywacji Windows==============================-->
+				<TextBlock Text="Aktywacja Windows" Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="connect.cmd" Grid.Row="1" Grid.Column="1" Click="WindowsActivationScript_Click" Margin="5" MinWidth="100" Grid.ColumnSpan="2"/>
+				<Button Content="Aktywacja telefoniczna" Grid.Row="1" Grid.Column="3" Click="WindowsActivationTelephone_Click" Margin="5" MinWidth="100"/>
+				<!--SPRAWDZIĆ W PRACY https://stackoverflow.com/questions/37203224/windows-auto-activate-method-->
+				<!-- c# activate windows slmgr-->
+
+				<!--==============================Menedżer urządzeń==============================-->
+				<TextBlock Text="Menedżer urządzeń" Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="devmgmt.msc" Grid.Row="2" Grid.Column="1" Click="DeviceManager_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
+
+				<!--==============================Test klawiatury==============================-->
+				<TextBlock Text="Test klawiatury" Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="AquaKeyTest.exe" Grid.Row="3" Grid.Column="1" Click="AquaKeyTest_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
+
+				<!--==============================Test LCD==============================-->
+				<TextBlock Text="Test LCD" Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="aMonitest.exe" Grid.Row="4" Grid.Column="2" Click="aMonitest_Click" Margin="5" MinWidth="100" />
+				<Button Content="touchscreen_2.exe" Grid.Row="4" Grid.Column="1" Click="touchScreen_Click" Margin="5" MinWidth="100"/>
+
+				<!--==============================Test audio i mikrofonu==============================-->
+				<TextBlock Text="Test audio i mikrofonu" Grid.Row="5" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="mmsys.cpl" Grid.Row="5" Grid.Column="1" Click="mmSys_Click" Margin="5" MinWidth="100" Grid.ColumnSpan="2"/>
+
+				<!--==============================Test kamery==============================-->
+				<TextBlock Text="Test kamery" Grid.Row="6" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+				<Button Content="cam.exe" Grid.Row="6" Grid.Column="1" Click="cam_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
+
+				<!--==============================Data i czas==============================-->
+				<TextBlock Text="Data i czas" Grid.Row="7" Grid.Column="0" VerticalAlignment="Center"/>
+				<TextBlock x:Name="tbDateTime" Text="{Binding Now}" Grid.Row="7" Grid.Column="1" Margin="5" VerticalAlignment="Center"/>
+				<TextBox x:Name="txtSetDateTime" Grid.Row="7" Grid.Column="2" FontSize="20" Margin="5" VerticalContentAlignment="Center"/>
+				<Button x:Name="btnSetDateTime" Content="Ustaw nową datę i czas" Grid.Row="7" Grid.Column="3" Margin="5" Click="btnSetDateTime_Click"/>
+				
+				<!--==============================Restart==============================-->
+				<Label Content="Restart systemu" Grid.Row="8" Grid.Column="0" VerticalContentAlignment="Center"/>
+				<Button Content="Restart" Grid.Row="8" Grid.Column="1" Click="restart_Click" Margin="5" MinWidth="100"/>
+				<Button Content="Restart do BIOSu" Grid.Row="8" Grid.Column="2" Click="restartBios_Click" Margin="5" MinWidth="100"/>
+
+				<!--==============================STATUSY==============================-->
+				<Label Content="Statusy" Grid.Row="0" Grid.Column="4" VerticalContentAlignment="Center"/>
+			</Grid>
+		</TabItem>
+	</TabControl>
 </Window>
+
+<!--Odpalać MSinfo32.exe-->
+<!--Sprawdzać klucz windowsa-->
+<!--Sprawdzać status aktywacji-->
+<!--Otwierać slui4-->
+<!--Obsłużyć skrypt Aktywacji Artura-->
+<!--Sprawdzać secure boot https://stackoverflow.com/questions/18172197/programmatically-determine-if-windows-8-secure-boot-is-enabled-->
+<!--Odpalać poszczególne testy-->
+<!--Data i czas-->
+<!--Odpalenie konsoli-->
+<!--Restart, restart do biosu-->
+
+<!--Dynamiczny binding-->
+<!--https://stackoverflow.com/questions/36198495/binding-from-xaml-doesnt-work-->
+
+<!--1.       Dynamiczne generowanie pol baterii i hdd
+
+2.       Ladowanie 5min
+
+3.       Dokonczyc 3 zakladke
+
+4.       Suma ram-->

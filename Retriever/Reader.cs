@@ -1,0 +1,190 @@
+﻿using System;
+using System.Collections.Generic;
+using ExcelDataReader;
+using System.Data;
+using System.IO;
+using System.Linq;
+
+namespace Retriever
+{
+    public class Reader
+    {
+        FileStream stream;
+        IExcelDataReader excelReader;
+        DataSet result;
+        public Computer Komputer { get; set; }
+        public RAM Ram { get; private set; }
+        public Storage[] Dyski { get; private set; }
+        public Mainboard PlytaGlowna { get; private set; }
+        public SWM Swm { get; private set; }
+        public IEnumerable<Model> listaModeli { get; private set; }
+        string Plik = @"/NoteBookiRef_v2.xlsx";
+
+        //Metoda otwierająca plik bazy danych
+        void Open()
+        {
+            stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
+            excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+            result = excelReader.AsDataSet();
+        }
+
+        //Kontruktor wyciągający dane o modelu z bazy danych
+        public Reader(Model model)
+        {
+            Open();
+            ReadData(model);
+            Close();
+        }
+
+        //Konstruktor pobierający listę modeli
+        public Reader()
+        {
+            Open();
+            SetDataTables();
+            Close();
+        }
+
+        // Metoda przeszukująca plik excela w celu znalezienia odpowiednich zeszytów z danymi
+        void SetDataTables()
+        {
+            IEnumerable<Model> tempPQ = null;
+            IEnumerable<Model> tempMD = null;
+            //Dodatkowe przełączniki
+            bool Medion = false, Peaq = false;
+            //Przeszukuj zeszyty w pliku do póki nie znajdziesz MD i PQ
+            for (int i = 0; i < result.Tables.Count; i++)
+            {
+                //Pobierz bazę z MD
+                if (result.Tables[i].TableName.ToString() == "MD")
+                {
+                    tempMD = GatherModels(result.Tables[i], i, 0, 2);
+                    Medion = true; //Pobrano bazę MD
+                }
+                //Pobierz bazę z PQ
+                else if (result.Tables[i].TableName.ToString() == "PQ")
+                {
+                    tempPQ = GatherModels(result.Tables[i], i, 1, 2);
+                    Peaq = true; //Pobrano bazę PQ
+                }
+                //Przełączniki przyspieszają zakończenie wykonywania pętli
+                if (Medion == true && Peaq == true)
+                {
+                    listaModeli = tempMD.Concat(tempPQ);
+                    return;
+                }
+            }
+        }
+
+        // Metoda zwracająca listę modeli z pliku excel.
+        IEnumerable<Model> GatherModels(DataTable table, int sheet, int mdColumn, int msnColumn)
+        {
+            for (int i = 1; i < table.Rows.Count; i++)
+            {
+                //Odrzuca rekordy w których brakuje modelu i msn
+                if (string.IsNullOrEmpty(table.Rows[i][msnColumn].ToString()) && (string.IsNullOrEmpty(table.Rows[i][mdColumn].ToString()))) continue;
+                //Argumenty: (Wiersz w którym znajduje się dany model, numer zeszytu w którym jest rekord, MSN, Model)
+                yield return new Model(i, sheet, table.Rows[i][msnColumn].ToString(), table.Rows[i][mdColumn].ToString(), table.TableName.ToString());
+            }
+        }
+
+        //Odczytanie informacji o danym modelu z bazy
+        void ReadData(Model model)
+        {
+            //Zmienne potrzebne do utworzenia obiektów opisujących komputer
+            string MD = null, Kolor = null, MSN = null, NowyMSN = null, PelnyModel = null, LCD = null, CPU = null, Taktowanie = null, System = null,
+                swm = null, Wskazowki = null, Obudowa = null, ModelPlyty = null, ProducentPlyty = null, BIOS = null;
+            bool ShippingMode = false;
+            //Utworzenie tymaczowego obiektu zeszytu
+            DataTable table = result.Tables[model.Zeszyt];
+            for (int i = 0; i < table.Columns.Count; i++)
+            {
+                #region Pobieranie i wpisywanie wartości dla konstruktorów
+                string variable = "";
+                switch (variable = table.Rows[0][i].ToString().ToLower().Replace(" ", ""))
+                {
+                    case "model":
+                        MD = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "farba":
+                        Kolor = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "msn":
+                    case "starymsn":
+                        MSN = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "nowymsn":
+                        NowyMSN = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "model3":
+                        PelnyModel = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "rodzajpanela":
+                        LCD = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "hdd":
+                    case "hdd ":
+                        string[] tempMem = table.Rows[model.Wiersz][i].ToString().Split(';', '+');
+                        Dyski = new Storage[tempMem.Length];
+                        for (int j = 0; j < tempMem.Length; j++)
+                        {
+                            Dyski[j] = new Storage(tempMem[j]);
+                        }
+                        break;
+                    case "ram ":
+                    case "ram":
+                        Ram = new RAM(table.Rows[model.Wiersz][i].ToString());
+                        break;
+                    case "cpu":
+                        CPU = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "tak":
+                        Taktowanie = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "systemoperacyjny":
+                        System = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "nrswm":
+                        swm = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "wskazowki":
+                    case "wskazówki":
+                    case "uwagi":
+                        Wskazowki = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "modelbudy":
+                        Obudowa = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "modelpłyty":
+                    case "modelplyty":
+                        ModelPlyty = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "producentplyty":
+                    case "producentpłyty":
+                        ProducentPlyty = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                    case "shipping":
+                        ShippingMode = false;
+                        if (table.Rows[model.Wiersz][i].ToString().ToLower() == "tak") ShippingMode = true;
+                        break;
+                    case "bios":
+                        BIOS = table.Rows[model.Wiersz][i].ToString();
+                        break;
+                }
+                #endregion
+            }
+            PlytaGlowna = new Mainboard(ModelPlyty, ProducentPlyty, CPU, Taktowanie, BIOS);
+            Komputer = new Computer(MD, MSN, System, new double[1] { 12 }, Wskazowki, Obudowa, LCD, Kolor, ShippingMode, NowyMSN, PelnyModel);
+            Swm = new SWM(swm: swm);
+        }
+
+        //Czyszczenie końcowe po zakończeniu używania programu
+        void Close()
+        {
+            stream.Close();
+            stream.Dispose();
+            excelReader.Close();
+            excelReader.Dispose();
+            result.Dispose();
+        }
+    }
+}
