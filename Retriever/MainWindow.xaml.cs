@@ -25,11 +25,11 @@ namespace Retriever
         public MainWindow()
         {
             InitializeComponent();
-            PrzygotujWiazanie();
+            PrzygotujAplikacje();
             UstawTimer();
         }
 
-        void PrzygotujWiazanie()
+        void PrzygotujAplikacje()
         {
             //Wczytanie i przypisanie listy modeli do grida
             ListSource = new ModelListSource(new Reader());           
@@ -41,10 +41,7 @@ namespace Retriever
             //Tworzenie dodatkowych kontrolek z informacjami
             CreateSwmDataControls(GathererInfo.Swm);
             CreateWearLevelDataControls(GathererInfo.Komputer.WearLevel);
-            CreateRamDataControls(GathererInfo.Ram);
-            CreateDiscDataHeaders(GathererInfo.Dyski, expDyskiNazwa);
-            
-            CreateDiscDataControls(GathererInfo.Dyski, expDyskiGatherer);
+            CreateDiscDataHeaders(GathererInfo.Dyski);
 
             //Kod wyszukiwarki modeli
             CollectionView widok = (CollectionView)CollectionViewSource.GetDefaultView(gridModele.ItemsSource);
@@ -58,13 +55,16 @@ namespace Retriever
             
             //Zapisanie aktualnego modelu komputera - albo na podstawie wydobytego, albo na podstawiie pierwszego zaznaczonego
             ThisComputer = q.First() as Model == null ? gridModele.SelectedItem as Model : q.First() as Model;
-            CreateDiscDataControls(ReaderInfo.Dyski, expDyskiReader);
+            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);
+            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiGatherer);
+
             //Dodanie kontekstu danych do grida
             Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
             gridZestawienie.DataContext = Retriever2;
             
         }
 
+        #region Wczytywanie nowych danych z pliku excel
         //Metoda wczytująca dane aktualnie zaznaczonego rekordu
         private void gridModele_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -72,7 +72,9 @@ namespace Retriever
             Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
             gridZestawienie.DataContext = Retriever2;
         }
+        #endregion
 
+        #region Wyszukiwarka
         bool FiltrUzytkownika(object item)
         {
             if (String.IsNullOrEmpty(txtWyszukiwarka.Text)) return true;
@@ -86,6 +88,7 @@ namespace Retriever
             CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
             ThisComputer = gridModele.SelectedItem as Model;
         }
+        #endregion
 
         #region Dynamiczne twozenie kontrolek
         //Dodawanie kontrolek SWM
@@ -107,120 +110,70 @@ namespace Retriever
             for (int i = 0; i < wl.Length; i++)
             {
                 var text = new TextBlock();
-                text.Text = string.Format("{0}%",wl[i]);
+                text.Text = string.Format("{0}%", wl[i]);
                 spWearLevel.Children.Add(text);
             }
         }
 
-        //Dodawanie kontrolek pojenmności RAM
-        public void CreateRamDataControls(RAM[] Ram)
-        {
-            expRam.Content = null;
-            var stack = new StackPanel();
-            
-            for (int i = 0; i < Ram.Length; i++)
-            {
-                var text = new TextBlock();
-                text.Text = string.Format("{0}GB", Ram[i].Pojemnosc);
-                stack.Children.Add(text);
-            }
-            expRam.Content = stack;
-        }
-
         //Dodawanie kontrolek z pojemnościami dysków
-        public void CreateDiscDataControls(Storage[] Disc, Expander control)
+        public void CreateDiscDataControls(Storage[] Disc, ref StackPanel control)
         {
-            control.Content = null;
-            var stack = new StackPanel();
-
             for (int i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}GB", Disc[i].Pojemnosc);
-                stack.Children.Add(text);
+                control.Children.Add(text);
             }
-            control.Content = stack;
         }
 
         //Dodawanie kontrolek z nazwami dysków
-        public void CreateDiscDataHeaders(Storage[] Disc, Expander control)
+        public void CreateDiscDataHeaders(Storage[] Disc)
         {
-            control.Content = null;
-            var stack = new StackPanel();
-
             for (int i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Disc[i].Nazwa);
-                text.FontWeight = FontWeights.Normal;
-                stack.Children.Add(text);
+                text.FontWeight = FontWeights.Bold;
+                spDyskiNazwa.Children.Add(text);
             }
-            control.Content = stack;
         }
         #endregion
-
-        #region Obsługa nagłówka w dyskach twardych
-        private void RemoveSpace(object sender, RoutedEventArgs e)
-        {
-            (sender as Expander).Header = "Dyski twarde";
-        }
-
-        private void AddSpace(object sender, RoutedEventArgs e)
-        {
-            (sender as Expander).Header = "          Dyski twarde";
-        }
-        #endregion
-
-
-        private void OpenExplorer_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start("::{20d04fe0-3aea-1069-a2d8-08002b30309d}");
-        }
-
-        private void WindowsActivationScript_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start(@"../../Skypty/odpal.bat");
-        }
-
-        private void DeviceManager_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start("devmgmt.msc");
-        }
 
         #region Obsługa daty i czasu w aplikacji
         //Metoda ustawiwjąca nową datę i czas
         private void btnSetDateTime_Click(object sender, RoutedEventArgs e)
         {
-            //DateTime control = DateTime.Parse("01.01.0001 00:00:00");
-            //SYSTEMTIME myTime = new SYSTEMTIME();
-            //DateTime timeToSet = new DateTime();
-            //if (String.IsNullOrEmpty(txtSetDateTime.Text))
-            //    return;
-            //else if (DateTime.TryParse(txtSetDateTime.Text, out timeToSet) && timeToSet != control)
-            //{
-            //    myTime.wYear = (short)timeToSet.Year;
-            //    myTime.wMonth = (short)timeToSet.Month;
-            //    myTime.wDay = (short)timeToSet.Day;
-            //    myTime.wHour = (short)timeToSet.Hour;
-            //    myTime.wMinute = (short)timeToSet.Minute;
-            //    myTime.wSecond = (short)timeToSet.Second;
-            //    myTime.wMilliseconds = (short)0;
-            //    SystemDateTimeChanger.SetSystemTime(ref myTime);
-            //}
-            Process.Start("timedate.cpl");
+            DateTime control = DateTime.Parse("01.01.0001 00:00:00");
+            SYSTEMTIME myTime = new SYSTEMTIME();
+            DateTime timeToSet = new DateTime();
+            if (String.IsNullOrEmpty(txtSetDateTime.Text))
+                Process.Start("timedate.cpl");
+            else if (DateTime.TryParse(txtSetDateTime.Text, out timeToSet) && timeToSet != control)
+            {
+                myTime.wYear = (short)timeToSet.Year;
+                myTime.wMonth = (short)timeToSet.Month;
+                myTime.wDay = (short)timeToSet.Day;
+                myTime.wHour = (short)timeToSet.Hour;
+                myTime.wMinute = (short)timeToSet.Minute;
+                myTime.wSecond = (short)timeToSet.Second;
+                myTime.wMilliseconds = (short)0;
+                SystemDateTimeChanger.SetSystemTime(ref myTime);
+            }
+            
         }
-        # region PRZETESTOWAC W PRACY
+
         void UstawTimer()
         {
             //Utworzenie obiektu przechowującego aktualny czas
             Timer = new SystemDateTime();
             tbDateTime.DataContext = Timer;
             TimeThicker = new DispatcherTimer();
-            TimeThicker.Interval = new TimeSpan(0, 0, 1); //Czas odświeżania - jedna minuta
+            TimeThicker.Interval = new TimeSpan(0, 0, 1); //Czas odświeżania - jedna sekunda
             TimeThicker.Tick += new EventHandler(RefreshTime);
             TimeThicker.Start();
         }
 
+        //Metoda odświeżająca czas w aplikacji co sekundę
         void RefreshTime(object sender, EventArgs e)
         {
             Timer = new SystemDateTime();
@@ -228,7 +181,21 @@ namespace Retriever
         }
         #endregion
 
-        #endregion
+        #region Skrypty
+        private void OpenExplorer_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("::{20d04fe0-3aea-1069-a2d8-08002b30309d}");
+        }
+
+        private void WindowsActivationScript_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory + @"\Skrypty\connect");
+        }
+
+        private void DeviceManager_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("devmgmt.msc");
+        }
 
         private void AquaKeyTest_Click(object sender, RoutedEventArgs e)
         {
@@ -267,7 +234,12 @@ namespace Retriever
 
         private void WindowsActivationTelephone_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(@"slui 4");
+            Process telActiv = new Process();
+            telActiv.StartInfo.FileName = "slui.exe";
+            telActiv.StartInfo.Arguments = "4";
+            telActiv.StartInfo.WorkingDirectory = "c:";
+            telActiv.Start();
         }
+        #endregion
     }
 }

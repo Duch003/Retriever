@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="MainWindow" Height="700" Width="1000"
-		x:Name="mainWindow">
+		x:Name="mainWindow" WindowState="Maximized">
 	<Window.Resources>
 		<Style TargetType="DataGrid">
 			<Setter Property="FontSize" Value="18"/>
@@ -39,7 +39,7 @@
 	</Window.Resources>
 
 	<!--Definicja TabControl - wewnątrz znajduje się wsyzstko inne-->
-	<TabControl Margin="5">
+	<TabControl Margin="5" SelectedIndex="1">
 
 		<!--==============================LISTA MODELI==============================-->
 		<!--Zakładka z DataGridem przechowującym wszystkie modele odczytane z pliku-->
@@ -127,22 +127,13 @@
 
 					<!--==============================Model==============================-->
 					<Border Grid.Row="2" Grid.Column="0" Background="LightSkyBlue">
-						<Expander x:Name="Expander1" FontWeight="Bold" MinWidth="150" >
-							<Expander.Header>
-								<TextBlock Text="  Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center" TextAlignment="Center"/>
-							</Expander.Header>
-							<Label Content="MSN"/>
-						</Expander>
+						<Label Content="  Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="1">
-						<Expander Header="{Binding ReaderInfo.Komputer.MD}"  IsExpanded="{Binding Path=IsExpanded, ElementName=Expander1}">
-							<TextBlock Text="{Binding ReaderInfo.Komputer.MSN}"/>
-						</Expander>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.MD}"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="2">
-						<Expander Header="{Binding GathererInfo.Komputer.MD}"  IsExpanded="{Binding Path=IsExpanded, ElementName=Expander1}">
-							<TextBlock Text="{Binding GathererInfo.Komputer.MSN}"/>
-						</Expander>
+						<TextBlock Text="{Binding GathererInfo.Komputer.MD}"/>
 					</Border>
 
 					<!--==============================OS==============================-->
@@ -187,21 +178,15 @@
 						<Label Content="PŁYTA GŁÓWNA I PROCESOR"/>
 					</Border>
 
-					<!--==============================Model i producent płyty głównej==============================-->
+					<!--==============================Model płyty głównej==============================-->
 					<Border Grid.Row="7" Grid.Column="0" Background="LightSkyBlue">
-						<Expander Header="Model płyty" FontWeight="Bold" x:Name="Expander2" Background="LightSkyBlue" MinWidth="150" >
-							<Label Content="Producent" FontWeight="Bold"/>
-						</Expander>
+						<Label Content="Model płyty" FontWeight="Bold" Background="LightSkyBlue" MinWidth="150"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="1">
-						<Expander Header="{Binding ReaderInfo.PlytaGlowna.Model}" IsExpanded="{Binding Path=IsExpanded, ElementName=Expander2}">
-							<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Producent}"/>
-						</Expander>
+						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Model}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="2">
-						<Expander Header="{Binding GathererInfo.PlytaGlowna.Model}" IsExpanded="{Binding Path=IsExpanded, ElementName=Expander2}">
-							<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Producent}"/>
-						</Expander>
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Model}"/>
 					</Border>
 
 					<!--==============================CPU==============================-->
@@ -242,23 +227,19 @@
 						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="2">
-						<Expander Padding="0" x:Name="expRam">
-							<Expander.Header>
-								<!--Header nie jest stringiem-->
-								<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}"/>
-							</Expander.Header>
-						</Expander>
+						<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}"/>
 					</Border>
 
 					<!--==============================Dyski==============================-->
 					<Border Grid.Row="12" Grid.Column="0" Background="LightSkyBlue">
-						<Expander Header="              Dyski twarde" x:Name="expDyskiNazwa" FontWeight="Bold" FontSize="20" IsExpanded="True" Expanded="AddSpace" Collapsed="RemoveSpace"/>
+						<StackPanel x:Name="spDyskiNazwa" />
+						
 					</Border>
 					<Border Grid.Row="12" Grid.Column="1">
-						<Expander Header="Dyski twarde" x:Name="expDyskiReader" IsExpanded="{Binding IsExpanded, ElementName=expDyskiNazwa}"/>
+						<StackPanel x:Name="spDyskiReader"/>
 					</Border>
 					<Border Grid.Row="12" Grid.Column="2">
-						<Expander Header="Dyski twarde" x:Name="expDyskiGatherer" IsExpanded="{Binding IsExpanded, ElementName=expDyskiNazwa}"/>
+						<StackPanel x:Name="spDyskiGatherer"/>
 					</Border>
 
 					<!--==============================POZOSTAŁE - NAGŁÓWEK==============================-->
