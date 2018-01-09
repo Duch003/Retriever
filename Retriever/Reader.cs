@@ -25,6 +25,7 @@ namespace Retriever
         //Metoda otwierająca plik bazy danych
         void Open()
         {
+
             stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
             excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
             result = excelReader.AsDataSet();
@@ -59,13 +60,14 @@ namespace Retriever
 
         //Metoda wyszukująca bios któy powinien być zainstalowany na podstawie porównywania modelu obudowy
         void LookForBios(Computer komp)
-        { 
+        {
             DataTable table = result.Tables[0];
-            for(int i = 0; i < table.Rows.Count; i++)
+            for (int i = 0; i < table.Rows.Count; i++)
             {
-                if(komp.Obudowa.ToLower() == table.Rows[i][0].ToString().ToLower() || komp.Obudowa.ToLower().Replace(" ","") == table.Rows[i][0].ToString().ToLower().Replace(" ", "") || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains(komp.Obudowa.ToLower().Replace(" ", "")))
+                if (table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains(komp.Obudowa.ToLower().Replace(" ", "")) || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains("e221xt") || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains("e222xt"))
                 {
                     WersjaBios = new BiosVer(table.Rows[i][3].ToString(), table.Rows[i][4].ToString());
+                    break;
                 }
             }
         }

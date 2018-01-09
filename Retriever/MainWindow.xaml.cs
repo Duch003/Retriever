@@ -9,9 +9,7 @@ using System.Windows.Threading;
 
 namespace Retriever
 {
-    /// <summary>
-    /// Logika interakcji dla klasy MainWindow.xaml
-    /// </summary>
+    
     public partial class MainWindow : Window
     {
         public Reader ReaderInfo { get; private set; }
@@ -25,9 +23,20 @@ namespace Retriever
 
         public MainWindow()
         {
-            InitializeComponent();
-            PrzygotujAplikacje();
-            UstawTimer();
+            try
+            {
+
+                InitializeComponent();
+                PrzygotujAplikacje();
+                UstawTimer();
+
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(string.Format(e.Data + "\n\n" + e.HelpLink + "\n\n" + e.InnerException + "\n\n" + e.Message + "\n\n" + e.Source + "\n\n" + e.StackTrace + "\n\n" + e.TargetSite));
+            }
+
+
         }
 
         void PrzygotujAplikacje()
@@ -55,12 +64,21 @@ namespace Retriever
             var q = from item in ListSource.ListaModeli
                     where item.MD.Equals(GathererInfo.Komputer.MD)
                     select item;
-            ReaderInfo = new Reader(((q.First() == null) ? (gridModele.SelectedItem as Model)  : (q.First() as Model)));
+
+            if (q.Count() != 0)
+            {
+                ReaderInfo = new Reader(q.First() == null ? gridModele.SelectedItem as Model : q.First() as Model);
+                ThisComputer = q.First() == null ? gridModele.SelectedItem as Model : q.First() as Model;
+            }
+               
+            else
+            {
+                ReaderInfo = new Reader(gridModele.SelectedItem as Model);
+                ThisComputer = gridModele.SelectedItem as Model;
+            }
+
             ReaderInfo_WersjaBios = new Reader(@"\Medion_NB_Bios.xlsx", ReaderInfo.Komputer);
             spReaderBios.DataContext = ReaderInfo_WersjaBios;
-
-            //Zapisanie aktualnego modelu komputera - albo na podstawie wydobytego, albo na podstawiie pierwszego zaznaczonego
-            ThisComputer = q.First() as Model == null ? gridModele.SelectedItem as Model : q.First() as Model;
             CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);            
 
             //Dodanie kontekstu danych do grida
@@ -226,7 +244,7 @@ namespace Retriever
 
         private void WindowsActivationScript_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\Skrypty\connect");
+            Process.Start(Environment.CurrentDirectory + @"\0\connect");
         }
 
         private void DeviceManager_Click(object sender, RoutedEventArgs e)
@@ -236,17 +254,17 @@ namespace Retriever
 
         private void AquaKeyTest_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\Skrypty/AquaKeyTest.exe");
+            Process.Start(Environment.CurrentDirectory + @"\0/AquaKeyTest.exe");
         }
 
         private void aMonitest_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\Skrypty/aMonitest.exe");
+            Process.Start(Environment.CurrentDirectory + @"\0/aMonitest.exe");
         }
 
         private void touchScreen_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\Skrypty\touchscreen_2.exe");
+            Process.Start(Environment.CurrentDirectory + @"\0\touchscreen_2.exe");
         }
 
         private void mmSys_Click(object sender, RoutedEventArgs e)
@@ -256,7 +274,7 @@ namespace Retriever
 
         private void cam_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\Skrypty\cam.exe");
+            Process.Start(Environment.CurrentDirectory + @"\0\cam.exe");
         }
 
         private void restart_Click(object sender, RoutedEventArgs e)

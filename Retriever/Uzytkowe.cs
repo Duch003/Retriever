@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Windows;
 
 namespace Retriever
 {
@@ -60,6 +61,7 @@ namespace Retriever
             {
                 designed = ExpandArr.Expand(designed);
                 designed[i] = Math.Round((double.Parse(z.Wartosc) / 1000), 2); //[Wh]
+                i++;
             }
             //Wyciągniej informacje o rzeczywistym maksymalnym możliwym naładowaniu baterii
             IEnumerable<Win32HardwareData> fullChargeCapacity = GetSingleProperty(Win32Hardware.BatteryFullChargedCapacity, "FullChargedCapacity", "root/wmi");
@@ -67,8 +69,9 @@ namespace Retriever
             //Z każdej znalezionej baterii wyciągniej i przelicz na Wh pojemność rzeczywistą
             foreach (Win32HardwareData z in fullChargeCapacity)
             {
-                full = ExpandArr.Expand(designed);
+                full = ExpandArr.Expand(full);
                 full[i] = Math.Round((double.Parse(z.Wartosc) / 1000), 2);
+                i++;
             }
             //Zwracaj WearLevele każdej baterii
             for (i = 0; i < designed.Length; i++)
