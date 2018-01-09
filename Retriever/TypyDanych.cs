@@ -82,16 +82,12 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o pamięci RAM-----------------------------------------------------------------
     public class RAM
     {
-        public string Bank { get; private set; } //Slot
         public double Pojemnosc { get; private set; } //Pojemność
-        public string Info { get; private set; }
 
         //Konstruktor standardowy
         public RAM(double size = 0, string bank = "-")
         {
-            Bank = bank;
             Pojemnosc = size;
-            Info = string.Format($"{bank}: {Pojemnosc}");
         }
 
         //Konstruktor na potrzeby bazy danych w pliku excel
@@ -113,13 +109,11 @@ namespace Retriever
                 if (temp.Contains(i.ToString()))
                 {
                     Pojemnosc = i;
-                    Bank = "0";
                     return;
                 }
             }
             //W innym wypadku
             Pojemnosc = 0;
-            Bank = "-";
         }
     }
 
@@ -341,7 +335,7 @@ namespace Retriever
         }   
     }
 
-    //--------------------------------------------------Struktura dla nazędzia ustawiajacego datę i czas---------------------------------------------
+    //--------------------------------------------------Struktura dla nazędzia ustawiajacego datę i czas-----------------------------------------------
     [StructLayout(LayoutKind.Sequential)]
     public struct SYSTEMTIME
     {
@@ -353,5 +347,170 @@ namespace Retriever
         public short wMinute;
         public short wSecond;
         public short wMilliseconds;
+    }
+
+    //--------------------------------------------------Typ wyliczeniowy na błędy Menedżera urządzeń---------------------------------------------------
+    public enum ConfigManagerErrorCode : byte
+    {
+        working_properly,
+        not_configured_correctly,
+        cannot_load_the_driver,
+        might_be_corrupted_or_low_on_memory_or_other_resources,
+        one_of_its_drivers_or_your_registry_might_be_corrupted,
+        needs_a_resource_that_Windows_cannot_manage,
+        boot_configuration_conflicts_with_other_devices,
+        cannot_filter,
+        driver_loader_is_missing,
+        controlling_firmware_is_reporting_the_resources_for_the_device_incorrectly,
+        cannot_start,
+        failed,
+        cannot_find_enough_free_resources_that_it_can_use,
+        cannot_verify_this_devices_resources,
+        cannot_work_properly_until_you_restart_your_computer,
+        reenumeration_problem,
+        cannot_identify_all_the_resources_this_device_uses,
+        device_is_asking_for_an_unknown_resource_type,
+        reinstall_the_drivers_for_this_device,
+        failure_using_the_VxD_loader,
+        your_registry_might_be_corrupted,
+        system_failure_Try_changing_the_driver_for_this_device,
+        disabled,
+        system_failure_state2_Try_changing_the_driver_for_this_device,
+        not_present_or_not_working_properly_or_does_not_have_all_its_drivers_installed,
+        windows_is_still_setting_up_this_device,
+        windows_is_still_setting_up_this_device_2,
+        not_valid_log_configuration,
+        drivers_are_not_installed,
+        disabled_because_the_firmware_of_the_device_did_not_give_it_the_required_resources,
+        Interrupt_Request_IRQ_resource_that_another_device_is_using,
+        not_working_properly_because_Windows_cannot_load_the_drivers_required_for_this_device,
+    }
+
+    //--------------------------------------------------Klasa obsługująca opisy błędów z menedżera urządzeń--------------------------------------------
+    public class ConfigManagerErrorDescription
+    {
+        int index;
+        public ConfigManagerErrorDescription(ConfigManagerErrorCode Code)
+        {
+            index = (int)Code;
+        }
+        string ReturnDescription(int index)
+        {
+            switch (index)
+            {
+                case 0:
+                    return "This device is working properly.";
+                case 1:
+                    return "This device is not configured correctly.";
+                case 2:
+                    return "Windows cannot load the driver for this device.";
+                case 3:
+                    return "The driver for this device might be corrupted, or your system may be running low on memory or other resources.";
+                case 4:
+                    return "This device is not working properly. One of its drivers or your registry might be corrupted.";
+                case 5:
+                    return "The driver for this device needs a resource that Windows cannot manage. ";
+                case 6:
+                    return "The boot configuration for this device conflicts with other devices.";
+                case 7:
+                    return "Cannot filter.";
+                case 8:
+                    return "The driver loader for the device is missing.";
+                case 9:
+                    return "This device is not working properly because the controlling firmware is reporting the resources for the device incorrectly.";
+                case 10:
+                    return "This device cannot start.";
+                case 11:
+                    return "This device failed.";
+                case 12:
+                    return "This device cannot find enough free resources that it can use.";
+                case 13:
+                    return "Windows cannot verify this device's resources.";
+                case 14:
+                    return "This device cannot work properly until you restart your computer.";
+                case 15:
+                    return "This device is not working properly because there is probably a re-enumeration problem.";
+                case 16:
+                    return "Windows cannot identify all the resources this device uses.";
+                case 17:
+                    return "This device is asking for an unknown resource type";
+                case 18:
+                    return "Reinstall the drivers for this device.";
+                case 19:
+                    return "Failure using the VxD loader.";
+                case 20:
+                    return "Your registry might be corrupted.";
+                case 21:
+                    return "System failure: Try changing the driver for this device. If that does not work, see your hardware documentation. Windows is removing this device. ";
+                case 22:
+                    return "This device is disabled.";
+                case 23:
+                    return "System failure: Try changing the driver for this device. If that doesn't work, see your hardware documentation.";
+                case 24:
+                    return "This device is not present, is not working properly, or does not have all its drivers installed.";
+                case 25:
+                    return "Windows is still setting up this device.";
+                case 26:
+                    return "Windows is still setting up this device.";
+                case 27:
+                    return "This device does not have valid log configuration.";
+                case 28:
+                    return "The drivers for this device are not installed.";
+                case 29:
+                    return "This device is disabled because the firmware of the device did not give it the required resources.";
+                case 30:
+                    return "This device is using an Interrupt Request (IRQ) resource that another device is using.";
+                case 31:
+                    return "This device is not working properly because Windows cannot load the drivers required for this device.";
+                default:
+                    return "How the hell You get this message!?";
+            }
+        }
+
+        public override string ToString()
+        {
+            return string.Format(ReturnDescription(index));
+        }
+    }
+
+    //--------------------------------------------------Kontener na dane o błędach z menedżera urządzeń------------------------------------------------
+    public class DeviceManager
+    {
+        public string Nazwa { get; private set; }
+        public string TrescBledu { get; private set; }
+        ConfigManagerErrorDescription Descriptor;
+
+        public DeviceManager(string nazwa, int kod)
+        {
+            Nazwa = nazwa;
+            Descriptor = new ConfigManagerErrorDescription((ConfigManagerErrorCode)kod);
+            TrescBledu = Descriptor.ToString();
+        }
+    }
+
+    //--------------------------------------------------Kontener na dane o adresach MAC urządzeń sieciowych--------------------------------------------
+    public class NetDevice
+    {
+        public string Nazwa { get; private set; }
+        public string AdresMAC { get; private set; }
+
+        public NetDevice(string nazwa, string adres)
+        {
+            Nazwa = nazwa;
+            AdresMAC = adres;
+        }
+    }
+
+    //--------------------------------------------------Kontener na dane o wersji BIOS która powinna być-----------------------------------------------
+    public class BiosVer
+    {
+        public string Wersja { get; private set; }
+        public string Opis { get; private set; }
+
+        public BiosVer(string ver, string opis)
+        {
+            Wersja = ver;
+            Opis = opis;
+        }
     }
 }

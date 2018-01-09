@@ -15,6 +15,7 @@ namespace Retriever
     public partial class MainWindow : Window
     {
         public Reader ReaderInfo { get; private set; }
+        public Reader ReaderInfo_WersjaBios { get; private set; }
         public ModelListSource ListSource;
         public Gatherer GathererInfo { get; private set; }
         public Model ThisComputer { get; private set; }
@@ -42,6 +43,9 @@ namespace Retriever
             CreateSwmDataControls(GathererInfo.Swm);
             CreateWearLevelDataControls(GathererInfo.Komputer.WearLevel);
             CreateDiscDataHeaders(GathererInfo.Dyski);
+            CreateDevMgmtDataControls(GathererInfo.MenedzerUrzadzen);
+            CreateNetDevDataControls(GathererInfo.UrzadzeniaSieciowe);
+            CreateDiscDataControls(GathererInfo.Dyski, ref spDyskiGatherer);
 
             //Kod wyszukiwarki modeli
             CollectionView widok = (CollectionView)CollectionViewSource.GetDefaultView(gridModele.ItemsSource);
@@ -52,11 +56,12 @@ namespace Retriever
                     where item.MD.Equals(GathererInfo.Komputer.MD)
                     select item;
             ReaderInfo = new Reader(((q.First() == null) ? (gridModele.SelectedItem as Model)  : (q.First() as Model)));
-            
+            ReaderInfo_WersjaBios = new Reader(@"\Medion_NB_Bios.xlsx", ReaderInfo.Komputer);
+            spReaderBios.DataContext = ReaderInfo_WersjaBios;
+
             //Zapisanie aktualnego modelu komputera - albo na podstawie wydobytego, albo na podstawiie pierwszego zaznaczonego
             ThisComputer = q.First() as Model == null ? gridModele.SelectedItem as Model : q.First() as Model;
-            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);
-            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiGatherer);
+            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);            
 
             //Dodanie kontekstu danych do grida
             Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
@@ -135,6 +140,38 @@ namespace Retriever
                 text.Text = string.Format("{0}", Disc[i].Nazwa);
                 text.FontWeight = FontWeights.Bold;
                 spDyskiNazwa.Children.Add(text);
+            }
+        }
+
+        //Dodawanie kontrolek z nazwami urządzeń z błędami
+        public void CreateDevMgmtDataControls(DeviceManager[] Dev)
+        {
+            for (int i = 0; i < Dev.Length; i++)
+            {
+                var text = new TextBlock();
+                text.Text = string.Format("{0}", Dev[i].Nazwa);
+                text.FontWeight = FontWeights.Bold;
+                spDeviceManagerCaption.Children.Add(text);
+                text = new TextBlock();
+                text.Text = string.Format("{0}", Dev[i].TrescBledu);
+                text.FontWeight = FontWeights.Bold;
+                spDeviceManagerErrorDescription.Children.Add(text);
+            }
+        }
+
+        //Dodawanie kontrolek z nazwami dysków
+        public void CreateNetDevDataControls(NetDevice[] Dev)
+        {
+            for (int i = 0; i < Dev.Length; i++)
+            {
+                var text = new TextBlock();
+                text.Text = string.Format("{0}", Dev[i].Nazwa);
+                text.FontWeight = FontWeights.Bold;
+                spDeviceCaption.Children.Add(text);
+                text = new TextBlock();
+                text.Text = string.Format("{0}", Dev[i].AdresMAC);
+                text.FontWeight = FontWeights.Bold;
+                spDeviceMACAddress.Children.Add(text);
             }
         }
         #endregion

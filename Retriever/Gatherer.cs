@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Retriever
@@ -6,10 +7,11 @@ namespace Retriever
     public class Gatherer
     {
         public Computer Komputer { get; set; }
-        public RAM[] Ram { get; private set; }
         public Storage[] Dyski { get; private set; }
         public Mainboard PlytaGlowna { get; private set; }
         public SWM[] Swm { get; private set; }
+        public DeviceManager[] MenedzerUrzadzen { get; private set; }
+        public NetDevice[] UrzadzeniaSieciowe { get; private set; }
         public double PamiecRamSuma { get; private set; }
 
         public Gatherer()
@@ -75,14 +77,7 @@ namespace Retriever
             #region Tworzenie instancji RAM
             //Pobieranie informacji o bankach
             i = 0;
-            Ram = new RAM[0];
-            string[] bank = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PhysicalMemory, "BankLabel"))
-            {
-                bank = ExpandArr.Expand(bank);
-                bank[i] = z.Wartosc;
-                i++;
-            }
+            RAM[] Ram = new RAM[0];
             //Pobieranie informacji o poejmności
             //Pojemność wyrażona w GiB
             //1073741824 B = 1 GiB
@@ -95,7 +90,7 @@ namespace Retriever
                 pojemnosc[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
                 Ram = ExpandArr.Expand(Ram);
-                Ram[i] = new RAM(size: pojemnosc[i], bank: bank[i]);
+                Ram[i] = new RAM(size: pojemnosc[i]);
                 PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
                 i++;
             }
@@ -136,9 +131,51 @@ namespace Retriever
                 i++;
             }
             #endregion
+
+            #region Tworzenie instancji DeviceManager
+            i = 0;
+            MenedzerUrzadzen = new DeviceManager[0];
+            string[] nazwaUrzadzenia = new string[0];
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "Caption", condition: "ConfigManagerErrorCode != 0"))
+            {
+                nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
+                nazwaUrzadzenia[i] = z.Wartosc;
+                i++;
+            }
+
+            i = 0;
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "ConfigManagerErrorCode", condition: "ConfigManagerErrorCode != 0"))
+            {
+                MenedzerUrzadzen = ExpandArr.Expand(MenedzerUrzadzen);
+                MenedzerUrzadzen[i] = new DeviceManager(nazwaUrzadzenia[i], Convert.ToInt32(z.Wartosc));
+                i++;
+            }
+            #endregion
+
+            #region Tworzenie instancji NetDevice
+            i = 0;
+            UrzadzeniaSieciowe = new NetDevice[0];
+            nazwaUrzadzenia = new string[0];
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Caption", condition: "MACAddress != null"))
+            {
+                nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
+                nazwaUrzadzenia[i] = z.Wartosc;
+                i++;
+            }
+
+            i = 0;
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null"))
+            {
+                UrzadzeniaSieciowe = ExpandArr.Expand(UrzadzeniaSieciowe);
+                UrzadzeniaSieciowe[i] = new NetDevice(nazwaUrzadzenia[i], z.Wartosc);
+                i++;
+            }
+            #endregion
+
+            #region Tworzenie instancji DeviceManager
+
+            #endregion
         }
-
-
 
         //Metoda poszukująca modelu
         string GatherModel(string modelString, bool modelFlag)

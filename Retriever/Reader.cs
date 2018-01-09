@@ -17,7 +17,9 @@ namespace Retriever
         public Storage[] Dyski { get; private set; }
         public Mainboard PlytaGlowna { get; private set; }
         public SWM Swm { get; private set; }
+        public BiosVer WersjaBios { get; private set; }
         public IEnumerable<Model> listaModeli { get; private set; }
+        public string BiosZBazy { get; private set; }
         string Plik = @"/NoteBookiRef_v2.xlsx";
 
         //Metoda otwierająca plik bazy danych
@@ -42,6 +44,30 @@ namespace Retriever
             Open();
             SetDataTables();
             Close();
+        }
+
+        //Konstruktor Pobierajacy aktualny bios z drugiej bazy
+        public Reader(string plik, Computer komp)
+        {
+            var temp = Plik;
+            Plik = plik;
+            Open();
+            LookForBios(komp);
+            Close();
+            Plik = temp;
+        }
+
+        //Metoda wyszukująca bios któy powinien być zainstalowany na podstawie porównywania modelu obudowy
+        void LookForBios(Computer komp)
+        { 
+            DataTable table = result.Tables[0];
+            for(int i = 0; i < table.Rows.Count; i++)
+            {
+                if(komp.Obudowa.ToLower() == table.Rows[i][0].ToString().ToLower() || komp.Obudowa.ToLower().Replace(" ","") == table.Rows[i][0].ToString().ToLower().Replace(" ", "") || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains(komp.Obudowa.ToLower().Replace(" ", "")))
+                {
+                    WersjaBios = new BiosVer(table.Rows[i][3].ToString(), table.Rows[i][4].ToString());
+                }
+            }
         }
 
         // Metoda przeszukująca plik excela w celu znalezienia odpowiednich zeszytów z danymi

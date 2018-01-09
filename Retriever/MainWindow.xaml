@@ -108,6 +108,11 @@
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
 						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
+						<RowDefinition Height="Auto"/>
 					</Grid.RowDefinitions>
 					<!--==============================LEGENDA==============================-->
 					<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
@@ -205,7 +210,10 @@
 						<Label Content="Wersja bios"/>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.WersjaBios}"/>
+						<StackPanel Orientation="Vertical" x:Name="spReaderBios">
+							<TextBlock Text="{Binding WersjaBios.Wersja}"/>
+							<TextBlock Text="{Binding WersjaBios.Opis}"/>
+						</StackPanel>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="2">
 						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.WersjaBios}"/>
@@ -213,7 +221,7 @@
 
 					<!--==============================NAGŁÓWEK - RAM I DYSKI TWARDE==============================-->
 					<Border Grid.Row="10" Grid.Column="0">
-						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Nazwa" FontStyle="Italic" FontWeight="Normal"/>
 					</Border>
 					<Border Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2">
 						<Label Content="RAM I DYSKI TWARDE"/>
@@ -221,7 +229,7 @@
 
 					<!--==============================Pamięć RAM==============================-->
 					<Border Grid.Row="11" Grid.Column="0">
-						<Label Content="Pamięć RAM" FontWeight="Bold"/>
+						<Label Content="RAM" FontWeight="Bold"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="1">
 						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}"/>
@@ -242,50 +250,80 @@
 						<StackPanel x:Name="spDyskiGatherer"/>
 					</Border>
 
-					<!--==============================POZOSTAŁE - NAGŁÓWEK==============================-->
+					<!--==============================MENEDŻER URZĄDZEŃ - NAGŁÓWEK==============================-->
 					<Border Grid.Row="13" Grid.Column="0">
-						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Urządzenia" FontStyle="Italic" FontWeight="Normal"/>
 					</Border>
 					<Border Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="BŁĘDY W MENEDŻERZE URZĄDZEŃ"/>
+					</Border>
+
+					<Border Grid.Row="14" Grid.Column="0">
+						<StackPanel x:Name="spDeviceManagerCaption"/>
+					</Border>
+					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2">
+						<StackPanel x:Name="spDeviceManagerErrorDescription"/>
+					</Border>
+
+					<!--==============================LANMAC - NAGŁÓWEK==============================-->
+					<Border Grid.Row="15" Grid.Column="0">
+						<Label Content="Urządzenia" FontStyle="Italic" FontWeight="Normal"/>
+					</Border>
+					<Border Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2">
+						<Label Content="ADRESY MAC URZĄDZEŃ SIECIOWYCH"/>
+					</Border>
+
+					<Border Grid.Row="16" Grid.Column="0">
+						<StackPanel x:Name="spDeviceCaption"/>
+					</Border>
+					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2">
+						<StackPanel x:Name="spDeviceMACAddress"/>
+					</Border>
+
+					<!--==============================POZOSTAŁE - NAGŁÓWEK==============================-->
+					<Border Grid.Row="17" Grid.Column="0">
+						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+					</Border>
+					<Border Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2">
 						<Label Content="POZOSTAŁE PARAMETRY"/>
 					</Border>
 					<!--==============================Kolor==============================-->
-					<Border Grid.Row="14" Grid.Column="0">
+					<Border Grid.Row="18" Grid.Column="0">
 						<Label Content="Kolor obudowy"/>
 					</Border>
-					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2">
+					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.Kolor}"/>
 					</Border>
 
 					<!--==============================Obudowa==============================-->
-					<Border Grid.Row="15" Grid.Column="0">
+					<Border Grid.Row="19" Grid.Column="0">
 						<Label Content="Rodzaj obudowy"/>
 					</Border>
-					<Border Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2">
+					<Border Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.Obudowa}"/>
 					</Border>
 
 					<!--==============================Shipping Mode==============================-->
-					<Border Grid.Row="16" Grid.Column="0">
+					<Border Grid.Row="20" Grid.Column="0">
 						<Label Content="Shipping Mode"/>
 					</Border>
-					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2">
+					<Border Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.ShippingMode}"/>
 					</Border>
 
 					<!--==============================Rodzaj LCD==============================-->
-					<Border Grid.Row="17" Grid.Column="0">
+					<Border Grid.Row="21" Grid.Column="0">
 						<Label Content="Rodzaj LCD"/>
 					</Border>
-					<Border Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2">
+					<Border Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.LCD}"/>
 					</Border>
 
 					<!--==============================Pełny model==============================-->
-					<Border Grid.Row="18" Grid.Column="0">
+					<Border Grid.Row="22" Grid.Column="0">
 						<Label Content="Pełny model"/>
 					</Border>
-					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2">
+					<Border Grid.Row="22" Grid.Column="1" Grid.ColumnSpan="2">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.PelnyModel}"/>
 					</Border>
 				</Grid>

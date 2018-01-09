@@ -10,6 +10,17 @@ namespace Retriever
     //--------------------------------------------------Klasa obsługująca WMI do wydobywania danych--------------------------------------------------
     public static class WMI
     {
+        //Metoda zwracająca pojedyńczą właściwość z określonej klasy z warunkiem
+        public static IEnumerable<Win32HardwareData> GetSingleProperty(Win32Hardware hardwareClass, string property, string condition, string scope = "root/cimv2")
+        {
+            string query = string.Format("SELECT {0} FROM {1} WHERE {2}", property, hardwareClass.ToString(), condition);
+            ManagementObjectSearcher search = new ManagementObjectSearcher(scope, query);
+            foreach (ManagementObject mo in search.Get())
+            {
+                yield return new Win32HardwareData(property, (mo[property] == null) ? "" : mo[property].ToString());
+            }
+        }
+
         //Metoda zwracająca pojedyńczą właściwość z określonej klasy
         public static IEnumerable<Win32HardwareData> GetSingleProperty(Win32Hardware hardwareClass, string property, string scope = "root/cimv2")
         {
@@ -176,6 +187,30 @@ namespace Retriever
         {
             SWM[] temp = arr;
             arr = new SWM[temp.Length + 1];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                arr[i] = temp[i];
+            }
+            return arr;
+        }
+
+        //DeviceManager
+        public static DeviceManager[] Expand(DeviceManager[] arr)
+        {
+            DeviceManager[] temp = arr;
+            arr = new DeviceManager[temp.Length + 1];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                arr[i] = temp[i];
+            }
+            return arr;
+        }
+
+        //NetDevice
+        public static NetDevice[] Expand(NetDevice[] arr)
+        {
+            NetDevice[] temp = arr;
+            arr = new NetDevice[temp.Length + 1];
             for (int i = 0; i < temp.Length; i++)
             {
                 arr[i] = temp[i];
