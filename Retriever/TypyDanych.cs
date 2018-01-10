@@ -100,7 +100,8 @@ namespace Retriever
                 string temp;
                 //Zabezpieczenie przed kolejnymi testami temp
                 if (info.Length < 2) continue;
-                //Przypadek 2048 GB - aby nie wykryło 20
+                //Przypadek 2048 GB - aby nie wykryło 20, ale przeszlo 2048
+                else if (info.Contains("2048")) temp = info[0].ToString();
                 else if (info[1] == '0') continue;
                 //W innym przypadku zbuduj zmienną do testów
                 else temp = info[0].ToString() + info[1].ToString();
