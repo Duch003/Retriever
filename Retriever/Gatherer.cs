@@ -13,6 +13,7 @@ namespace Retriever
         public DeviceManager[] MenedzerUrzadzen { get; private set; }
         public NetDevice[] UrzadzeniaSieciowe { get; private set; }
         public double PamiecRamSuma { get; private set; }
+        
 
         public Gatherer()
         {

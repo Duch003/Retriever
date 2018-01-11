@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Timers;
-using System.Windows.Threading;
 
 namespace Retriever
 {
@@ -312,7 +311,8 @@ namespace Retriever
         Win32_VideoSettings,
         //Inne
         Win32_OperatingSystem,
-        Win32_ComputerSystem
+        Win32_ComputerSystem,
+        SoftwareLicensingProduct
     }
 
     //--------------------------------------------------Kontener przetrzymujący listę modeli-----------------------------------------------------------
@@ -328,11 +328,13 @@ namespace Retriever
     //--------------------------------------------------Kontener na informacje o dacie i czasie--------------------------------------------------------
     public class SystemDateTime
     { 
-        public string Now { get; private set; }
+        public string Date { get; private set; }
+        public string Time { get; private set; }
 
         public SystemDateTime()
         {
-            Now = DateTime.Now.ToShortDateString() + " " + DateTime.Now.ToShortTimeString();
+            Date = DateTime.Now.ToShortDateString();
+            Time = DateTime.Now.ToLongTimeString();
         }   
     }
 
@@ -514,4 +516,46 @@ namespace Retriever
             Opis = opis;
         }
     }
+
+    //--------------------------------------------------Typ wyliczeniowy ze statusami aktywacji systemu------------------------------------------------
+    public enum WindowsActivationStatus : byte
+    {
+        Unlicensed,
+        Licensed,
+        OOBGRace,
+        OOTGrace,
+        NonGeniueGrace,
+        Notification,
+        ExtendedGrace
+    }
+
+    //--------------------------------------------------Typ wyliczeniowy dla statusów SecureBoot-------------------------------------------------------
+    public enum SecureBootStatus : sbyte
+    {
+        NotImplemented = -1,
+        Disabled = 0,
+        Enabled = 1
+    }
+
+    //--------------------------------------------------Klasa-kontener na poszczególne statusy systemu-------------------------------------------------
+    public class Status
+    {
+        public string WinStatus { get; private set; }
+        public string SecureStatus { get; private set; }
+
+        public Status()
+        {
+            WindowsActivationStatus result = (WindowsActivationStatus)Convert.ToInt16(WMI.GetSingleProperty
+                (Win32Hardware.SoftwareLicensingProduct, property: "LicenseStatus",
+                condition: "ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f' AND PartialProductKey != null")
+                .First().Wartosc);
+            WinStatus = result.ToString();
+
+            SecureBootStatus secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
+                @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
+                "UEFISecureBootEnabled", "-1"));
+            SecureStatus = secure.ToString();
+        }
+    }
+
 }

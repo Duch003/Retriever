@@ -19,13 +19,14 @@ namespace Retriever
         public Model ThisComputer { get; private set; }
         public RetrieverInfo Retriever2 { get; private set; }
         public SystemDateTime Timer { get; private set; }
+        public Status Statusy { get; private set; }
         DispatcherTimer TimeThicker; //Timer do odświeżania czasu w kontrolce
 
         public MainWindow()
         {
+            AktwacjaWindows ac = new AktwacjaWindows();
             try
             {
-
                 InitializeComponent();
                 PrzygotujAplikacje();
                 UstawTimer();
@@ -33,10 +34,9 @@ namespace Retriever
             }
             catch (Exception e)
             {
+
                 MessageBox.Show(string.Format(e.Data + "\n\n" + e.HelpLink + "\n\n" + e.InnerException + "\n\n" + e.Message + "\n\n" + e.Source + "\n\n" + e.StackTrace + "\n\n" + e.TargetSite));
             }
-
-
         }
 
         void PrzygotujAplikacje()
@@ -84,6 +84,10 @@ namespace Retriever
             //Dodanie kontekstu danych do grida
             Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
             gridZestawienie.DataContext = Retriever2;
+
+            //Utworzenie instatncji statusów
+            Statusy = new Status();
+            tbWinStatus.DataContext = tbSecureBootStatus.DataContext = Statusy;
             
         }
 
@@ -201,9 +205,9 @@ namespace Retriever
             DateTime control = DateTime.Parse("01.01.0001 00:00:00");
             SYSTEMTIME myTime = new SYSTEMTIME();
             DateTime timeToSet = new DateTime();
-            if (String.IsNullOrEmpty(txtSetDateTime.Text))
+            if (String.IsNullOrEmpty(txtDateTime.Text))
                 Process.Start("timedate.cpl");
-            else if (DateTime.TryParse(txtSetDateTime.Text, out timeToSet) && timeToSet != control)
+            else if (DateTime.TryParse(txtDateTime.Text, out timeToSet) && timeToSet != control)
             {
                 myTime.wYear = (short)timeToSet.Year;
                 myTime.wMonth = (short)timeToSet.Month;
@@ -221,7 +225,7 @@ namespace Retriever
         {
             //Utworzenie obiektu przechowującego aktualny czas
             Timer = new SystemDateTime();
-            tbDateTime.DataContext = Timer;
+            tbDate.DataContext = tbTime.DataContext = Timer;
             TimeThicker = new DispatcherTimer();
             TimeThicker.Interval = new TimeSpan(0, 0, 1); //Czas odświeżania - jedna sekunda
             TimeThicker.Tick += new EventHandler(RefreshTime);
@@ -232,7 +236,7 @@ namespace Retriever
         void RefreshTime(object sender, EventArgs e)
         {
             Timer = new SystemDateTime();
-            tbDateTime.DataContext = Timer;
+            tbDate.DataContext = tbTime.DataContext = Timer;
         }
         #endregion
 
@@ -244,7 +248,9 @@ namespace Retriever
 
         private void WindowsActivationScript_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0\connect");
+            Process.Start(Environment.CurrentDirectory + @"\0\connect").WaitForExit();
+            Statusy = new Status();
+            tbWinStatus.DataContext = Statusy;
         }
 
         private void DeviceManager_Click(object sender, RoutedEventArgs e)
