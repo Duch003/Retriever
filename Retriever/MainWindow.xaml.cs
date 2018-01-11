@@ -24,7 +24,7 @@ namespace Retriever
 
         public MainWindow()
         {
-            AktwacjaWindows ac = new AktwacjaWindows();
+            //AktwacjaWindows ac = new AktwacjaWindows();
             try
             {
                 InitializeComponent();
@@ -285,7 +285,7 @@ namespace Retriever
 
         private void restart_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(@"shutdown","/r /t 0");
+            Process.Start(@"shutdown","/r /f /t 0");
         }
 
         private void restartBios_Click(object sender, RoutedEventArgs e)
@@ -301,6 +301,81 @@ namespace Retriever
             telActiv.StartInfo.WorkingDirectory = "c:";
             telActiv.Start();
         }
+
+        private void KBMatrixEnable(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory + @"\KB\Enable.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\KB\Enable.bat").WaitForExit();
+            Process.Start(@"shutdown", "/r /f /t 0");
+        }
+
+        private void KBMatrixDisable(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory + @"\KB\Disable.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\KB\Disable.bat").WaitForExit();
+            Process.Start(@"shutdown", "/r /f /t 0");
+        }
+
         #endregion
+
+        private void Amidewin_Medion86(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Amidewin_Peaq86(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Amidewin_Medion64(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Amidewin_Peaq64(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void S221x_Medion(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void S221x_Peaq(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IVT_Medion(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void IVT_Peaq(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OEM_Medion(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OEM_Peaq(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void WBT_Medion(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void WBT_Peaq(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

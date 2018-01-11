@@ -33,28 +33,27 @@ namespace Retriever
             string profileXml = string.Format("<?xml version=\"1.0\"?>" +
                 "<WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"> + " +
                     "<name>{0}</name> + " +
-                    "   <SSIDConfig>" +
-                    "       <SSID>" +
-                    "           <hex>{1}</hex>" +
-                    "           <name>{0}</name>" +
-                    "       </SSID>" +
-                    "   </SSIDConfig>" +
-                    "<connectionType>ESS</connectionType> + " +
-                    "<MSM>" +
-                    "   <security>  " +
-                    "       <authEncryption>" +
-                    "           <authentication>open</authentication>" +
-                    "           <encryption>none</encryption>" +
-                    "           <useOneX>false</useOneX>" +
-                    "       </authEncryption>" +
-                    "   </security>" +
-                "</MSM>" +
-                "<MacRandomization xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v3\">" +
-                "   < enableRandomization > false </ enableRandomization >
-
-        < randomizationSeed > 2145148662 </ randomizationSeed >
-
-    </ MacRandomization ></WLANProfile>", profileName, mac);    
+                        "<SSIDConfig>" +
+                            "<SSID>" +
+                                "<hex>{1}</hex>" +
+                                "<name>{0}</name>" +
+                            "</SSID>" +
+                        "</SSIDConfig>" +
+                        "<connectionType>ESS</connectionType> + " +
+                        "<MSM>" +
+                            "<security>  " +
+                                "<authEncryption>" +
+                                    "<authentication>open</authentication>" +
+                                    "<encryption>none</encryption>" +
+                                    "<useOneX>false</useOneX>" +
+                                "</authEncryption>" +
+                            "</security>" +
+                        "</MSM>" +
+                        "<MacRandomization xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v3\">" +
+                            "<enableRandomization>false</enableRandomization>" +
+                            "<randomizationSeed>2145148662</randomizationSeed>" +
+                        "</MacRandomization>" +
+                 "</WLANProfile>", profileName, mac);    
 
             foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
             {

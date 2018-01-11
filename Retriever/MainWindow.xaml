@@ -328,13 +328,10 @@
 		<TabItem Header="Testy">
 			<Grid>
 				<Grid.RowDefinitions>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
-					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+					<RowDefinition Height="*"/>
 				</Grid.RowDefinitions>
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="Auto"/>
@@ -411,7 +408,7 @@
 						<Label Content="Data i czas" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<TextBlock x:Name="tbDate" Text="{Binding Date}" Grid.Row="1" Grid.Column="0"/>
 						<TextBlock x:Name="tbTime" Text="{Binding Time}" Grid.Row="1" Grid.Column="1"/>
-						<TextBox x:Name="txtDateTime" Grid.Row="2" Grid.Column="0" MinWidth="100"/>
+						<TextBox x:Name="txtDateTime" Grid.Row="2" Grid.Column="0" MinWidth="100" Margin="5"/>
 						<Button Content="Ustaw datę i czas" Grid.Row="2" Grid.Column="1" Click="btnSetDateTime_Click" Margin="5"/>
 
 						<!--STATUSY-->
@@ -422,6 +419,64 @@
 						<TextBlock Text="Secure Boot:" Grid.Row="6" Grid.Column="0"/>
 						<TextBlock x:Name="tbSecureBootStatus" Text="{Binding SecureStatus}" Grid.Row="6" Grid.Column="1"/>
 						
+					</Grid>
+				</Border>
+				<Border Grid.Row="0" Grid.Column="2">
+					<!--USTAWIENIA KLAWIATURY-->
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<Label Content="KB Matrix" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+						<Button Content="Enable" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Click="KBMatrixEnable"/>
+						<Button Content="Disable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Click="KBMatrixDisable"/>
+					</Grid>
+				</Border>
+				<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
+					<!--USTAWIENIA KLAWIATURY-->
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+							<ColumnDefinition Width="Auto"/>
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+						<!--AMIDEWIN PEGATRON-->
+						<Label Content="Amidewin Pegatron" Grid.Row="0" Grid.Column="0" MinWidth="195"/>
+						<Button Content="Medion x86" Grid.Row="1" Grid.Column="0" Click="Amidewin_Medion86" Margin="5"/>
+						<Button Content="Peaq x86" Grid.Row="2" Grid.Column="0" Click="Amidewin_Peaq86" Margin="5"/>
+						<Button Content="Medion x64" Grid.Row="3" Grid.Column="0" Click="Amidewin_Medion64" Margin="5"/>
+						<Button Content="Peaq x64" Grid.Row="4" Grid.Column="0" Click="Amidewin_Peaq64" Margin="5"/>
+						<!--ECS S221xT-->
+						<Label Content="ECS S221x" Grid.Row="0" Grid.Column="1" MinWidth="195"/>
+						<Button Content="Medion" Grid.Row="1" Grid.Column="1" Click="S221x_Medion" Margin="5"/>
+						<Button Content="Peaq" Grid.Row="2" Grid.Column="1" Click="S221x_Peaq" Margin="5"/>
+						<!--ECS IVT-->
+						<Label Content="ECS IVT" Grid.Row="0" Grid.Column="2" MinWidth="195"/>
+						<Button Content="Medion" Grid.Row="1" Grid.Column="2" Click="IVT_Medion" Margin="5"/>
+						<Button Content="Peaq" Grid.Row="2" Grid.Column="2" Click="IVT_Peaq" Margin="5"/>
+						<!--OEM DATA-->
+						<Label Content="OEM DATA" Grid.Row="0" Grid.Column="3" MinWidth="195"/>
+						<Button Content="Medion" Grid.Row="1" Grid.Column="3" Click="OEM_Medion" Margin="5"/>
+						<Button Content="Peaq" Grid.Row="2" Grid.Column="3" Click="OEM_Peaq" Margin="5"/>
+						<!--WBT T11-->
+						<Label Content="WBT T11" Grid.Row="0" Grid.Column="4" MinWidth="190"/>
+						<Button Content="Medion" Grid.Row="1" Grid.Column="4" Click="WBT_Medion" Margin="5"/>
+						<Button Content="Peaq" Grid.Row="2" Grid.Column="4" Click="WBT_Peaq" Margin="5"/>
 					</Grid>
 				</Border>
 			</Grid>
