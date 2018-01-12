@@ -25,6 +25,7 @@ namespace Retriever
         public MainWindow()
         {
             //AktwacjaWindows ac = new AktwacjaWindows();
+            WMI.ActivateWindows();
             try
             {
                 InitializeComponent();
@@ -377,5 +378,7 @@ namespace Retriever
         {
 
         }
+
+        //Dla 99960 nie wyswietla hdd reader
     }
 }

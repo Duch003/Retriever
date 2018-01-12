@@ -312,7 +312,8 @@ namespace Retriever
         //Inne
         Win32_OperatingSystem,
         Win32_ComputerSystem,
-        SoftwareLicensingProduct
+        SoftwareLicensingProduct,
+        Win32_WindowsProductActivation
     }
 
     //--------------------------------------------------Kontener przetrzymujący listę modeli-----------------------------------------------------------

@@ -12,12 +12,21 @@ namespace Retriever
 {
     public class AktwacjaWindows
     {
-        WlanClient client;
-        string profileName = "WindowsActivation";
+        WlanClient Client;
+        string Key;
 
         public AktwacjaWindows()
         {
-            Connect();
+            if(GetWindowsKey())
+            {
+                Connect();
+            }
+            else
+            {
+                var mess = string.Format("Brak klucza Windows w systemie.");
+                MessageBox.Show(mess, "Nie można aktywować systemu", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+                
         }
 
         static string GetStringForSSID(Wlan.Dot11Ssid ssid)
@@ -27,39 +36,28 @@ namespace Retriever
 
         void Connect()
         {
-            client = new WlanClient();
+            Client = new WlanClient();
             string profileName = "WindowsActivation";
             string mac = "57696E646F777341637469766174696F6E";
-            string profileXml = string.Format("<?xml version=\"1.0\"?>" +
-                "<WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"> + " +
-                    "<name>{0}</name> + " +
-                        "<SSIDConfig>" +
-                            "<SSID>" +
-                                "<hex>{1}</hex>" +
-                                "<name>{0}</name>" +
-                            "</SSID>" +
-                        "</SSIDConfig>" +
-                        "<connectionType>ESS</connectionType> + " +
-                        "<MSM>" +
-                            "<security>  " +
-                                "<authEncryption>" +
-                                    "<authentication>open</authentication>" +
-                                    "<encryption>none</encryption>" +
-                                    "<useOneX>false</useOneX>" +
-                                "</authEncryption>" +
-                            "</security>" +
-                        "</MSM>" +
-                        "<MacRandomization xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v3\">" +
-                            "<enableRandomization>false</enableRandomization>" +
-                            "<randomizationSeed>2145148662</randomizationSeed>" +
-                        "</MacRandomization>" +
-                 "</WLANProfile>", profileName, mac);    
+            string profileXml = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>{0}</name><SSIDConfig><SSID><hex>{1}</hex><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>open</authentication><encryption>none</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>", profileName, mac);
 
-            foreach (WlanClient.WlanInterface wlanIface in client.Interfaces)
+            foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
             {
                 wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
                 wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
             }
+        }
+        
+        bool GetWindowsKey()
+        {
+            var temp = WMI.GetSingleProperty(Win32Hardware.SoftwareLicensingProduct, property: "OA3xOriginalProductKey");
+            if (temp.Count() > 0)
+            {
+                Key = temp.First().Wartosc;
+                return true;
+            }               
+            else
+                return false;
         }
     }
 }

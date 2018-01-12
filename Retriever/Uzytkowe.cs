@@ -4,13 +4,15 @@ using System.Linq;
 using System.Management;
 using System.IO;
 using System.Runtime.InteropServices;
-using System.Windows;
+using Microsoft.Management.Infrastructure;
+using NativeWifi;
 
 namespace Retriever
 {
     //--------------------------------------------------Klasa obsługująca WMI do wydobywania danych--------------------------------------------------
     public static class WMI
     {
+
         //Metoda zwracająca pojedyńczą właściwość z określonej klasy z warunkiem
         public static IEnumerable<Win32HardwareData> GetSingleProperty(Win32Hardware hardwareClass, string property, string condition, string scope = "root/cimv2")
         {
@@ -77,6 +79,31 @@ namespace Retriever
             for (i = 0; i < designed.Length; i++)
             {
                 yield return Math.Round(((1 - (full[i] / designed[i])) * 100), 2);
+            }
+        }
+
+        //Metoda aktywująca OS
+        public static void ActivateWindows()
+        {
+            ManagementScope scope = new ManagementScope(@"root\cimv2");
+            ManagementClass myClass = new ManagementClass(scope.Path.Path, Win32Hardware.Win32_WindowsProductActivation.ToString(), null);
+
+            //Jeżeli status aktywacji == 0 (wymagana aktywacja)
+            if (Convert.ToInt32(myClass.Properties["ActivationRequired"].Value) == 0)
+            {
+                #region Utworzenie łącznika z kartami sieciowymi i ustawienie połączenia na WindowsActivation
+                WlanClient Client = new WlanClient();
+                string profileName = "WindowsActivation";
+                string mac = "57696E646F777341637469766174696F6E";
+                string profileXml = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>{0}</name><SSIDConfig><SSID><hex>{1}</hex><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>open</authentication><encryption>none</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>", profileName, mac);
+
+                foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
+                {
+                    wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
+                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
+                }
+                #endregion
+                myClass.InvokeMethod("ActivateOnline", null);
             }
         }
     }
