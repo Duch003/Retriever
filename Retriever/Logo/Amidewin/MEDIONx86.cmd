@@ -1,0 +1,3 @@
+AMIDEWIN.exe /SM "MEDION"
+AMIDEWIN.exe /BM "MEDION"
+pause

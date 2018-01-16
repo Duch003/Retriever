@@ -216,3 +216,7 @@ namespace Retriever
         }
     }
 }
+
+
+//BLAD LOGICZNY
+//PO USUNIECIU W WYSZUKIWARCE BLAD

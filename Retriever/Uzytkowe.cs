@@ -82,29 +82,56 @@ namespace Retriever
             }
         }
 
-        //Metoda aktywująca OS
-        public static void ActivateWindows()
+        ////Metoda aktywująca OS
+        //public static void ActivateWindows()
+        //{
+        //    ManagementScope scope = new ManagementScope(@"root\cimv2");
+        //    ManagementClass myClass = new ManagementClass(scope.Path.Path, Win32Hardware.SoftwareLicensingProduct.ToString(), null);
+
+        //    //Jeżeli status aktywacji == 0 (wymagana aktywacja)
+        //    if (Convert.ToInt32(myClass.Properties["LicenseStatus"].Value) != 1)
+        //    {
+        //        //string[] param = new string[2];
+        //        //param[0] = @"/ipk";
+        //        //param[1] = GetOriginalProductKey();
+        //        #region Utworzenie łącznika z kartami sieciowymi i ustawienie połączenia na WindowsActivation
+        //        WlanClient Client = new WlanClient();
+        //        string profileName = "WindowsActivation";
+        //        string mac = "57696E646F777341637469766174696F6E";
+        //        string profileXml = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>{0}</name><SSIDConfig><SSID><hex>{1}</hex><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>open</authentication><encryption>none</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>", profileName, mac);
+
+        //        foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
+        //        {
+        //            wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
+        //            wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
+        //        }
+        //        #endregion
+        //        myClass.InvokeMethod()
+        //    }
+        //}
+
+        public static string GetOriginalProductKey()
         {
-            ManagementScope scope = new ManagementScope(@"root\cimv2");
-            ManagementClass myClass = new ManagementClass(scope.Path.Path, Win32Hardware.Win32_WindowsProductActivation.ToString(), null);
+            //create a management scope object
+            ManagementScope scope = new ManagementScope("\\\\.\\ROOT\\cimv2");
 
-            //Jeżeli status aktywacji == 0 (wymagana aktywacja)
-            if (Convert.ToInt32(myClass.Properties["ActivationRequired"].Value) == 0)
+            //create object query
+            ObjectQuery query = new ObjectQuery("SELECT * FROM SoftwareLicensingService Where OA3xOriginalProductKey != null");
+
+            //create object searcher
+            ManagementObjectSearcher searcher =
+                                    new ManagementObjectSearcher(scope, query);
+
+            //get a collection of WMI objects
+            ManagementObjectCollection queryCollection = searcher.Get();
+
+            //enumerate the collection.
+            foreach (ManagementObject m in queryCollection)
             {
-                //#region Utworzenie łącznika z kartami sieciowymi i ustawienie połączenia na WindowsActivation
-                //WlanClient Client = new WlanClient();
-                //string profileName = "WindowsActivation";
-                //string mac = "57696E646F777341637469766174696F6E";
-                //string profileXml = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>{0}</name><SSIDConfig><SSID><hex>{1}</hex><name>{0}</name></SSID></SSIDConfig><connectionType>ESS</connectionType><connectionMode>manual</connectionMode><MSM><security><authEncryption><authentication>open</authentication><encryption>none</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>", profileName, mac);
-
-                //foreach (WlanClient.WlanInterface wlanIface in Client.Interfaces)
-                //{
-                //    wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
-                //    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, profileName);
-                //}
-                //#endregion
-                //myClass.InvokeMethod("ActivateOnline", null);
+                // access properties of the WMI object
+                return m["OA3xOriginalProductKey"].ToString();
             }
+            return null;
         }
     }
 

@@ -1,0 +1,41 @@
+AMI ROM Tool - AMIDEWIN
+
+Description :
+	DMI Editor for Windows command mode.
+
+Current Label :
+	DMIEDIT_WIN-5.16
+
+Release Date :
+	
+
+Source Control Location :
+	SS: AptioV;$/AptioV/RomUtils/DmiEdit\DmiEditWin/32;
+
+Reference Document :
+	Readme.txt
+
+Known Issues :
+
+
+Release Notes:
+==============================================================================
+5.16
+	1.Modifying SMBIOS Type4 Processor Information. [EIP 169809]
+	2.Removing SMI 0x20/24 while Get BIOS info.
+==============================================================================
+5.15
+	1.Fix AMIDEWIN /dump 3 doesn't show type 3 Chassis SKU Number. [EIP 158891]
+==============================================================================
+5.14
+	1.AMIDEWIN supports the Type0 offest04 Vendor Name.[EIP 136110]
+	* SMIBIOS Module needs 5.004_SmBios_03 or later version to support functions properly.
+==============================================================================
+5.13.1
+	1.The buffer length is not enough for 16MB rom when call smi0x25. [EIP 140950]
+==============================================================================
+5.13
+	1.Version number changed for AptioV. Sync AMIDEWIN_2.13.
+	2.After Clear the System Product Name by DMIEDIT tool under Shell, it shows abnormal string. [EIP 136093]
+	3.Make sure to add SMIFunc0x20 before SMIFunc0x25 and SMIFunc0x24.
+==============================================================================

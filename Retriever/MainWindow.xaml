@@ -415,7 +415,7 @@
 						<TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<Label Content="Statusy" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<TextBlock Text="Aktywacja Windows:" Grid.Row="5" Grid.Column="0"/>
-						<TextBlock x:Name="tbWinStatus" Text="{Binding WinStatus}" Grid.Row="5" Grid.Column="1"/>
+						<TextBlock x:Name="tbWinStatus" Text="{Binding WinStatus, UpdateSourceTrigger=PropertyChanged}" Grid.Row="5" Grid.Column="1"/>
 						<TextBlock Text="Secure Boot:" Grid.Row="6" Grid.Column="0"/>
 						<TextBlock x:Name="tbSecureBootStatus" Text="{Binding SecureStatus}" Grid.Row="6" Grid.Column="1"/>
 						
@@ -432,14 +432,19 @@
 							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						<Label Content="KB Matrix" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<Button Content="Enable" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Click="KBMatrixEnable"/>
 						<Button Content="Disable" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Click="KBMatrixDisable"/>
+						<Label Content="Explorer" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
+						<Button Content="Explorer" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="5" Click="btnBios_Click"/>
 					</Grid>
 				</Border>
 				<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
-					<!--USTAWIENIA KLAWIATURY-->
+					<!--USTAWIENIA LOGO-->
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
@@ -475,8 +480,10 @@
 						<Button Content="Peaq" Grid.Row="2" Grid.Column="3" Click="OEM_Peaq" Margin="5"/>
 						<!--WBT T11-->
 						<Label Content="WBT T11" Grid.Row="0" Grid.Column="4" MinWidth="190"/>
-						<Button Content="Medion" Grid.Row="1" Grid.Column="4" Click="WBT_Medion" Margin="5"/>
-						<Button Content="Peaq" Grid.Row="2" Grid.Column="4" Click="WBT_Peaq" Margin="5"/>
+						<Button Content="Medion x86" Grid.Row="1" Grid.Column="4" Click="WBT_Medionx86" Margin="5"/>
+						<Button Content="Peaq x86" Grid.Row="2" Grid.Column="4" Click="WBT_Peaqx86" Margin="5"/>
+						<Button Content="Medion x64" Grid.Row="3" Grid.Column="4" Click="WBT_Medionx64" Margin="5"/>
+						<Button Content="Peaq x64" Grid.Row="4" Grid.Column="4" Click="WBT_Peaqx64" Margin="5"/>
 					</Grid>
 				</Border>
 			</Grid>

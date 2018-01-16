@@ -25,13 +25,11 @@ namespace Retriever
         public MainWindow()
         {
             //AktwacjaWindows ac = new AktwacjaWindows();
-            WMI.ActivateWindows();
             try
             {
                 InitializeComponent();
                 PrzygotujAplikacje();
                 UstawTimer();
-
             }
             catch (Exception e)
             {
@@ -99,6 +97,8 @@ namespace Retriever
             ReaderInfo = new Reader((gridModele.SelectedItem as Model) == null ? ThisComputer : gridModele.SelectedItem as Model);
             Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
             gridZestawienie.DataContext = Retriever2;
+            spReaderBios.DataContext = ReaderInfo_WersjaBios;
+            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);
         }
         #endregion
 
@@ -146,6 +146,7 @@ namespace Retriever
         //Dodawanie kontrolek z pojemnościami dysków
         public void CreateDiscDataControls(Storage[] Disc, ref StackPanel control)
         {
+            control.Children.Clear();
             for (int i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
@@ -157,6 +158,7 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami dysków
         public void CreateDiscDataHeaders(Storage[] Disc)
         {
+            spDyskiNazwa.Children.Clear();
             for (int i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
@@ -249,9 +251,10 @@ namespace Retriever
 
         private void WindowsActivationScript_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0\connect").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\connect");
             Statusy = new Status();
             tbWinStatus.DataContext = Statusy;
+            this.UpdateLayout();
         }
 
         private void DeviceManager_Click(object sender, RoutedEventArgs e)
@@ -261,17 +264,17 @@ namespace Retriever
 
         private void AquaKeyTest_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0/AquaKeyTest.exe");
+            Process.Start(Environment.CurrentDirectory + @"\Testy\AquaKeyTest.exe");
         }
 
         private void aMonitest_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0/aMonitest.exe");
+            Process.Start(Environment.CurrentDirectory + @"\Testy\aMonitest.exe");
         }
 
         private void touchScreen_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0\touchscreen_2.exe");
+            Process.Start(Environment.CurrentDirectory + @"\Testy\touchscreen_2.exe");
         }
 
         private void mmSys_Click(object sender, RoutedEventArgs e)
@@ -281,7 +284,7 @@ namespace Retriever
 
         private void cam_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start(Environment.CurrentDirectory + @"\0\cam.exe");
+            Process.Start(Environment.CurrentDirectory + @"\Testy\cam.exe");
         }
 
         private void restart_Click(object sender, RoutedEventArgs e)
@@ -307,78 +310,102 @@ namespace Retriever
         {
             Process.Start(Environment.CurrentDirectory + @"\KB\Enable.bat").WaitForExit();
             Process.Start(Environment.CurrentDirectory + @"\KB\Enable.bat").WaitForExit();
-            Process.Start(@"shutdown", "/r /f /t 0");
+            //Process.Start(@"shutdown", "/r /f /t 0");
         }
 
         private void KBMatrixDisable(object sender, RoutedEventArgs e)
         {
             Process.Start(Environment.CurrentDirectory + @"\KB\Disable.bat").WaitForExit();
             Process.Start(Environment.CurrentDirectory + @"\KB\Disable.bat").WaitForExit();
-            Process.Start(@"shutdown", "/r /f /t 0");
+            //Process.Start(@"shutdown", "/r /f /t 0");
+        }
+
+        private void btnBios_Click(object sender, RoutedEventArgs e)
+        {
+            //Process.Start("::{20d04fe0-3aea-1069-a2d8-08002b30309d}");
+            Process.Start(Environment.CurrentDirectory + @"\..\..\..\..\..");
         }
 
         #endregion
 
+        #region Logo systemowe
         private void Amidewin_Medion86(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Amidewin\MEDIONx86.cmd").WaitForExit();
         }
 
         private void Amidewin_Peaq86(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Amidewin\PEAQx86.cmd").WaitForExit();
         }
 
         private void Amidewin_Medion64(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Amidewin\MEDIONx64.bat").WaitForExit();
         }
 
         private void Amidewin_Peaq64(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Amidewin\PEAQx64.bat").WaitForExit();
         }
+        
 
         private void S221x_Medion(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Ecs_s221x\Medion.bat").WaitForExit();
         }
 
         private void S221x_Peaq(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Ecs_s221x\Peaq.bat").WaitForExit();
         }
 
         private void IVT_Medion(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Ecs_ivt\Medion\MEDION.bat").WaitForExit();
         }
 
         private void IVT_Peaq(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Ecs_ivt\Peaq\PEAQ.bat").WaitForExit();
         }
 
         private void OEM_Medion(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\OemData\logo_med.bat").WaitForExit();
         }
 
         private void OEM_Peaq(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\OemData\logo_pea.bat").WaitForExit();
         }
 
-        private void WBT_Medion(object sender, RoutedEventArgs e)
+        private void WBT_Medionx86(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\clear_logox86.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\medionx86.bat").WaitForExit();
         }
 
-        private void WBT_Peaq(object sender, RoutedEventArgs e)
+        private void WBT_Peaqx86(object sender, RoutedEventArgs e)
         {
-
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\clear_logox86.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\peaqx86.bat").WaitForExit();
         }
 
+        private void WBT_Medionx64(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\clear_logo.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\medion.bat").WaitForExit();
+        }
+
+        private void WBT_Peaqx64(object sender, RoutedEventArgs e)
+        {
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\clear_logo.bat").WaitForExit();
+            Process.Start(Environment.CurrentDirectory + @"\Wbt_t11\peaq.bat").WaitForExit();
+        }
+
+
+        #endregion
         //Dla 99960 nie wyswietla hdd reader
     }
 }
