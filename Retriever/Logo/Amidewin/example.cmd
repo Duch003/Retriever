@@ -1,6 +1,0 @@
-AMIDEWINx64.exe /SM "System Manufacturer"
-AMIDEWINx64.exe /SP "OHR2"
-AMIDEWINx64.exe /SK "OHR1"
-AMIDEWINx64.exe /BM "MB Manufacturer"
-AMIDEWINx64.exe /BP "OHR2"
-AMIDEWINx64.exe /CM "Medion"

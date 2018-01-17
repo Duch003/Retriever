@@ -1,8 +1,0 @@
-<component>
-	name = "DMIEDIT (Windows 64Bit)"
-	category = eModule
-	LocalRoot = "RomUtils\DmiEditWin\64\"
-	RefName = "DMIEDITWIN64"
-[files]
-"DmiEditWin64.zip"	
-<endComponent>

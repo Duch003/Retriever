@@ -1,8 +1,0 @@
-<component>
-	name = "DMIEDIT (Windows 32Bit)"
-	category = eModule
-	LocalRoot = "RomUtils\DmiEditWin\32\"
-	RefName = "DMIEDITWIN32"
-[files]
-"DmiEditWin32.zip"	
-<endComponent>

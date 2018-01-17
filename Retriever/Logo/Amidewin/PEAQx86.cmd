@@ -1,3 +1,0 @@
-AMIDEWIN.exe /SM "PEAQ"
-AMIDEWIN.exe /BM "PEAQ"
-pause

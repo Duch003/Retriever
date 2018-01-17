@@ -1,1 +1,0 @@
-WBT64.exe -pwmi -ncp -NoMsg /COEM    

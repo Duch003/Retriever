@@ -1,2 +1,0 @@
-@echo "Change to SKU S2218,  please wait for system restart."
-@WinFlash32.exe /nodelay /silent /nowarn /noerror /dks "OHR1" /dpm "MB Productname" /dps "OHR2 " /dms "System Manufacturer" /dmm "MB Manufacturer" /dmc "MEDION" /patch

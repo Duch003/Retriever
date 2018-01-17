@@ -1,1 +1,0 @@
-WBT.exe -PWMI -ncp -NoMsg /SOEM eb.BIN       

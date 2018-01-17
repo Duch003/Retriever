@@ -1,7 +1,0 @@
-STEP:
-1. Extract file to the folder
-2. Run command prompt as administrator
-3. Change directory to the folder
-4. run S2217.bat for flashing to SKU S2217
-   run S2218.bat for flashing to SKU S2218
-   run PEAQ.bat for flashing to SKU PEAQ

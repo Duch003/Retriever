@@ -157,7 +157,7 @@ namespace Retriever
             i = 0;
             UrzadzeniaSieciowe = new NetDevice[0];
             nazwaUrzadzenia = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Caption", condition: "MACAddress != null"))
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Caption", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
                 nazwaUrzadzenia[i] = z.Wartosc;
@@ -165,7 +165,7 @@ namespace Retriever
             }
 
             i = 0;
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null"))
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 UrzadzeniaSieciowe = ExpandArr.Expand(UrzadzeniaSieciowe);
                 UrzadzeniaSieciowe[i] = new NetDevice(nazwaUrzadzenia[i], z.Wartosc);

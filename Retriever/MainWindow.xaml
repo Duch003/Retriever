@@ -4,7 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="700" Width="1000"
+        Title="MainWindow"
+		SizeToContent="WidthAndHeight"
 		x:Name="mainWindow" WindowState="Maximized">
 	<Window.Resources>
 		<Style TargetType="DataGrid">
@@ -80,6 +81,7 @@
 						<ColumnDefinition Width="Auto"/>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
+						<ColumnDefinition Width="*"/>
 					</Grid.ColumnDefinitions>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
@@ -117,6 +119,52 @@
 					<Border Grid.Row="0" Grid.Column="2">
 						<Label Content="Rzeczywiste" Background="LimeGreen"/>
 					</Border>
+					<Border Grid.Row="0" Grid.Column="3">
+						<Label Content="Statusy" Background="LimeGreen"/>
+					</Border>
+
+					<!--==============================STATUSY==============================-->
+					<!--Czy jest klucz w systemie-->
+					<Border Grid.Row="1" Grid.Column="3" Background="LightSkyBlue">
+						<Label Content="Klucz Windows" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+					
+					<!--Status aktywacji-->
+					<Border Grid.Row="2" Grid.Column="3" Background="LightSkyBlue">
+						<Label Content="Aktywacja Windows" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+
+					<!--Status SecureBoot-->
+					<Border Grid.Row="3" Grid.Column="3" Background="LightSkyBlue">
+						<Label Content="SecureBoot" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+
+					<!--Wykryta ilość portów USB-->
+					<Border Grid.Row="4" Grid.Column="3" Background="LightSkyBlue">
+						<Label Content="Ilość portów USB" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+					<Border Grid.Row="5" Grid.Column="3">
+						<TextBlock Text=""/>
+					</Border>
+
+					<!--Wykryta ilość portów SD-->
+					<Border Grid.Row="6" Grid.Column="5" Background="LightSkyBlue">
+						<Label Content="Ilość portów SD" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+					<Border Grid.Row="7" Grid.Column="3">
+						<TextBlock Text=""/>
+					</Border>
+
+					<!--Stan naładowania baterii-->
+					<Border Grid.Row="8" Grid.Column="5" Background="LightSkyBlue">
+						<Label Content="Aktualny stan baterii" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					</Border>
+					<Border Grid.Row="9" Grid.Column="3">
+						<TextBlock Text=""/>
+					</Border>
+					<Border Grid.Row="10" Grid.Column="3">
+						<TextBlock Text=""/>
+					</Border>
 
 					<!--==============================NAGŁÓWEK - DANE PODSTAWOWE==============================-->
 					<Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
@@ -125,7 +173,7 @@
 
 					<!--==============================Model==============================-->
 					<Border Grid.Row="2" Grid.Column="0" Background="LightSkyBlue">
-						<Label Content="  Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+						<Label Content="Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="1">
 						<TextBlock Text="{Binding ReaderInfo.Komputer.MD}"/>
@@ -162,7 +210,7 @@
 						<Label Content="Wear Level"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%>}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="2">
 						<StackPanel Orientation="Vertical" x:Name="spWearLevel"/>
@@ -325,7 +373,7 @@
 
 		<!--==============================TESTY==============================-->
 		<!--Zakładka z narzędziami do testów-->
-		<TabItem Header="Testy">
+		<!--<TabItem Header="Testy">
 			<Grid>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="*"/>
@@ -337,7 +385,7 @@
 					<ColumnDefinition Width="Auto"/>
 				</Grid.ColumnDefinitions>
 				<Border BorderThickness="2" BorderBrush="Black"  Grid.Row="0" Grid.Column="0">
-					<!--NARZĘDZIA DO TESTOWANIA-->
+					--><!--NARZĘDZIA DO TESTOWANIA--><!--
 					<Grid>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto"/>
@@ -357,38 +405,38 @@
 							<ColumnDefinition Width="Auto"/>
 							<ColumnDefinition Width="Auto"/>
 						</Grid.ColumnDefinitions>
-						<!--==============================NARZĘDZIA DO TESOTWANIA==============================-->
+						--><!--==============================NARZĘDZIA DO TESOTWANIA==============================--><!--
 						<Label Content="Narzędzia do testowania" Grid.Column="0" Grid.ColumnSpan="4" Grid.Row="0" VerticalContentAlignment="Center"/>
 
-						<!--==============================Skrypt Aktywacji Windows==============================-->
+						--><!--==============================Skrypt Aktywacji Windows==============================--><!--
 						<TextBlock Text="Aktywacja Windows" Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="connect.cmd" Grid.Row="1" Grid.Column="1" Click="WindowsActivationScript_Click" Margin="5" MinWidth="100" Grid.ColumnSpan="2"/>
 						<Button Content="Aktywacja telefoniczna" Grid.Row="1" Grid.Column="3" Click="WindowsActivationTelephone_Click" Margin="5" MinWidth="100"/>
 
-						<!--==============================Menedżer urządzeń==============================-->
+						--><!--==============================Menedżer urządzeń==============================--><!--
 						<TextBlock Text="Menedżer urządzeń" Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="devmgmt.msc" Grid.Row="2" Grid.Column="1" Click="DeviceManager_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
 
-						<!--==============================Test klawiatury==============================-->
+						--><!--==============================Test klawiatury==============================--><!--
 						<TextBlock Text="Test klawiatury" Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="AquaKeyTest.exe" Grid.Row="3" Grid.Column="1" Click="AquaKeyTest_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
 
-						<!--==============================Test LCD==============================-->
+						--><!--==============================Test LCD==============================--><!--
 						<TextBlock Text="Test LCD" Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="aMonitest.exe" Grid.Row="4" Grid.Column="2" Click="aMonitest_Click" Margin="5" MinWidth="100" />
 						<Button Content="touchscreen_2.exe" Grid.Row="4" Grid.Column="1" Click="touchScreen_Click" Margin="5" MinWidth="100"/>
 
-						<!--==============================Test audio i mikrofonu==============================-->
+						--><!--==============================Test audio i mikrofonu==============================--><!--
 						<TextBlock Text="Test audio i mikrofonu" Grid.Row="5" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="mmsys.cpl" Grid.Row="5" Grid.Column="1" Click="mmSys_Click" Margin="5" MinWidth="100" Grid.ColumnSpan="2"/>
 
-						<!--==============================Test kamery==============================-->
+						--><!--==============================Test kamery==============================--><!--
 						<TextBlock Text="Test kamery" Grid.Row="6" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
 						<Button Content="cam.exe" Grid.Row="6" Grid.Column="1" Click="cam_Click" Margin="5" MinWidth="100"  Grid.ColumnSpan="2"/>
 					</Grid>
 				</Border>
 				<Border Grid.Row="0" Grid.Column="1">
-					<!--DATA,CZAS, STATUSY-->
+					--><!--DATA,CZAS, STATUSY--><!--
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
@@ -404,14 +452,14 @@
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
 						
-						<!--DATA I CZAS-->
+						--><!--DATA I CZAS--><!--
 						<Label Content="Data i czas" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<TextBlock x:Name="tbDate" Text="{Binding Date}" Grid.Row="1" Grid.Column="0"/>
 						<TextBlock x:Name="tbTime" Text="{Binding Time}" Grid.Row="1" Grid.Column="1"/>
 						<TextBox x:Name="txtDateTime" Grid.Row="2" Grid.Column="0" MinWidth="100" Margin="5"/>
 						<Button Content="Ustaw datę i czas" Grid.Row="2" Grid.Column="1" Click="btnSetDateTime_Click" Margin="5"/>
 
-						<!--STATUSY-->
+						--><!--STATUSY--><!--
 						<TextBlock Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<Label Content="Statusy" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"/>
 						<TextBlock Text="Aktywacja Windows:" Grid.Row="5" Grid.Column="0"/>
@@ -422,7 +470,7 @@
 					</Grid>
 				</Border>
 				<Border Grid.Row="0" Grid.Column="2">
-					<!--USTAWIENIA KLAWIATURY-->
+					--><!--USTAWIENIA KLAWIATURY--><!--
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
@@ -444,7 +492,7 @@
 					</Grid>
 				</Border>
 				<Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3">
-					<!--USTAWIENIA LOGO-->
+					--><!--USTAWIENIA LOGO--><!--
 					<Grid>
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition Width="Auto"/>
@@ -460,25 +508,25 @@
 							<RowDefinition Height="Auto"/>
 							<RowDefinition Height="Auto"/>
 						</Grid.RowDefinitions>
-						<!--AMIDEWIN PEGATRON-->
+						--><!--AMIDEWIN PEGATRON--><!--
 						<Label Content="Amidewin Pegatron" Grid.Row="0" Grid.Column="0" MinWidth="195"/>
 						<Button Content="Medion x86" Grid.Row="1" Grid.Column="0" Click="Amidewin_Medion86" Margin="5"/>
 						<Button Content="Peaq x86" Grid.Row="2" Grid.Column="0" Click="Amidewin_Peaq86" Margin="5"/>
 						<Button Content="Medion x64" Grid.Row="3" Grid.Column="0" Click="Amidewin_Medion64" Margin="5"/>
 						<Button Content="Peaq x64" Grid.Row="4" Grid.Column="0" Click="Amidewin_Peaq64" Margin="5"/>
-						<!--ECS S221xT-->
+						--><!--ECS S221xT--><!--
 						<Label Content="ECS S221x" Grid.Row="0" Grid.Column="1" MinWidth="195"/>
 						<Button Content="Medion" Grid.Row="1" Grid.Column="1" Click="S221x_Medion" Margin="5"/>
 						<Button Content="Peaq" Grid.Row="2" Grid.Column="1" Click="S221x_Peaq" Margin="5"/>
-						<!--ECS IVT-->
+						--><!--ECS IVT--><!--
 						<Label Content="ECS IVT" Grid.Row="0" Grid.Column="2" MinWidth="195"/>
 						<Button Content="Medion" Grid.Row="1" Grid.Column="2" Click="IVT_Medion" Margin="5"/>
 						<Button Content="Peaq" Grid.Row="2" Grid.Column="2" Click="IVT_Peaq" Margin="5"/>
-						<!--OEM DATA-->
+						--><!--OEM DATA--><!--
 						<Label Content="OEM DATA" Grid.Row="0" Grid.Column="3" MinWidth="195"/>
 						<Button Content="Medion" Grid.Row="1" Grid.Column="3" Click="OEM_Medion" Margin="5"/>
 						<Button Content="Peaq" Grid.Row="2" Grid.Column="3" Click="OEM_Peaq" Margin="5"/>
-						<!--WBT T11-->
+						--><!--WBT T11--><!--
 						<Label Content="WBT T11" Grid.Row="0" Grid.Column="4" MinWidth="190"/>
 						<Button Content="Medion x86" Grid.Row="1" Grid.Column="4" Click="WBT_Medionx86" Margin="5"/>
 						<Button Content="Peaq x86" Grid.Row="2" Grid.Column="4" Click="WBT_Peaqx86" Margin="5"/>
@@ -487,7 +535,7 @@
 					</Grid>
 				</Border>
 			</Grid>
-		</TabItem>
+		</TabItem>-->
 	</TabControl>
 </Window>
 

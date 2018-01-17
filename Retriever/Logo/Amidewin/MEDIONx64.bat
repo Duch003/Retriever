@@ -1,3 +1,0 @@
-AMIDEWINx64.exe /SM "MEDION"
-AMIDEWINx64.exe /BM "MEDION"
-pause
