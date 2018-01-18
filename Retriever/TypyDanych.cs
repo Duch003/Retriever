@@ -507,7 +507,7 @@ namespace Retriever
     //--------------------------------------------------Typ wyliczeniowy dla statusów SecureBoot-------------------------------------------------------
     public enum SecureBootStatus : sbyte
     {
-        NotImplemented = -1,
+        None = -1,
         Disabled = 0,
         Enabled = 1
     }
@@ -515,17 +515,18 @@ namespace Retriever
     //--------------------------------------------------Klasa-kontener na poszczególne statusy systemu-------------------------------------------------
     public class Status
     {
-        public string WinStatus { get; set; }
-        public string SecureStatus { get; set; }
-        public bool KluczWindows { get; set; }
-        public int PortyUSB { get; set; }
-        public int PortySD { get; set; }
+        public string WinStatus { get; private set; }
+        public string SecureStatus { get; private set; }
+        public string KluczWindows { get; private set; }
+        public int PortyUSB { get; private set; }
+        public double[] StanBaterii { get; private set; }
 
         public Status()
         {
-            
-
-           
+            RenewWindowsActivationStatusInfo();
+            RenewSecureBootInfo();
+            RenewWindowsKeyInfo();
+            CountUSB();
         }
 
         public void RenewWindowsActivationStatusInfo()
@@ -541,23 +542,48 @@ namespace Retriever
         {
             SecureBootStatus secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
                @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
-               "UEFISecureBootEnabled", "-1"));
+               "UEFISecureBootEnabled", -1));
             SecureStatus = secure.ToString();
         }
 
         public void RenewWindowsKeyInfo()
         {
-            KluczWindows = WMI.GetOriginalProductKey() == null ? false : true;               
+            KluczWindows = WMI.GetOriginalProductKey() == null ? "Brak klucza" : "Znaleziono klucz";               
         }
 
         public void CountUSB()
         {
-
+            var ans = WMI.GetAll(Win32Hardware.Win32_USBController);
+            PortyUSB = ans.Where(z => z.Wlasciwosc == "Availability").Count();
         }
 
-        public void CountSD()
+        public void RefreshBatteriesState()
         {
+            int i = 0;
+            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
+            foreach(Win32HardwareData z in ans)
+            {
+                StanBaterii = ExpandArr.Expand(StanBaterii);
+                StanBaterii[i] = Convert.ToInt64(z.Wartosc);
+            }
+        }
 
+        public void RefreshBatteriesState(object sender, EventArgs e)
+        {
+            RefreshBatteriesState();
+        }
+    }
+
+    //--------------------------------------------------Kontener na dane o kartach graficznych----------------------------------------------------------
+    public class GraphicCard
+    {
+        string Nazwa { get; set; }
+        string Opis { get; set; }
+
+        public GraphicCard(string nazwa, string opis)
+        {
+            Nazwa = nazwa;
+            Opis = opis;
         }
     }
 

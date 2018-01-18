@@ -119,6 +119,16 @@ namespace Retriever
         }
         #endregion
 
+        #region Ustawienie timera do odświeżania danych
+        void UstawTimer()
+        {
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(Statusy.RefreshBatteriesState);
+            timer.Interval = new TimeSpan(0, 1, 0);
+            timer.Start();
+        }
+        #endregion
+
         #region Dynamiczne twozenie kontrolek
         //Dodawanie kontrolek SWM
         public void CreateSwmDataControls(SWM[] Swm)
@@ -167,7 +177,8 @@ namespace Retriever
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Disc[i].Nazwa);
-                text.Style = Resources["PropertyValue"] as Style;
+                text.Style = Resources["TextBlockDescription"] as Style;
+                DockPanel.SetDock(text, Dock.Top);
                 spDyskiNazwa.Children.Add(text);
             }
         }
@@ -175,11 +186,14 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami urządzeń z błędami
         public void CreateDevMgmtDataControls(DeviceManager[] Dev)
         {
+            spDeviceManagerCaption.Children.Clear();
+            spDeviceManagerErrorDescription.Children.Clear();
             for (int i = 0; i < Dev.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].Nazwa);
                 text.Style = Resources["TextBlockDescription"] as Style;
+                DockPanel.SetDock(text, Dock.Top);
                 spDeviceManagerCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].TrescBledu);
@@ -191,6 +205,8 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami dysków
         public void CreateNetDevDataControls(NetDevice[] Dev)
         {
+            spDeviceCaption.Children.Clear();
+            spDeviceMACAddress.Children.Clear();
             for (int i = 0; i < Dev.Length; i++)
             {
                 var text = new TextBlock();
@@ -199,6 +215,7 @@ namespace Retriever
                 text.MaxWidth = 250;
                 text.Height = 50;
                 text.TextWrapping = TextWrapping.Wrap;
+                DockPanel.SetDock(text, Dock.Top);
                 spDeviceCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].AdresMAC);

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.IO;
-using System.Runtime.InteropServices;
-using Microsoft.Management.Infrastructure;
-using NativeWifi;
 
 namespace Retriever
 {
@@ -22,6 +19,7 @@ namespace Retriever
             {
                 yield return new Win32HardwareData(property, (mo[property] == null) ? "" : mo[property].ToString());
             }
+            
         }
 
         //Metoda zwracająca pojedyńczą właściwość z określonej klasy
@@ -39,6 +37,20 @@ namespace Retriever
         public static IEnumerable<Win32HardwareData> GetAll(Win32Hardware hardwareClass, string scope = "root/cimv2")
         {
             string query = string.Format("SELECT * FROM {0}", hardwareClass.ToString());
+            ManagementObjectSearcher search = new ManagementObjectSearcher(scope, query);
+            foreach (ManagementObject mo in search.Get())
+            {
+                foreach (PropertyData prop in mo.Properties)
+                {
+                    yield return new Win32HardwareData(prop.Name, (prop.Value == null) ? "-" : prop.Value.ToString());
+                }
+            }
+        }
+
+        //Metoda zwracająca całą zawartość określonej klasy z warunkiem
+        public static IEnumerable<Win32HardwareData> GetAll(Win32Hardware hardwareClass, string condition, string scope = "root/cimv2")
+        {
+            string query = string.Format("SELECT * FROM {0} WHERE {1}", hardwareClass.ToString(), condition);
             ManagementObjectSearcher search = new ManagementObjectSearcher(scope, query);
             foreach (ManagementObject mo in search.Get())
             {
@@ -85,23 +97,12 @@ namespace Retriever
         //Metoda zwracająca klucz Windows
         public static string GetOriginalProductKey()
         {
-            //create a management scope object
-            ManagementScope scope = new ManagementScope("\\\\.\\ROOT\\cimv2");
-
-            //create object query
+            ManagementScope scope = new ManagementScope("root/cimv2");
             ObjectQuery query = new ObjectQuery("SELECT * FROM SoftwareLicensingService Where OA3xOriginalProductKey != null");
-
-            //create object searcher
-            ManagementObjectSearcher searcher =
-                                    new ManagementObjectSearcher(scope, query);
-
-            //get a collection of WMI objects
-            ManagementObjectCollection queryCollection = searcher.Get();
-
-            //enumerate the collection.
-            foreach (ManagementObject m in queryCollection)
+            ManagementObjectSearcher search = new ManagementObjectSearcher(scope, query);
+            ManagementObjectCollection ans = search.Get();
+            foreach (ManagementObject m in ans)
             {
-                // access properties of the WMI object
                 return m["OA3xOriginalProductKey"].ToString();
             }
             return null;
@@ -163,84 +164,11 @@ namespace Retriever
 
     //--------------------------------------------------Klasa powiększająca tablice------------------------------------------------------------------
     public static class ExpandArr
-    {
-        //DOUBLE
-        public static double[] Expand(double[] arr)
+    { 
+        public static T[] Expand<T>(T[] arr)
         {
-            double[] temp = arr;
-            arr = new double[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //STRING
-        public static string[] Expand(string[] arr)
-        {
-            string[] temp = arr;
-            arr = new string[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //RAM
-        public static RAM[] Expand(RAM[] arr)
-        {
-            RAM[] temp = arr;
-            arr = new RAM[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //STORAGE
-        public static Storage[] Expand(Storage[] arr)
-        {
-            Storage[] temp = arr;
-            arr = new Storage[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //SWM
-        public static SWM[] Expand(SWM[] arr)
-        {
-            SWM[] temp = arr;
-            arr = new SWM[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //DeviceManager
-        public static DeviceManager[] Expand(DeviceManager[] arr)
-        {
-            DeviceManager[] temp = arr;
-            arr = new DeviceManager[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-
-        //NetDevice
-        public static NetDevice[] Expand(NetDevice[] arr)
-        {
-            NetDevice[] temp = arr;
-            arr = new NetDevice[temp.Length + 1];
+            var temp = arr;
+            arr = new T[temp.Length + 1];
             for (int i = 0; i < temp.Length; i++)
             {
                 arr[i] = temp[i];

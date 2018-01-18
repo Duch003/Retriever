@@ -5,20 +5,20 @@ namespace Retriever
 {
     public class Gatherer
     {
-        public Computer Komputer { get; set; }
+        public Computer Komputer { get; private set; }
         public Storage[] Dyski { get; private set; }
         public Mainboard PlytaGlowna { get; private set; }
         public SWM[] Swm { get; private set; }
         public DeviceManager[] MenedzerUrzadzen { get; private set; }
         public NetDevice[] UrzadzeniaSieciowe { get; private set; }
         public double PamiecRamSuma { get; private set; }
-        
+        public GraphicCard[] KartyGraficzne { get; private set; }     
 
         public Gatherer()
         {
             int i = 0; //Iterator dla pętli foreach
-            #region Tworzenie instancji Computer
 
+            #region Tworzenie instancji Computer
             //Pobranie modelu
             var temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
             string model = GatherModel((temp.First() as Win32HardwareData).Wartosc, true);
@@ -78,6 +78,7 @@ namespace Retriever
             //Pobieranie informacji o bankach
             i = 0;
             RAM[] Ram = new RAM[0];
+            
             //Pobieranie informacji o poejmności
             //Pojemność wyrażona w GiB
             //1073741824 B = 1 GiB
@@ -115,7 +116,7 @@ namespace Retriever
                 size = ExpandArr.Expand(size);
                 size[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
-                Dyski = ExpandArr.Expand(Dyski);
+                Dyski = ExpandArr.Expand<Storage>(Dyski);
                 Dyski[i] = new Storage(size: size[i], nazwa: nazwa[i]);
                 i++;
             }
@@ -172,8 +173,24 @@ namespace Retriever
             }
             #endregion
 
-            #region Tworzenie instancji DeviceManager
+            #region Tworzenie instancji GraphicCard
+            i = 0;
+            KartyGraficzne = new GraphicCard[0];
+            nazwaUrzadzenia = new string[0];
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "AdapterCompatibility"))
+            {
+                nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
+                nazwaUrzadzenia[i] = z.Wartosc;
+                i++;
+            }
 
+            i = 0;
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "Caption"))
+            {
+                KartyGraficzne = ExpandArr.Expand(KartyGraficzne);
+                KartyGraficzne[i] = new GraphicCard(nazwaUrzadzenia[i], z.Wartosc);
+                i++;
+            }
             #endregion
         }
 
