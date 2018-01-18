@@ -28,16 +28,16 @@ namespace Retriever
     public class Computer
     {
         public string MD { get; set; }                          //Model komputera
-        public string MSN { get; private set; }                 //MSN komputera
-        public string System { get; private set; }              //System operacyjny   
-        public double[] WearLevel { get; private set; }         //Przegrzanie baterii
-        public string Wskazowki { get; private set; }           //Dodatkowe informacje odnośnie komputera
-        public string Obudowa { get; private set; }             //Model obudowy
-        public bool ShippingMode { get; private set; }          //ShippingMode
-        public string NowyMSN { get; private set; }             //NowyMSN
-        public string LCD { get; private set; }                 //Rodzaj matrycy
-        public string PelnyModel { get; private set; }          //Dotyczy peaq - pełny model z dodatkowymi informacjami
-        public string Kolor { get; private set; }               //Kolor obudowy
+        public string MSN { get; set; }                 //MSN komputera
+        public string System { get; set; }              //System operacyjny   
+        public double[] WearLevel { get; set; }         //Przegrzanie baterii
+        public string Wskazowki { get; set; }           //Dodatkowe informacje odnośnie komputera
+        public string Obudowa { get; set; }             //Model obudowy
+        public bool ShippingMode { get; set; }          //ShippingMode
+        public string NowyMSN { get; set; }             //NowyMSN
+        public string LCD { get; set; }                 //Rodzaj matrycy
+        public string PelnyModel { get; set; }          //Dotyczy peaq - pełny model z dodatkowymi informacjami
+        public string Kolor { get; set; }               //Kolor obudowy
 
         public Computer(string md = "-", string msn = "-", string system = "-", double[] wearLevel = null,
             string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string nowyMsn = "-",
@@ -60,12 +60,12 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane związane z płyta główną-------------------------------------------------------
     public class Mainboard
     {
-        public string Model { get; private set; }       //Model płyty głównej
-        public string Producent { get; private set; }   //Producent płyty
-        public string CPU { get; private set; }         //Procesor
-        public string Taktowanie { get; private set; }  //Taktowanie
-        public string WersjaBios { get; private set; }  //Wersja bios płyty
-        public string ID { get; private set; }          //Pełna nazwa procesora
+        public string Model { get; set; }       //Model płyty głównej
+        public string Producent { get; set; }   //Producent płyty
+        public string CPU { get; set; }         //Procesor
+        public string Taktowanie { get; set; }  //Taktowanie
+        public string WersjaBios { get; set; }  //Wersja bios płyty
+        public string ID { get; set; }          //Pełna nazwa procesora
 
         public Mainboard(string model = "-", string producent = "-", string cpu = "-", string taktowanie = "-", string bios = "-")
         {
@@ -81,7 +81,7 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o pamięci RAM-----------------------------------------------------------------
     public class RAM
     {
-        public double Pojemnosc { get; private set; } //Pojemność
+        public double Pojemnosc { get; set; } //Pojemność
 
         //Konstruktor standardowy
         public RAM(double size = 0, string bank = "-")
@@ -120,8 +120,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o dyskach twardych------------------------------------------------------------
     public class Storage
     {
-        public string Nazwa { get; private set; }       //Nazwa dysku
-        public double Pojemnosc { get; private set; }   //Pojemność
+        public string Nazwa { get; set; }       //Nazwa dysku
+        public double Pojemnosc { get; set; }   //Pojemność
         List<string> size = new List<string>            //Lista potencjalnych pojemności dysków
         {
             "1",
@@ -173,8 +173,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o IMAGE'u komputera-----------------------------------------------------------
     public class SWM
     {
-        public string Dysk { get; private set; } //Dysk na którym zlokalizowano swconf.dat
-        public string Swm { get; private set; }  //Nr SWM z pliku swconf.dat (3 linijka)
+        public string Dysk { get; set; } //Dysk na którym zlokalizowano swconf.dat
+        public string Swm { get; set; }  //Nr SWM z pliku swconf.dat (3 linijka)
 
         public SWM(string dysk = "-", string swm = "00000000")
         {
@@ -199,8 +199,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na wyniki z klasy WMI-----------------------------------------------------------------
     public class Win32HardwareData
     {
-        public string Wlasciwosc { get; private set; }
-        public string Wartosc { get; private set; }
+        public string Wlasciwosc { get; set; }
+        public string Wartosc { get; set; }
 
         public Win32HardwareData(string property, string value)
         {
@@ -320,38 +320,11 @@ namespace Retriever
     //--------------------------------------------------Kontener przetrzymujący listę modeli-----------------------------------------------------------
     public class ModelListSource
     {
-        public IEnumerable<Model> ListaModeli { get; private set; }
+        public IEnumerable<Model> ListaModeli { get; set; }
         public ModelListSource(Reader reader)
         {
             ListaModeli = reader.listaModeli;
         }
-    }
-
-    //--------------------------------------------------Kontener na informacje o dacie i czasie--------------------------------------------------------
-    public class SystemDateTime
-    { 
-        public string Date { get; private set; }
-        public string Time { get; private set; }
-
-        public SystemDateTime()
-        {
-            Date = DateTime.Now.ToShortDateString();
-            Time = DateTime.Now.ToLongTimeString();
-        }   
-    }
-
-    //--------------------------------------------------Struktura dla nazędzia ustawiajacego datę i czas-----------------------------------------------
-    [StructLayout(LayoutKind.Sequential)]
-    public struct SYSTEMTIME
-    {
-        public short wYear;
-        public short wMonth;
-        public short wDayOfWeek;
-        public short wDay;
-        public short wHour;
-        public short wMinute;
-        public short wSecond;
-        public short wMilliseconds;
     }
 
     //--------------------------------------------------Typ wyliczeniowy na błędy Menedżera urządzeń---------------------------------------------------
@@ -481,8 +454,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o błędach z menedżera urządzeń------------------------------------------------
     public class DeviceManager
     {
-        public string Nazwa { get; private set; }
-        public string TrescBledu { get; private set; }
+        public string Nazwa { get; set; }
+        public string TrescBledu { get; set; }
         ConfigManagerErrorDescription Descriptor;
 
         public DeviceManager(string nazwa, int kod)
@@ -496,8 +469,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o adresach MAC urządzeń sieciowych--------------------------------------------
     public class NetDevice
     {
-        public string Nazwa { get; private set; }
-        public string AdresMAC { get; private set; }
+        public string Nazwa { get; set; }
+        public string AdresMAC { get; set; }
 
         public NetDevice(string nazwa, string adres)
         {
@@ -509,8 +482,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o wersji BIOS która powinna być-----------------------------------------------
     public class BiosVer
     {
-        public string Wersja { get; private set; }
-        public string Opis { get; private set; }
+        public string Wersja { get; set; }
+        public string Opis { get; set; }
 
         public BiosVer(string ver, string opis)
         {
@@ -542,21 +515,49 @@ namespace Retriever
     //--------------------------------------------------Klasa-kontener na poszczególne statusy systemu-------------------------------------------------
     public class Status
     {
-        public string WinStatus { get; private set; }
-        public string SecureStatus { get; private set; }
+        public string WinStatus { get; set; }
+        public string SecureStatus { get; set; }
+        public bool KluczWindows { get; set; }
+        public int PortyUSB { get; set; }
+        public int PortySD { get; set; }
 
         public Status()
+        {
+            
+
+           
+        }
+
+        public void RenewWindowsActivationStatusInfo()
         {
             WindowsActivationStatus result = (WindowsActivationStatus)Convert.ToInt16(WMI.GetSingleProperty
                 (Win32Hardware.SoftwareLicensingProduct, property: "LicenseStatus",
                 condition: "ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f' AND PartialProductKey != null")
                 .First().Wartosc);
             WinStatus = result.ToString();
+        }
 
+        public void RenewSecureBootInfo()
+        {
             SecureBootStatus secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
-                @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
-                "UEFISecureBootEnabled", "-1"));
+               @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
+               "UEFISecureBootEnabled", "-1"));
             SecureStatus = secure.ToString();
+        }
+
+        public void RenewWindowsKeyInfo()
+        {
+            KluczWindows = WMI.GetOriginalProductKey() == null ? false : true;               
+        }
+
+        public void CountUSB()
+        {
+
+        }
+
+        public void CountSD()
+        {
+
         }
     }
 

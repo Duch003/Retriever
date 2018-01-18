@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Retriever
@@ -186,7 +185,6 @@ namespace Retriever
             string ans = ""; //String z odpowiedzią
             if (modelFlag)
             {
-                if ("GE72 6QD" == modelString) return "GE72 6QD";
                 //W tym przypadku poszukiwany jest MD. Wszystkie 5 flag oznacza cyfry
                 for (int i = 0; i < modelString.Length; i++)
                 {

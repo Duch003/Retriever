@@ -8,7 +8,12 @@
 		SizeToContent="WidthAndHeight"
 		x:Name="mainWindow" WindowState="Maximized">
 	<Window.Resources>
-		<Style TargetType="DataGrid">
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="Style.xaml"/>
+			</ResourceDictionary.MergedDictionaries>
+		</ResourceDictionary>
+		<!--<Style TargetType="DataGrid">
 			<Setter Property="FontSize" Value="18"/>
 
 		</Style>
@@ -29,7 +34,7 @@
 		<Style TargetType="Border">
 			<Setter Property="BorderBrush" Value="Black"/>
 			<Setter Property="BorderThickness" Value="2"/>
-		</Style>
+		</Style>-->
 	</Window.Resources>
 
 	<!--Definicja TabControl - wewnątrz znajduje się wsyzstko inne-->
@@ -111,261 +116,297 @@
 					</Grid.RowDefinitions>
 					<!--==============================LEGENDA==============================-->
 					<Border Grid.Row="0" Grid.Column="0" Grid.RowSpan="2">
-						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal" VerticalContentAlignment="Bottom"/>
+						<Label Content="Parametry" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="0" Grid.Column="1">
-						<Label Content="Baza danych" Background="LimeGreen"/>
+						<Label Content="Baza danych" Style="{StaticResource GreenHeader}"/>
 					</Border>
 					<Border Grid.Row="0" Grid.Column="2">
-						<Label Content="Rzeczywiste" Background="LimeGreen"/>
+						<Label Content="Rzeczywiste" Style="{StaticResource GreenHeader}"/>
 					</Border>
 					<Border Grid.Row="0" Grid.Column="3">
-						<Label Content="Statusy" Background="LimeGreen"/>
+						<Label Content="Statusy" Style="{StaticResource GreenHeader}"/>
 					</Border>
 
 					<!--==============================STATUSY==============================-->
 					<!--Czy jest klucz w systemie-->
-					<Border Grid.Row="1" Grid.Column="3" Background="LightSkyBlue">
-						<Label Content="Klucz Windows" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="1" Grid.Column="3">
+						<Label Content="Klucz Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					
 					<!--Status aktywacji-->
-					<Border Grid.Row="2" Grid.Column="3" Background="LightSkyBlue">
-						<Label Content="Aktywacja Windows" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="2" Grid.Column="3">
+						<Label Content="Aktywacja Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<!--Status SecureBoot-->
-					<Border Grid.Row="3" Grid.Column="3" Background="LightSkyBlue">
-						<Label Content="SecureBoot" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="3" Grid.Column="3">
+						<Label Content="SecureBoot" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<!--Wykryta ilość portów USB-->
-					<Border Grid.Row="4" Grid.Column="3" Background="LightSkyBlue">
-						<Label Content="Ilość portów USB" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="4" Grid.Column="3">
+						<Label Content="Ilość portów USB" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="3">
-						<TextBlock Text=""/>
+						<TextBlock Text="" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--Wykryta ilość portów SD-->
-					<Border Grid.Row="6" Grid.Column="5" Background="LightSkyBlue">
-						<Label Content="Ilość portów SD" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="6" Grid.Column="5">
+						<Label Content="Ilość portów SD" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="3">
-						<TextBlock Text=""/>
+						<TextBlock Text="" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--Stan naładowania baterii-->
-					<Border Grid.Row="8" Grid.Column="5" Background="LightSkyBlue">
-						<Label Content="Aktualny stan baterii" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="8" Grid.Column="5">
+						<Label Content="Aktualny stan baterii" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="3">
-						<TextBlock Text=""/>
+						<TextBlock Text="" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="10" Grid.Column="3">
-						<TextBlock Text=""/>
+						<TextBlock Text="" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================NAGŁÓWEK - DANE PODSTAWOWE==============================-->
 					<Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="DANE PODSTAWOWE"/>
+						<Label Content="DANE PODSTAWOWE" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<!--==============================Model==============================-->
-					<Border Grid.Row="2" Grid.Column="0" Background="LightSkyBlue">
-						<Label Content="Model" Background="LightSkyBlue" FontWeight="Bold" HorizontalAlignment="Center"/>
+					<Border Grid.Row="2" Grid.Column="0">
+						<Label Content="Model" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.MD}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.Komputer.MD}"/>
+						<TextBlock Text="{Binding GathererInfo.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================OS==============================-->
 					<Border Grid.Row="3" Grid.Column="0">
-						<Label Content="OS"/>
+						<Label Content="OS" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border  Grid.Row="3" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.System}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.System}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border  Grid.Row="3" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.Komputer.System}"/>
+						<TextBlock Text="{Binding GathererInfo.Komputer.System}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================SWM==============================-->
 					<Border Grid.Row="4" Grid.Column="0">
-						<Label Content="SWM"/>
+						<Label Content="SWM" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="4" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Swm.Swm}"/>
+						<TextBlock Text="{Binding ReaderInfo.Swm.Swm}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<!--Dodatkowy panel do którego programowo dodawane są kontolki z informacjami-->
 					<Border Grid.Row="4" Grid.Column="2">
-						<StackPanel Orientation="Vertical" x:Name="spSwm"/>
+						<StackPanel Orientation="Vertical" x:Name="spSwm">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 
 					<!--==============================Wear Level==============================-->
 					<Border Grid.Row="5" Grid.Column="0">
-						<Label Content="Wear Level"/>
+						<Label Content="Wear Level" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%>}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%>}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="2">
-						<StackPanel Orientation="Vertical" x:Name="spWearLevel"/>
+						<StackPanel Orientation="Vertical" x:Name="spWearLevel">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 
 					<!--==============================NAGŁÓWEK - PŁYTA GŁÓWNA I PROCESOR==============================-->
 					<Border Grid.Row="6" Grid.Column="0">
-						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Parametry" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="PŁYTA GŁÓWNA I PROCESOR"/>
+						<Label Content="PŁYTA GŁÓWNA I PROCESOR" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<!--==============================Model płyty głównej==============================-->
-					<Border Grid.Row="7" Grid.Column="0" Background="LightSkyBlue">
-						<Label Content="Model płyty" FontWeight="Bold" Background="LightSkyBlue" MinWidth="150"/>
+					<Border Grid.Row="7" Grid.Column="0">
+						<Label Content="Model płyty" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Model}"/>
+						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Model}"/>
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================CPU==============================-->
 					<Border Grid.Row="8" Grid.Column="0">
-						<Label Content="CPU"/>
+						<Label Content="CPU" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.ID}"/>
+						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.ID}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.CPU}"/>
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.CPU}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Wersja Bios==============================-->
 					<Border Grid.Row="9" Grid.Column="0">
-						<Label Content="Wersja bios"/>
+						<Label Content="Wersja bios" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="1">
 						<StackPanel Orientation="Vertical" x:Name="spReaderBios">
-							<TextBlock Text="{Binding WersjaBios.Wersja}"/>
-							<TextBlock Text="{Binding WersjaBios.Opis}" TextWrapping="WrapWithOverflow"/>
+							<TextBlock Text="{Binding WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
+							<TextBlock Text="{Binding WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}"/>
 						</StackPanel>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.WersjaBios}"/>
+						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.WersjaBios}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================NAGŁÓWEK - RAM I DYSKI TWARDE==============================-->
 					<Border Grid.Row="10" Grid.Column="0">
-						<Label Content="Nazwa" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Nazwa" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="RAM I DYSKI TWARDE"/>
+						<Label Content="RAM I DYSKI TWARDE" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<!--==============================Pamięć RAM==============================-->
 					<Border Grid.Row="11" Grid.Column="0">
-						<Label Content="RAM" FontWeight="Bold"/>
+						<Label Content="RAM" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="1">
-						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}"/>
+						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="2">
-						<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}"/>
+						<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Dyski==============================-->
 					<Border Grid.Row="12" Grid.Column="0" Background="LightSkyBlue">
-						<StackPanel x:Name="spDyskiNazwa" />
+						<StackPanel x:Name="spDyskiNazwa">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 						
 					</Border>
 					<Border Grid.Row="12" Grid.Column="1">
-						<StackPanel x:Name="spDyskiReader"/>
+						<StackPanel x:Name="spDyskiReader">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 					<Border Grid.Row="12" Grid.Column="2">
-						<StackPanel x:Name="spDyskiGatherer"/>
+						<StackPanel x:Name="spDyskiGatherer">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 
 					<!--==============================MENEDŻER URZĄDZEŃ - NAGŁÓWEK==============================-->
 					<Border Grid.Row="13" Grid.Column="0">
-						<Label Content="Urządzenia" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Urządzenia" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="13" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="BŁĘDY W MENEDŻERZE URZĄDZEŃ"/>
+						<Label Content="BŁĘDY W MENEDŻERZE URZĄDZEŃ" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
-					<Border Grid.Row="14" Grid.Column="0">
-						<StackPanel x:Name="spDeviceManagerCaption"/>
+					<Border Grid.Row="14" Grid.Column="0" Background="LightSkyBlue">
+						<StackPanel x:Name="spDeviceManagerCaption">
+							<!--<StackPanel.Resources>
+								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
+							</StackPanel.Resources>-->
+						</StackPanel>
 					</Border>
 					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2">
-						<StackPanel x:Name="spDeviceManagerErrorDescription"/>
+						<StackPanel x:Name="spDeviceManagerErrorDescription">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 
 					<!--==============================LANMAC - NAGŁÓWEK==============================-->
 					<Border Grid.Row="15" Grid.Column="0">
-						<Label Content="Urządzenia" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Urządzenia" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="15" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="ADRESY MAC URZĄDZEŃ SIECIOWYCH"/>
+						<Label Content="ADRESY MAC URZĄDZEŃ SIECIOWYCH" Style="{StaticResource BlueHeader}"/>
 					</Border>
 
 					<Border Grid.Row="16" Grid.Column="0">
-						<StackPanel x:Name="spDeviceCaption"/>
+						<StackPanel x:Name="spDeviceCaption">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2">
-						<StackPanel x:Name="spDeviceMACAddress"/>
+						<StackPanel x:Name="spDeviceMACAddress">
+							<StackPanel.Resources>
+								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+							</StackPanel.Resources>
+						</StackPanel>
 					</Border>
 
 					<!--==============================POZOSTAŁE - NAGŁÓWEK==============================-->
 					<Border Grid.Row="17" Grid.Column="0">
-						<Label Content="Parametry" FontStyle="Italic" FontWeight="Normal"/>
+						<Label Content="Parametry" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="17" Grid.Column="1" Grid.ColumnSpan="2">
-						<Label Content="POZOSTAŁE PARAMETRY"/>
+						<Label Content="POZOSTAŁE PARAMETRY" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<!--==============================Kolor==============================-->
 					<Border Grid.Row="18" Grid.Column="0">
-						<Label Content="Kolor obudowy"/>
+						<Label Content="Kolor obudowy" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.Kolor}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.Kolor}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Obudowa==============================-->
 					<Border Grid.Row="19" Grid.Column="0">
-						<Label Content="Rodzaj obudowy"/>
+						<Label Content="Rodzaj obudowy" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="19" Grid.Column="1" Grid.ColumnSpan="2">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.Obudowa}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.Obudowa}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Shipping Mode==============================-->
 					<Border Grid.Row="20" Grid.Column="0">
-						<Label Content="Shipping Mode"/>
+						<Label Content="Shipping Mode" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="20" Grid.Column="1" Grid.ColumnSpan="2">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.ShippingMode}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.ShippingMode}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Rodzaj LCD==============================-->
 					<Border Grid.Row="21" Grid.Column="0">
-						<Label Content="Rodzaj LCD"/>
+						<Label Content="Rodzaj LCD" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="21" Grid.Column="1" Grid.ColumnSpan="2">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.LCD}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.LCD}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Pełny model==============================-->
 					<Border Grid.Row="22" Grid.Column="0">
-						<Label Content="Pełny model"/>
+						<Label Content="Pełny model" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="22" Grid.Column="1" Grid.ColumnSpan="2">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.PelnyModel}"/>
+						<TextBlock Text="{Binding ReaderInfo.Komputer.PelnyModel}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 				</Grid>
 			</ScrollViewer>
