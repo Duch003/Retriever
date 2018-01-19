@@ -81,6 +81,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DataParser.cs" />
     <Compile Include="Gatherer.cs" />
     <Compile Include="Gatherer2.cs" />
     <Compile Include="Reader.cs" />

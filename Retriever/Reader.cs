@@ -4,6 +4,7 @@ using ExcelDataReader;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Xml;
 
 namespace Retriever
 {
@@ -22,15 +23,6 @@ namespace Retriever
         public string BiosZBazy { get; private set; }
         string Plik = @"/NoteBookiRef_v2.xlsx";
 
-        //Metoda otwierająca plik bazy danych
-        void Open()
-        {
-
-            stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
-            excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-            result = excelReader.AsDataSet();
-        }
-
         //Kontruktor wyciągający dane o modelu z bazy danych
         public Reader(Model model)
         {
@@ -44,6 +36,7 @@ namespace Retriever
         {
             Open();
             SetDataTables();
+            CreateXMLFile();
             Close();
         }
 
@@ -56,6 +49,76 @@ namespace Retriever
             LookForBios(komp);
             Close();
             Plik = temp;
+        }
+
+        //Metoda otwierająca plik bazy danych
+        void Open()
+        {
+
+            stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
+            excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+            result = excelReader.AsDataSet();
+            FileInfo fInfo = new FileInfo("staticdata.txt");
+            FileStream fs;
+            if (!fInfo.Exists)
+            {
+                fs = File.Create(Environment.CurrentDirectory);
+                
+
+
+            }
+                
+            else
+                fs = fInfo.OpenRead();
+
+        }
+
+        //Utworzenie pliku XML dla bazy danych
+        void CreateXMLFile()
+        {
+            //Utworz obiekt do zapisywania tekstu
+            XmlTextWriter writer = new XmlTextWriter("Model.xml", System.Text.Encoding.UTF8);
+            //Parametry zapisu
+            writer.WriteStartDocument(true);
+            writer.Formatting = Formatting.Indented;
+            writer.Indentation = 2;
+            //Utworzenie bazowego znacznika
+            writer.WriteStartElement("BAZA");
+            //Zapisanie bazy
+            foreach(Model z in listaModeli)
+            {
+                CreateNode(z.Wiersz, z.Zeszyt, z.MSN, z.MD, writer);
+            }
+            //Zamknięcie znacznika
+            writer.WriteEndElement();
+            //Zamknięcie dokumentu
+            writer.WriteEndDocument();
+            
+            writer.Close();
+        }
+
+        //Metoda zapisująca dane Modelu w pliku XML
+        void CreateNode(int wiersz, int zeszyt, string msn, string md, XmlTextWriter writer)
+        {
+            //Utworzenie roota MODEL
+            writer.WriteStartElement("Model"); //Dodaj pierwotną gałąź
+            //Utworzenie gałęzi Wiersz
+            writer.WriteStartElement("Wiersz");     //Dodaj subgałąź
+            writer.WriteString(wiersz.ToString());  //Wpisz wartość
+            writer.WriteEndElement();               //Zamknij gałąź
+            //Utworzenie gałęzi Zeszyt
+            writer.WriteStartElement("Zeszyt");
+            writer.WriteString(zeszyt.ToString());
+            writer.WriteEndElement();
+            //Utworzenie gałęzi MSN
+            writer.WriteStartElement("MSN");
+            writer.WriteString(msn);
+            writer.WriteEndElement();
+            //Utworzenie gałęzi MD
+            writer.WriteStartElement("MD");
+            writer.WriteString(md);
+            writer.WriteEndElement();
+            writer.WriteEndElement();
         }
 
         //Metoda wyszukująca bios któy powinien być zainstalowany na podstawie porównywania modelu obudowy
@@ -111,6 +174,7 @@ namespace Retriever
                 //Odrzuca rekordy w których brakuje modelu i msn
                 if (string.IsNullOrEmpty(table.Rows[i][msnColumn].ToString()) && (string.IsNullOrEmpty(table.Rows[i][mdColumn].ToString()))) continue;
                 //Argumenty: (Wiersz w którym znajduje się dany model, numer zeszytu w którym jest rekord, MSN, Model)
+                XmlDocument doc = new XmlDocument();
                 yield return new Model(i, sheet, table.Rows[i][msnColumn].ToString(), table.Rows[i][mdColumn].ToString(), table.TableName.ToString());
             }
         }
