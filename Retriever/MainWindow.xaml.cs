@@ -74,7 +74,7 @@ namespace Retriever
                 ThisComputer = gridModele.SelectedItem as Model;
             }
 
-            ReaderInfo_WersjaBios = new Reader(@"\Medion_NB_Bios.xlsx", ReaderInfo.Komputer);
+            ReaderInfo_WersjaBios = new Reader(", ReaderInfo.Komputer);
             spReaderBios.DataContext = ReaderInfo_WersjaBios;
             CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);            
 

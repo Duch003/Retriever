@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Management;
 using System.IO;
+using System.Windows;
 
 namespace Retriever
 {
@@ -174,6 +175,51 @@ namespace Retriever
                 arr[i] = temp[i];
             }
             return arr;
+        }
+    }
+
+    //--------------------------------------------------Klasa obsługująca zapisywanie i wyświetlanie błędów------------------------------------------
+    public static class ErrorWriter
+    {
+        //Metoda zapisująca loga
+        public static bool WriteErrorLog(Exception e)
+        {
+            bool logCreated = true;
+            FileInfo errorInfo;
+            StreamWriter sw = null;
+            try
+            {
+                errorInfo = new FileInfo(File.Create(Environment.CurrentDirectory + $"\\{DateTime.Now.ToLongTimeString()}.log").Name);
+                sw = new StreamWriter(new FileStream(errorInfo.DirectoryName, FileMode.Open));
+                sw.WriteLine("Obiekt, który wyrzucił wyjątek: {0}", e.Source);
+                sw.WriteLine("Metoda która wyrzuciła wyjątek: {0}", e.TargetSite);
+                sw.WriteLine("Wywołania stosu: {0}", e.StackTrace);
+                sw.WriteLine("Pary klucz-wartość: {0}", e.Data);
+                sw.WriteLine("Opis: {0}", e.Message);
+            }
+            catch (Exception logEx)
+            {
+                MessageBox.Show($"Nie można utworzyć loga błędu. Treść błędu:\n{logEx.Message}", "Błąd przy tworzeniu loga błędu.", MessageBoxButton.OK, MessageBoxImage.Error);
+                logCreated = false;
+            }
+            finally
+            {
+                sw.Close();
+                sw.Dispose();
+            }
+            return logCreated;
+        }
+
+        //Metoda działająca w wypadku kiedy nie można zapisać loga
+        public static void ShowErrorLog(Exception e, string naglowek, string opis)
+        {
+            string mess = string.Format(@"\n\nObiekt, który wyrzucił wyjątek: {0}\n" +
+                "Metoda która wyrzuciła wyjątek: {1}\n" +
+                "Wywołania stosu: {2}\n" +
+                "Pary klucz-wartość: {3}" +
+                "Opis: {4})", 
+                e.Source, e.TargetSite, e.StackTrace, e.Data, e.Message);
+            MessageBox.Show(naglowek, opis + mess, MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }

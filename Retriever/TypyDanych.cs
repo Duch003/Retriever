@@ -27,7 +27,7 @@ namespace Retriever
     //--------------------------------------------------Kontener na ogólne i różne dane o komputerze---------------------------------------------------
     public class Computer
     {
-        public string MD { get; set; }                          //Model komputera
+        public string MD { get; set; }                  //Model komputera
         public string MSN { get; set; }                 //MSN komputera
         public string System { get; set; }              //System operacyjny   
         public double[] WearLevel { get; set; }         //Przegrzanie baterii
@@ -441,7 +441,7 @@ namespace Retriever
                 case 31:
                     return "This device is not working properly because Windows cannot load the drivers required for this device.";
                 default:
-                    return "How the hell You get this message!?";
+                    return "The cake is a lie.";
             }
         }
 
@@ -512,7 +512,7 @@ namespace Retriever
         Enabled = 1
     }
 
-    //--------------------------------------------------Klasa-kontener na poszczególne statusy systemu-------------------------------------------------
+    //--------------------------------------------------Kontener na poszczególne statusy systemu-------------------------------------------------
     public class Status
     {
         public string WinStatus { get; private set; }
