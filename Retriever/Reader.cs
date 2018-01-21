@@ -11,28 +11,41 @@ namespace Retriever
 {
     public class Reader
     {
-        FileStream stream;
-        IExcelDataReader excelReader;
-        DataSet result;
-        public Computer Komputer { get; set; }
-        public RAM Ram { get; private set; }
-        public Storage[] Dyski { get; private set; }
-        public Mainboard PlytaGlowna { get; private set; }
-        public SWM Swm { get; private set; }
-        public BiosVer WersjaBios { get; private set; }
-        public IEnumerable<Model> listaModeli { get; private set; }
-        public string BiosZBazy { get; private set; }
-        string Plik = @"/NoteBookiRef_v2.xlsx";
+        FileStream                  stream;
+        IExcelDataReader            excelReader;
+        DataSet                     result;
+        public Computer             Komputer { get; set; }
+        public RAM                  Ram { get; private set; }
+        public Storage[]            Dyski { get; private set; }
+        public Mainboard            PlytaGlowna { get; private set; }
+        public SWM                  Swm { get; private set; }
+        public BiosVer              WersjaBios { get; private set; }
+        public IEnumerable<Model>   listaModeli { get; private set; }
+        public string               BiosZBazy { get; private set; }
+        string                      Plik = @"/NoteBookiRef_v2.xlsx";
 
+        //TODO Dokończyć usprawnianie klasy w zależności od decyzji przełożonych
         //Konstruktor pobierający listę modeli
         public Reader()
         {
+            //TEST I - Istnienie bazy danych notebooków
             if (Open())
             {
                 SetDataTables();
+                //TEST II - Istnienie pliku staticdata.txt
+                //Jeżeli nie istnieje plik staticdata, utwórz go
+                if (!File.Exists(Environment.CurrentDirectory + @"\staticdata.txt"))
+                {
+                    FileStream fs = (File.Create(Environment.CurrentDirectory + @"\staticdata.txt"));
+                    StreamWriter sw = new StreamWriter(fs);
+                }
+                    
+                //Jeżeli nie istnieje plik Model.xml, utwórz go
                 if(!File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
+                    //Jeżeli nie udało się otworzyć pliku, zakończ działanie konstruktora
                     if(!CreateXMLFile())
                         return;
+
                 Close();
             }
             else return;
@@ -73,6 +86,16 @@ namespace Retriever
                 result = null;
             }
             return isOpened;
+        }
+
+        //Czyszczenie końcowe po zakończeniu używania programu
+        void Close()
+        {
+            stream.Close();
+            stream.Dispose();
+            excelReader.Close();
+            excelReader.Dispose();
+            result.Dispose();
         }
 
         //Utworzenie pliku XML dla bazy danych
@@ -119,8 +142,7 @@ namespace Retriever
                 writer.WriteEndDocument();
                 writer.Close();
             }
-            return isCreated;
-            
+            return isCreated;           
         }
 
         //Metoda zapisująca dane Modelu w pliku XML
@@ -318,18 +340,10 @@ namespace Retriever
                 ReadData(model);
                 Close();
             }
-            #region
+            #endregion
         }
 
-        //Czyszczenie końcowe po zakończeniu używania programu
-        void Close()
-        {
-            stream.Close();
-            stream.Dispose();
-            excelReader.Close();
-            excelReader.Dispose();
-            result.Dispose();
-        }
+        
     }
 
     

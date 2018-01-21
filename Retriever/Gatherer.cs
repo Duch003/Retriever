@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Retriever
 {
@@ -21,7 +22,7 @@ namespace Retriever
             #region Tworzenie instancji Computer
             //Pobranie modelu
             var temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
-            string model = GatherModel((temp.First() as Win32HardwareData).Wartosc, true);
+            string model = GatherModel((temp.First() as Win32HardwareData).Wartosc);
 
             //Pobranie MSN
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "SKU");
@@ -46,7 +47,7 @@ namespace Retriever
 
             //Pobieranie obudowy - jest to zamienne z biosem
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
-            string obudowa = GatherModel((temp.First() as Win32HardwareData).Wartosc, false);
+            string obudowa = GatherCase((temp.First() as Win32HardwareData).Wartosc);
             #endregion
             Komputer = new Computer(md: model, msn: msn, system: system, wearLevel: wearLevel, obudowa: obudowa);
 
@@ -157,7 +158,7 @@ namespace Retriever
             i = 0;
             UrzadzeniaSieciowe = new NetDevice[0];
             nazwaUrzadzenia = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Caption", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
+            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Description", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
                 nazwaUrzadzenia[i] = z.Wartosc;
@@ -194,72 +195,27 @@ namespace Retriever
             #endregion
         }
 
-        //Metoda poszukująca modelu
-        string GatherModel(string modelString, bool modelFlag)
+        //Metoda poszukująca modelu komputera
+        string GatherModel(string modelString)
         {
-            bool[] flags = new bool[5]; //Flagi znaków
-            int j = 0; //Iterator do poruszania się po flagach
-            string ans = ""; //String z odpowiedzią
-            if (modelFlag)
-            {
-                //W tym przypadku poszukiwany jest MD. Wszystkie 5 flag oznacza cyfry
-                for (int i = 0; i < modelString.Length; i++)
-                {
-                    //Jeżeli znak jest cyfrą
-                    if (char.IsDigit(modelString[i]))
-                    {
-                        //Oznacz flagę cyfry
-                        flags[j] = true;
-                        ans = ans + modelString[i];
-                        j++;
-                    }
-                    //W innym przypadku
-                    else
-                    {
-                        //Zerowanie
-                        flags = new bool[5];
-                        ans = "";
-                        j = 0;
-                    }
-
-                    if (flags[0] == true && flags[1] == true && flags[2] == true && flags[3] == true && flags[4] == true)
-                        return ans;
-                }
-            }
+            Regex rgx = new Regex(@"\d{5}");
+            Match m = rgx.Match(modelString);
+            if (m.Success)
+                return m.Value.ToString();
             else
-            {
-                //W tym przypadku poszukiwany jest model obudowy. Pierwsza flaga to litera, pozostałe to cyfry
-                for (int i = 0; i < modelString.Length; i++)
-                {
-                    //Jeżeli znak jest liczbą i znaleziono już pierwszą literę
-                    if (char.IsDigit(modelString[i]) && flags[0] == true)
-                    {
-                        //Oznacz flagę cyfry
-                        flags[j] = true;
-                        ans = ans + modelString[i];
-                        j++;
-                    }
-                    //Jeżeli znaleziono literę i nie ma pierwszej flagi litery
-                    else if (char.IsLetter(modelString[i]) && flags[0] == false)
-                    {
-                        flags[0] = true;
-                        ans = ans + modelString[i];
-                        j++;
-                    }
-                    //W innym przypadku (np.: kolejna litera)
-                    else
-                    {
-                        //Zerowanie
-                        flags = new bool[5];
-                        ans = "";
-                        j = 0;
-                    }
+                return "";
+        }
 
-                    if (flags[0] == true && flags[1] == true && flags[2] == true && flags[3] == true && flags[4] == true)
-                        return ans;
-                }
-            }
-            return "-";
+        //Metoda poszukujaca modelu obudowy komputera
+        string GatherCase(string caseString)
+        {
+            Regex rgx = new Regex(@"[A-Za-z]{1}\d{4}");
+            Match m = rgx.Match(caseString);
+            if (m.Success)
+                return m.Value.ToString();
+            else
+                return "";
+
         }
     }
 }
