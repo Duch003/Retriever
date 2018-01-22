@@ -25,9 +25,11 @@ namespace Retriever
         string                      Plik = @"/NoteBookiRef_v2.xlsx";
 
         //TODO Dokończyć usprawnianie klasy w zależności od decyzji przełożonych
+        //TODO zHASZOWAC CALY PLIK xml crc32
         //Konstruktor pobierający listę modeli
         public Reader()
         {
+            int ilosc_modeli;
             //TEST I - Istnienie bazy danych notebooków
             if (Open())
             {
@@ -37,7 +39,14 @@ namespace Retriever
                 if (!File.Exists(Environment.CurrentDirectory + @"\staticdata.txt"))
                 {
                     FileStream fs = (File.Create(Environment.CurrentDirectory + @"\staticdata.txt"));
-                    StreamWriter sw = new StreamWriter(fs);
+                    ilosc_modeli = 0;
+                    //StreamWriter sw = new StreamWriter(fs);
+                }
+                else
+                {
+                    FileInfo fi = new FileInfo(Environment.CurrentDirectory + @"\staticdata.txt");
+                    StreamReader sr = fi.OpenText();
+                    ilosc_modeli = Convert.ToInt32(sr.ReadLine());
                 }
                     
                 //Jeżeli nie istnieje plik Model.xml, utwórz go
