@@ -6,61 +6,69 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Windows;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Retriever
 {
     public class Reader
     {
-        FileStream                  stream;
-        IExcelDataReader            excelReader;
-        DataSet                     result;
-        public Computer             Komputer { get; set; }
-        public RAM                  Ram { get; private set; }
-        public Storage[]            Dyski { get; private set; }
-        public Mainboard            PlytaGlowna { get; private set; }
-        public SWM                  Swm { get; private set; }
-        public BiosVer              WersjaBios { get; private set; }
-        public IEnumerable<Model>   listaModeli { get; private set; }
-        public string               BiosZBazy { get; private set; }
-        string                      Plik = @"/NoteBookiRef_v2.xlsx";
+        FileStream stream;
+        IExcelDataReader excelReader;
+        DataSet result;
+        public Computer Komputer { get; set; }
+        public RAM Ram { get; private set; }
+        public Storage[] Dyski { get; private set; }
+        public Mainboard PlytaGlowna { get; private set; }
+        public SWM Swm { get; private set; }
+        public BiosVer WersjaBios { get; private set; }
+        public IEnumerable<Model> listaModeli { get; private set; }
+        public string BiosZBazy { get; private set; }
+        string Plik = @"/NoteBookiRef_v3.xlsx";
+        string AktualnyHash;
 
-        //TODO Dokończyć usprawnianie klasy w zależności od decyzji przełożonych
-        //TODO zHASZOWAC CALY PLIK xml crc32
         //Konstruktor pobierający listę modeli
         public Reader()
         {
-            int ilosc_modeli;
             //TEST I - Istnienie bazy danych notebooków
-            if (Open())
+            if(!Open()) return;
+            else
             {
-                SetDataTables();
                 //TEST II - Istnienie pliku staticdata.txt
-                //Jeżeli nie istnieje plik staticdata, utwórz go
-                if (!File.Exists(Environment.CurrentDirectory + @"\staticdata.txt"))
+                //Jeżeli nie istnieje plik hash, utwórz go
+                if (!File.Exists(Environment.CurrentDirectory + @"\sha1.txt"))
                 {
-                    FileStream fs = (File.Create(Environment.CurrentDirectory + @"\staticdata.txt"));
-                    ilosc_modeli = 0;
-                    //StreamWriter sw = new StreamWriter(fs);
+                    //Utworzenie pliku i zapisanie hasha
+                    FileStream fs = new FileStream(Environment.CurrentDirectory + @"\sha1.txt", FileMode.Create);
+                    StreamWriter sw = new StreamWriter(fs);
+                    sw.WriteLine(AktualnyHash);
+                    sw.Close();
+                    //Utworzenie lub uaktualnienie bazy danych
+                    SaveModelList();
+                    CreateXMLFile();
                 }
+                //Jeżeli plik istnieje, porównaj hashe
                 else
                 {
-                    FileInfo fi = new FileInfo(Environment.CurrentDirectory + @"\staticdata.txt");
-                    StreamReader sr = fi.OpenText();
-                    ilosc_modeli = Convert.ToInt32(sr.ReadLine());
+                    //Pobranie hasha z pliku
+                    FileStream fs = new FileStream(Environment.CurrentDirectory + @"\sha1.txt", FileMode.Open);
+                    StreamReader sr = new StreamReader(fs);
+                    var temp = sr.ReadLine().ToString();
+                    //Jeżeli hashe są różne, pobierz na nowo listę modeli
+                    if (temp != AktualnyHash)
+                    {
+                        SaveModelList();
+                        CreateXMLFile();
+                    }
+                    //Jeżeli są takie same, nie rób nic
                 }
-                    
-                //Jeżeli nie istnieje plik Model.xml, utwórz go
-                if(!File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
-                    //Jeżeli nie udało się otworzyć pliku, zakończ działanie konstruktora
-                    if(!CreateXMLFile())
-                        return;
-
+                //Pozamykaj pliki, można pobierać dane z bazy danych
                 Close();
-            }
-            else return;
+            } 
         }
 
         //Metoda otwierająca plik bazy danych
+        //Zapewnia że baza danych istnieje, jest otwarta i utworzono hashcode
         bool Open()
         {
             //Zmienna zwracająca końcowy wynik
@@ -68,10 +76,13 @@ namespace Retriever
             //Spróbuj otworzyć plik bazy danych
             try
             {
+                //Otwarcie pliku
                 stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
                 excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 result = excelReader.AsDataSet();
                 isOpened = true;
+                
+                
             }
             catch (Exception e)
             {
@@ -94,6 +105,16 @@ namespace Retriever
                 excelReader = null;
                 result = null;
             }
+            //Utworzenie hasha do porównania z zapisanym
+            BufferedStream bs = new BufferedStream(stream);
+            SHA1Managed sha1 = new SHA1Managed();
+            byte[] hash = sha1.ComputeHash(bs);
+            StringBuilder hashhex = new StringBuilder(2 * hash.Length);
+            foreach (byte b in hash)
+            {
+                hashhex.AppendFormat("{0:X2}", b);
+            }
+            AktualnyHash = hashhex.ToString();
             return isOpened;
         }
 
@@ -143,7 +164,7 @@ namespace Retriever
                 //Zapisanie bazy
                 foreach (Model z in listaModeli)
                 {
-                    CreateNode(z.Wiersz, z.Zeszyt, z.MSN, z.MD, writer);
+                    CreateNode(z.WierszModel, z.WierszBios, z.MSN, z.MD, writer);
                 }
                 //Zamknięcie znacznika
                 writer.WriteEndElement();
@@ -155,17 +176,17 @@ namespace Retriever
         }
 
         //Metoda zapisująca dane Modelu w pliku XML
-        void CreateNode(int wiersz, int zeszyt, string msn, string md, XmlTextWriter writer)
+        void CreateNode(int wierszModel, int wierszBios, string msn, string md, XmlTextWriter writer)
         {
             //Utworzenie roota MODEL
             writer.WriteStartElement("Model"); //Dodaj pierwotną gałąź
             //Utworzenie gałęzi Wiersz
-            writer.WriteStartElement("Wiersz");     //Dodaj subgałąź
-            writer.WriteString(wiersz.ToString());  //Wpisz wartość
+            writer.WriteStartElement("WierszModel");     //Dodaj subgałąź
+            writer.WriteString(wierszModel.ToString());  //Wpisz wartość
             writer.WriteEndElement();               //Zamknij gałąź
             //Utworzenie gałęzi Zeszyt
-            writer.WriteStartElement("Zeszyt");
-            writer.WriteString(zeszyt.ToString());
+            writer.WriteStartElement("WierszBios");
+            writer.WriteString(wierszBios.ToString());
             writer.WriteEndElement();
             //Utworzenie gałęzi MSN
             writer.WriteStartElement("MSN");
@@ -178,47 +199,18 @@ namespace Retriever
             writer.WriteEndElement();
         }
 
-        //Metoda wyszukująca bios któy powinien być zainstalowany na podstawie porównywania modelu obudowy
-        void LookForBios(Computer komp)
+        //Metoda przeszukująca plik za bazą danych, następnie tworzy listę modeli
+        void SaveModelList()
         {
-            DataTable table = result.Tables[0];
-            for (int i = 0; i < table.Rows.Count; i++)
-            {
-                if (table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains(komp.Obudowa.ToLower().Replace(" ", "")) || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains("e221xt") || table.Rows[i][0].ToString().ToLower().Replace(" ", "").Contains("e222xt"))
-                {
-                    WersjaBios = new BiosVer(table.Rows[i][3].ToString(), table.Rows[i][4].ToString());
-                    break;
-                }
-            }
-        }
-
-        // Metoda przeszukująca plik excela w celu znalezienia odpowiednich zeszytów z danymi
-        void SetDataTables()
-        {
-            IEnumerable<Model> tempPQ = null;
-            IEnumerable<Model> tempMD = null;
-            //Dodatkowe przełączniki
-            bool Medion = false, Peaq = false;
-            //Przeszukuj zeszyty w pliku do póki nie znajdziesz MD i PQ
+            IEnumerable<Model> md;
+            //Przeszukuj zeszyty w pliku do póki nie znajdziesz MD
             for (int i = 0; i < result.Tables.Count; i++)
             {
                 //Pobierz bazę z MD
                 if (result.Tables[i].TableName.ToString() == "MD")
                 {
-                    tempMD = GatherModels(result.Tables[i], i, 0, 2);
-                    Medion = true; //Pobrano bazę MD
-                }
-                //Pobierz bazę z PQ
-                else if (result.Tables[i].TableName.ToString() == "PQ")
-                {
-                    tempPQ = GatherModels(result.Tables[i], i, 1, 2);
-                    Peaq = true; //Pobrano bazę PQ
-                }
-                //Przełączniki przyspieszają zakończenie wykonywania pętli
-                if (Medion == true && Peaq == true)
-                {
-                    listaModeli = tempMD.Concat(tempPQ);
-                    return;
+                    listaModeli = GatherModels(result.Tables[i], i, 0, 1);
+                    break;
                 }
             }
         }
@@ -228,9 +220,9 @@ namespace Retriever
         {
             for (int i = 1; i < table.Rows.Count; i++)
             {
-                //Odrzuca rekordy w których brakuje modelu i msn
-                if (string.IsNullOrEmpty(table.Rows[i][msnColumn].ToString()) && (string.IsNullOrEmpty(table.Rows[i][mdColumn].ToString()))) continue;
-                //Argumenty: (Wiersz w którym znajduje się dany model, numer zeszytu w którym jest rekord, MSN, Model)
+                
+                
+                
                 yield return new Model(i, sheet, table.Rows[i][msnColumn].ToString(), table.Rows[i][mdColumn].ToString(), table.TableName.ToString());
             }
         }
@@ -238,96 +230,46 @@ namespace Retriever
         //Odczytanie informacji o danym modelu z bazy
         void ReadData(Model model)
         {
-            //Zmienne potrzebne do utworzenia obiektów opisujących komputer
-            string MD = null, Kolor = null, MSN = null, NowyMSN = null, PelnyModel = null, LCD = null, CPU = null, Taktowanie = null, System = null,
-                swm = null, Wskazowki = null, Obudowa = null, ModelPlyty = null, ProducentPlyty = null, BIOS = null;
-            bool ShippingMode = false;
-
             //Utworzenie tymaczowego obiektu zeszytu
             if (model != null)
             {
-                DataTable table = result.Tables[model.Zeszyt];
-                for (int i = 0; i < table.Columns.Count; i++)
+                Open();
+                DataTable table = result.Tables["MD"];
+
+                //TODO Dodac wyszukiwanie BIOS
+                PlytaGlowna = new Mainboard(
+                    model:      table.Rows[model.WierszModel][14].ToString(),
+                    producent:  table.Rows[model.WierszModel][15].ToString(),
+                    cpu:        table.Rows[model.WierszModel][7].ToString(),
+                    taktowanie: table.Rows[model.WierszModel][8].ToString());
+
+                Komputer = new Computer(
+                    md:         table.Rows[model.WierszModel][0].ToString(),
+                    //msn:      table.Rows[model.Wiersz][1].ToString(), Opcjonalne wyświetlanie MSN, odkomentować jeżeli potrzeba + dorobić wiersze dla msn w xaml
+                    //staryMsn: table.Rows[model.Wiersz][2].ToString(),
+                    wearLevel: new double[1] { 12 },
+                    wskazowki:  table.Rows[model.WierszModel][12].ToString(),
+                    obudowa:    table.Rows[model.WierszModel][13].ToString(),
+                    lcd:        table.Rows[model.WierszModel][4].ToString(),
+                    kolor:      table.Rows[model.WierszModel][3].ToString(),
+                    shipp:      table.Rows[model.WierszModel][16].ToString() == "Tak" ? true : false,
+                    pelnyModel: table.Rows[model.WierszModel][17].ToString());
+
+                Swm = new SWM(swm: table.Rows[model.WierszModel][10].ToString());
+
+                Ram = new RAM(table.Rows[model.WierszModel][6].ToString());
+
+                var tempMem = table.Rows[model.WierszModel][5].ToString().Split(';');
+                Dyski = new Storage[tempMem.Length];
+                for (int j = 0; j < tempMem.Length; j++)
                 {
-                    #region Pobieranie i wpisywanie wartości dla konstruktorów
-                    string variable = "";
-                    switch (variable = table.Rows[0][i].ToString().ToLower().Replace(" ", ""))
-                    {
-                        case "model":
-                            MD = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "farba":
-                            Kolor = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "msn":
-                        case "starymsn":
-                            MSN = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "nowymsn":
-                            NowyMSN = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "model3":
-                            PelnyModel = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "rodzajpanela":
-                            LCD = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "hdd":
-                        case "hdd ":
-                            string[] tempMem = table.Rows[model.Wiersz][i].ToString().Split(';', '+');
-                            Dyski = new Storage[tempMem.Length];
-                            for (int j = 0; j < tempMem.Length; j++)
-                            {
-                                Dyski[j] = new Storage(tempMem[j]);
-                            }
-                            break;
-                        case "ram ":
-                        case "ram":
-                            Ram = new RAM(table.Rows[model.Wiersz][i].ToString());
-                            break;
-                        case "cpu":
-                            CPU = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "tak":
-                            Taktowanie = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "systemoperacyjny":
-                            System = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "nrswm":
-                            swm = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "wskazowki":
-                        case "wskazówki":
-                        case "uwagi":
-                            Wskazowki = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "modelbudy":
-                            Obudowa = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "modelpłyty":
-                        case "modelplyty":
-                            ModelPlyty = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "producentplyty":
-                        case "producentpłyty":
-                            ProducentPlyty = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                        case "shipping":
-                            ShippingMode = false;
-                            if (table.Rows[model.Wiersz][i].ToString().ToLower() == "tak") ShippingMode = true;
-                            break;
-                        case "bios":
-                            BIOS = table.Rows[model.Wiersz][i].ToString();
-                            break;
-                    }
-                    #endregion
+                    Dyski[j] = new Storage(tempMem[j]);
                 }
+                Close();
+
             }
             //W przypadku kiedy nie ma modelu, wpisz wartości null, konstruktory utworzą wartości domyślne
-            PlytaGlowna = new Mainboard(ModelPlyty, ProducentPlyty, CPU, Taktowanie, BIOS);
-            Komputer = new Computer(MD, MSN, System, new double[1] { 12 }, Wskazowki, Obudowa, LCD, Kolor, ShippingMode, NowyMSN, PelnyModel);
-            Swm = new SWM(swm: swm);
+
         }
 
         //Metoda odświeżajaca wartości Readera bez tworzenia nowego obiektu Reader

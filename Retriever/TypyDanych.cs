@@ -3,21 +3,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Retriever
 {
     //--------------------------------------------------Kontener na podstawowe dane o modelach---------------------------------------------------------
     public class Model
     {
-        public int Wiersz { get; set; } //Nr linii danego modelu
-        public int Zeszyt { get; set; } //Nr zeszytu na ktorym jest model (MD/PQ)
+        public int WierszModel { get; set; } //Nr linii danego modelu
+        public int WierszBios { get; set; } //Nr linii z danymi o BIOSie
         public string MSN { get; set; }
         public string MD { get; set; }
         public string NazwaZeszytu { get; set; }
-        public Model(int wiersz, int zeszyt, string msn, string md, string sheetName)
+        public Model(int wierszModel, int wierszBios, string msn, string md, string sheetName)
         {
-            Wiersz = wiersz;
-            Zeszyt = zeszyt;
+            WierszModel = wierszModel;
+            WierszBios = wierszBios;
             MSN = msn;
             MD = md;
             NazwaZeszytu = (sheetName == "MD") ? "Medion" : "Peaq";
@@ -34,13 +35,13 @@ namespace Retriever
         public string Wskazowki { get; set; }           //Dodatkowe informacje odnośnie komputera
         public string Obudowa { get; set; }             //Model obudowy
         public bool ShippingMode { get; set; }          //ShippingMode
-        public string NowyMSN { get; set; }             //NowyMSN
+        public string StaryMSN { get; set; }             //NowyMSN
         public string LCD { get; set; }                 //Rodzaj matrycy
         public string PelnyModel { get; set; }          //Dotyczy peaq - pełny model z dodatkowymi informacjami
         public string Kolor { get; set; }               //Kolor obudowy
 
         public Computer(string md = "-", string msn = "-", string system = "-", double[] wearLevel = null,
-            string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string nowyMsn = "-",
+            string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string staryMsn = "-",
             string pelnyModel = "-")
         {
             MD = md;
@@ -50,7 +51,7 @@ namespace Retriever
             Wskazowki = wskazowki;
             Obudowa = obudowa;
             ShippingMode = shipp;
-            NowyMSN = nowyMsn;
+            StaryMSN = staryMsn;
             LCD = lcd;
             PelnyModel = pelnyModel;
             Kolor = kolor;
@@ -92,28 +93,22 @@ namespace Retriever
         //Konstruktor na potrzeby bazy danych w pliku excel
         public RAM(string info)
         {
-            //Przeszukuje zakres możliwych wartości pamięci ram
-            for (int i = 33; i > 0; i--)
+            Regex[] size = new Regex[2]
             {
-                //Dodatkowa zmienna na prawidlowe wydobycie pamieci ram
-                string temp;
-                //Zabezpieczenie przed kolejnymi testami temp
-                if (info.Length < 2) continue;
-                //Przypadek 2048 GB - aby nie wykryło 20, ale przeszlo 2048
-                else if (info.Contains("2048")) temp = info[0].ToString();
-                else if (info[1] == '0') continue;
-                //W innym przypadku zbuduj zmienną do testów
-                else temp = info[0].ToString() + info[1].ToString();
-
-                //Testowanie w zależności o i
-                if (temp.Contains(i.ToString()))
+                new Regex(@"\d\d"),
+                new Regex(@"\d")
+            };
+            Match result;
+            foreach(Regex rgx in size)
+            {
+                result = rgx.Match(info);
+                if (result.Success)
                 {
-                    Pojemnosc = i;
-                    return;
+                    Pojemnosc = Convert.ToDouble(result.Value);
+                    break;
                 }
+                else Pojemnosc = -999;        
             }
-            //W innym wypadku
-            Pojemnosc = 0;
         }
     }
 
@@ -122,22 +117,6 @@ namespace Retriever
     {
         public string Nazwa { get; set; }       //Nazwa dysku
         public double Pojemnosc { get; set; }   //Pojemność
-        List<string> size = new List<string>            //Lista potencjalnych pojemności dysków
-        {
-            "1",
-            "1,5",
-            "1.5",
-            "2",
-            "16",
-            "32",
-            "64",
-            "128",
-            "240",
-            "256",
-            "500",
-            "512",
-            "750"
-        };
         //Konstruktor standardowy
         public Storage(double size = 0, string nazwa = "Brak")
         {
@@ -148,25 +127,49 @@ namespace Retriever
         //Konstruktor na potrzeby bazy w pliku excel
         public Storage(string info)
         {
-            info.ToLower();
-            for (int i = size.Count - 1; i >= 0; i--)
+            //Wzory dla odnajdywania wartości pojemności
+            Regex[] size = new Regex[3]
             {
-                //Badanie czy info zawiera w sobie którąś z wartości w liście
-                if (info.Contains(size[i]))
+                new Regex(@"\d{2}"),
+                new Regex(@"\d{3}"),
+                new Regex(@"\d{4}")
+            };
+            //Wzory dla odnajdywania typu dysku
+            Regex[] type = new Regex[4]
+            {
+                new Regex(@"[A-Za-z]{3}"),
+                new Regex(@"[A-Za-z]{4}"),
+                new Regex(@"[A-Za-z]{5}"),
+                new Regex(@"[A-Za-z]{3}\s[A-Za-z]\d")
+            };
+            //Test i wynik
+            Match result;
+            foreach(Regex rgx in size)
+            {
+                result = rgx.Match(info);
+                if (result.Success)
                 {
-                    //Dodatkowy warunek uwzględniający pamięć typu M.2
-                    if (size[i] == "2" && (info.Contains("m2") || info.Contains("m.2"))) continue;
-                    else
-                    {
-                        Pojemnosc = double.Parse(size[i]) <= 2 ? double.Parse(size[i]) * 1000 : double.Parse(size[i]);
-                        Nazwa = info.Replace(size[i], "").Replace("GB", "").Replace("TB", "").Replace(" ", ""); //Usuwa wartość oraz jednostkę, pozozstawia sam typ pamięci.
-                        return;
-                    }
+                    Pojemnosc = Convert.ToDouble(result.Value);
+                    break;
                 }
+                else Pojemnosc = 0;
             }
-            //W innym wypadku
-            Pojemnosc = 0;
-            Nazwa = info;
+            foreach (Regex rgx in type)
+            {
+                result = rgx.Match(info);
+                if (result.Success)
+                {
+                    Nazwa = result.Value;
+                    break;
+                }
+                else Nazwa = "-";
+            }
+        }
+
+        //Nadpisana metoda ToString na potrzeby wyświetlania w tabeli wartości z bazy danych
+        public override string ToString()
+        {
+            return string.Format("{0}: {1}", Nazwa, Pojemnosc);
         }
     }
 
@@ -176,7 +179,7 @@ namespace Retriever
         public string Dysk { get; set; } //Dysk na którym zlokalizowano swconf.dat
         public string Swm { get; set; }  //Nr SWM z pliku swconf.dat (3 linijka)
 
-        public SWM(string dysk = "-", string swm = "00000000")
+        public SWM(string swm, string dysk = "-")
         {
             Dysk = dysk;
             Swm = swm;
