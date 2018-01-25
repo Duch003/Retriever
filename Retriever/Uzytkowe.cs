@@ -196,16 +196,13 @@ namespace Retriever
                 sw.WriteLine("Wywołania stosu: {0}", e.StackTrace);
                 sw.WriteLine("Pary klucz-wartość: {0}", e.Data);
                 sw.WriteLine("Opis: {0}", e.Message);
+                sw.Close();
+                sw.Dispose();
             }
             catch (Exception logEx)
             {
                 MessageBox.Show($"Nie można utworzyć loga błędu. Treść błędu:\n{logEx.Message}", "Błąd przy tworzeniu loga błędu.", MessageBoxButton.OK, MessageBoxImage.Error);
                 logCreated = false;
-            }
-            finally
-            {
-                sw.Close();
-                sw.Dispose();
             }
             return logCreated;
         }

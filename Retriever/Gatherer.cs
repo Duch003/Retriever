@@ -13,7 +13,8 @@ namespace Retriever
         public DeviceManager[] MenedzerUrzadzen { get; private set; }
         public NetDevice[] UrzadzeniaSieciowe { get; private set; }
         public double PamiecRamSuma { get; private set; }
-        public GraphicCard[] KartyGraficzne { get; private set; }     
+        public GraphicCard[] KartyGraficzne { get; private set; }    
+        public BiosVer WersjaBios { get; private set; }
 
         public Gatherer()
         {
@@ -68,12 +69,15 @@ namespace Retriever
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_Processor, "MaxClockSpeed");
             double tempTaktowanie = double.Parse((temp.First() as Win32HardwareData).Wartosc);
             string mbTaktowanie = Math.Round((tempTaktowanie / 1000), 2).ToString() + " GHz";
+            #endregion
+            PlytaGlowna = new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie);
 
+            #region Tworzenie instancji BiosVer
             //Pobierane informacji o wersji BIOS
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
             string mbWersjaBios = (temp.First() as Win32HardwareData).Wartosc;
+            WersjaBios = new BiosVer(mbWersjaBios);
             #endregion
-            PlytaGlowna = new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie, bios: mbWersjaBios);
 
             #region Tworzenie instancji RAM
             //Pobieranie informacji o bankach

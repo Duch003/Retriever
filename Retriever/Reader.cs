@@ -8,6 +8,9 @@ using System.Xml;
 using System.Windows;
 using System.Security.Cryptography;
 using System.Text;
+using System.Xml.Linq;
+using System.Collections.ObjectModel;
+using System.Xml.Serialization;
 
 namespace Retriever
 {
@@ -22,11 +25,12 @@ namespace Retriever
         public Mainboard PlytaGlowna { get; private set; }
         public SWM Swm { get; private set; }
         public BiosVer WersjaBios { get; private set; }
-        public IEnumerable<Model> listaModeli { get; private set; }
+        public ObservableCollection<Model> listaModeli { get; private set; }
         public string BiosZBazy { get; private set; }
         string Plik = @"/NoteBookiRef_v3.xlsx";
         string AktualnyHash;
-
+        
+        //TODO Nie może wiele osób na raz otiwerać pliku, należy go kopiowac z serwera
         //Konstruktor główny
         // - sprawdza czy wszystkie pliki kontrolne są na swoim miejscu
         // - sprawdza czy baza danych jest osiągalna
@@ -48,7 +52,6 @@ namespace Retriever
                     sw.Close();
                     //Utworzenie lub uaktualnienie bazy danych
                     SaveModelList();
-                    CreateXMLFile();
                 }
                 //Jeżeli plik istnieje, porównaj hashe
                 else
@@ -59,10 +62,9 @@ namespace Retriever
                     var temp = sr.ReadLine().ToString();
                     //Jeżeli hashe są różne, pobierz na nowo listę modeli
                     if (temp != AktualnyHash)
-                    {
                         SaveModelList();
-                        CreateXMLFile();
-                    }
+                    else
+                        LoadModelList();
                     //Jeżeli są takie same, nie rób nic
                 }
                 //Pozamykaj pliki, można pobierać dane z bazy danych
@@ -80,10 +82,11 @@ namespace Retriever
             try
             {
                 //Otwarcie pliku
-                stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read);
+                stream = new FileStream(Environment.CurrentDirectory + Plik, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 result = excelReader.AsDataSet();
                 isOpened = true;
+                ComputeHashCode();
             }
             catch (Exception e)
             {
@@ -106,16 +109,6 @@ namespace Retriever
                 excelReader = null;
                 result = null;
             }
-            //Utworzenie hasha do porównania z zapisanym
-            BufferedStream bs = new BufferedStream(stream);
-            SHA1Managed sha1 = new SHA1Managed();
-            byte[] hash = sha1.ComputeHash(bs);
-            StringBuilder hashhex = new StringBuilder(2 * hash.Length);
-            foreach (byte b in hash)
-            {
-                hashhex.AppendFormat("{0:X2}", b);
-            }
-            AktualnyHash = hashhex.ToString();
             return isOpened;
         }
 
@@ -129,89 +122,119 @@ namespace Retriever
             result.Dispose();
         }
 
-        //Utworzenie pliku XML dla bazy danych
-        bool CreateXMLFile()
+        //Metoda obliczająca i zapisująca w pliku sha1.txt HashCode
+        //Można użyć tylko w metodzie Open()
+        void ComputeHashCode()
         {
-            bool isCreated = true;
-            XmlTextWriter writer = null;
-            try
+            //Utworzenie hasha do porównania z zapisanym
+            BufferedStream bs = new BufferedStream(stream);
+            SHA1Managed sha1 = new SHA1Managed();
+            byte[] hash = sha1.ComputeHash(bs);
+            StringBuilder hashhex = new StringBuilder(2 * hash.Length);
+            foreach (byte b in hash)
             {
-                //Utworz obiekt do zapisywania tekstu
-                writer = new XmlTextWriter("Model.xml", System.Text.Encoding.UTF8);
+                hashhex.AppendFormat("{0:X2}", b);
             }
-            catch(Exception e)
-            {
-                if(ErrorWriter.WriteErrorLog(e))
-                {
-                    string opis = string.Format("Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.\n");
-                    MessageBox.Show(opis + "\n\n" + e.Message, "Błąd utworzenia pliku", MessageBoxButton.OK, MessageBoxImage.Error);
-                    isCreated = false;
-                }
-                else
-                {
-                    string opis = "Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.";
-                    ErrorWriter.ShowErrorLog(e, "Błąd utworzenia pliku", opis);
-                    isCreated = false;
-                }
-            }
-            if(writer != null)
-            {
-                //Parametry zapisu
-                writer.WriteStartDocument(true);
-                writer.Formatting = Formatting.Indented;
-                writer.Indentation = 2;
-                //Utworzenie bazowego znacznika
-                writer.WriteStartElement("BAZA");
-                //Zapisanie bazy
-                foreach (Model z in listaModeli)
-                {
-                    CreateNode(z.WierszModel, z.WierszBios, z.MSN, z.MD, writer);
-                }
-                //Zamknięcie znacznika
-                writer.WriteEndElement();
-                //Zamknięcie dokumentu
-                writer.WriteEndDocument();
-                writer.Close();
-            }
-            return isCreated;           
+            AktualnyHash = hashhex.ToString();
         }
 
-        //Metoda zapisująca dane Modelu w pliku XML
-        void CreateNode(int wierszModel, int wierszBios, string msn, string md, XmlTextWriter writer)
-        {
-            //Utworzenie roota MODEL
-            writer.WriteStartElement("Model"); //Dodaj pierwotną gałąź
-            //Utworzenie gałęzi Wiersz
-            writer.WriteStartElement("WierszModel");     //Dodaj subgałąź
-            writer.WriteString(wierszModel.ToString());  //Wpisz wartość
-            writer.WriteEndElement();               //Zamknij gałąź
-            //Utworzenie gałęzi Zeszyt
-            writer.WriteStartElement("WierszBios");
-            writer.WriteString(wierszBios.ToString());
-            writer.WriteEndElement();
-            //Utworzenie gałęzi MSN
-            writer.WriteStartElement("MSN");
-            writer.WriteString(msn);
-            writer.WriteEndElement();
-            //Utworzenie gałęzi MD
-            writer.WriteStartElement("MD");
-            writer.WriteString(md);
-            writer.WriteEndElement();
-            writer.WriteEndElement();
-        }
+        ////Utworzenie pliku XML dla bazy danych
+        //bool CreateXMLFile()
+        //{
+        //    bool isCreated = true;
+        //    XmlTextWriter writer = null;
+        //    try
+        //    {
+        //        //Utworz obiekt do zapisywania tekstu
+        //        writer = new XmlTextWriter("Model.xml", System.Text.Encoding.UTF8);
+        //    }
+        //    catch(Exception e)
+        //    {
+        //        if(ErrorWriter.WriteErrorLog(e))
+        //        {
+        //            string opis = string.Format("Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.\n");
+        //            MessageBox.Show(opis + "\n\n" + e.Message, "Błąd utworzenia pliku", MessageBoxButton.OK, MessageBoxImage.Error);
+        //            isCreated = false;
+        //        }
+        //        else
+        //        {
+        //            string opis = "Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.";
+        //            ErrorWriter.ShowErrorLog(e, "Błąd utworzenia pliku", opis);
+        //            isCreated = false;
+        //        }
+        //    }
+        //    if(writer != null)
+        //    {
+        //        //Parametry zapisu
+        //        writer.WriteStartDocument(true);
+        //        writer.Formatting = Formatting.Indented;
+        //        writer.Indentation = 2;
+        //        //Utworzenie bazowego znacznika
+        //        writer.WriteStartElement("BAZA");
+        //        //Zapisanie bazy
+        //        foreach (Model z in listaModeli)
+        //        {
+        //            CreateNode(z.WierszModel, z.WierszBios, z.MSN, z.MD, writer);
+        //        }
+        //        //Zamknięcie znacznika
+        //        writer.WriteEndElement();
+        //        //Zamknięcie dokumentu
+        //        writer.WriteEndDocument();
+        //        writer.Close();
+        //    }
+        //    return isCreated;           
+        //}
 
+        ////Metoda zapisująca dane Modelu w pliku XML
+        //void CreateNode(int wierszModel, int wierszBios, string msn, string md, XmlTextWriter writer)
+        //{
+        //    //Utworzenie roota MODEL
+        //    writer.WriteStartElement("Model"); //Dodaj pierwotną gałąź
+        //    //Utworzenie gałęzi Wiersz
+        //    writer.WriteStartElement("WierszModel");     //Dodaj subgałąź
+        //    writer.WriteString(wierszModel.ToString());  //Wpisz wartość
+        //    writer.WriteEndElement();               //Zamknij gałąź
+        //    //Utworzenie gałęzi Zeszyt
+        //    writer.WriteStartElement("WierszBios");
+        //    writer.WriteString(wierszBios.ToString());
+        //    writer.WriteEndElement();
+        //    //Utworzenie gałęzi MSN
+        //    writer.WriteStartElement("MSN");
+        //    writer.WriteString(msn);
+        //    writer.WriteEndElement();
+        //    //Utworzenie gałęzi MD
+        //    writer.WriteStartElement("MD");
+        //    writer.WriteString(md);
+        //    writer.WriteEndElement();
+        //    writer.WriteEndElement();
+        //}
+
+        //Metoda wczytująca listę modeli do pamięci
         void LoadModelList()
         {
-           
+            XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+            StreamReader sr = new StreamReader(Environment.CurrentDirectory + @"\Model.xml");
+            listaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
+            sr.Close();
         }
 
         //Metoda pobierajaca i układająca listę modeli
+        //Po jej użyciu lista jest już w pamięci
         void SaveModelList()
         {
-            listaModeli = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
-            listaModeli = listaModeli.OrderBy(z => z.MD);
+            IEnumerable<Model> temp = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
+            temp = temp.OrderBy(z => z.MD);
+            listaModeli = new ObservableCollection<Model>(temp);
+            XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+            StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"\Model.xml");
+            xs.Serialize(sw, listaModeli);
+            sw.Close();
         }
 
+        //TODO Poprawić listę bios - wyszukiwanie po modelu płyty, nie obudowy
+        //TODO Usprawnić szukanie: dla konkretnych producentów konkretne wiersze lub ignorowanie wierszy do póki nie odnajdzie się producent
+        //TODO Jeżeli nie znajdzie biosu w tabeli, może to być peaq, wtedy zapisać bios peaq
+        //TODO Testowane do tego momentu
         // Metoda zwracająca listę modeli z pliku excel.
         IEnumerable<Model> GatherModels(DataTable modelTable, DataTable biosTable)
         {
@@ -225,14 +248,17 @@ namespace Retriever
 
                 //Na podstawie modelu obudowy przeszukaj tabelę z biosami i znajdź 
                 int biosRow = -1;
-                string temp = modelTable.Rows[i][14].ToString();
+                string temp = modelTable.Rows[i][13].ToString();
                 //Jeżeli jest zapisany model, zacznij poszukiwania
                 if(temp != "-")
                 {
-                    for (int j = 0; i < biosTable.Rows.Count; j++)
+                    for (int j = 0; j < biosTable.Rows.Count; j++)
                     {
-                        if (biosTable.Rows[i][0].ToString().Contains(temp))
+                        if (biosTable.Rows[j][0].ToString().Contains(temp))
+                        {
                             biosRow = j;
+                            break;
+                        }                            
                         else if (j == biosTable.Rows.Count - 1)
                             biosRow = -1;
                     }
@@ -256,8 +282,13 @@ namespace Retriever
                     model:      table.Rows[model.WierszModel][14].ToString(),
                     producent:  table.Rows[model.WierszModel][15].ToString(),
                     cpu:        table.Rows[model.WierszModel][7].ToString(),
-                    taktowanie: table.Rows[model.WierszModel][8].ToString(),
-                    bios:       table.Rows[model.WierszModel][13].ToString());
+                    taktowanie: table.Rows[model.WierszModel][8].ToString());
+                #endregion
+
+                #region Tworzenie instancji BiosVer
+                WersjaBios = new BiosVer(
+                    ver: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][3].ToString(),
+                    opis: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][4].ToString());
                 #endregion
 
                 #region Tworzenie instancji Computer

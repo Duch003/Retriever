@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -12,91 +13,58 @@ namespace Retriever
     
     public partial class MainWindow : Window
     {
-        public Reader ReaderInfo { get; private set; }
-        public Reader ReaderInfo_WersjaBios { get; private set; }
-        public ModelListSource ListSource;
-        public Gatherer GathererInfo { get; private set; }
-        public Model ThisComputer { get; private set; }
-        public RetrieverInfo Retriever2 { get; private set; }
-        public Status Statusy { get; private set; }
+        //public Reader ReaderInfo { get; private set; }
+        //public Gatherer GathererInfo { get; private set; }
+        public RetrieverInfo Retriever { get; private set; }
 
         public MainWindow()
         {
-            //AktwacjaWindows ac = new AktwacjaWindows();
-            //try
-            {
-                InitializeComponent();
-                PrzygotujAplikacje();
-                //UstawTimer();
-            }
-            //catch (Exception e)
-            //{
-
-            //    MessageBox.Show(string.Format(e.Data + "\n\n" + e.HelpLink + "\n\n" + e.InnerException + "\n\n" + e.Message + "\n\n" + e.Source + "\n\n" + e.StackTrace + "\n\n" + e.TargetSite));
-            //}
+            InitializeComponent();
+            PrzygotujAplikacje();
+                //UstawTimer();     
         }
 
         void PrzygotujAplikacje()
         {
-            //Wczytanie i przypisanie listy modeli do grida
-            ListSource = new ModelListSource(new Reader());           
-            gridModele.ItemsSource = ListSource.ListaModeli;
-      
-            //Wczytanie danych rzeczywistych komputera i przypisanie do gridów
-            GathererInfo = new Gatherer();
+            //Utworzenie instancji Retriever
+            Retriever = new RetrieverInfo(new Reader(), new Gatherer(), new Status());
+            gridZestawienie.DataContext = Retriever;
 
-            //Tworzenie dodatkowych kontrolek z informacjami
-            CreateSwmDataControls(GathererInfo.Swm);
-            CreateWearLevelDataControls(GathererInfo.Komputer.WearLevel);
-            CreateDiscDataHeaders(GathererInfo.Dyski);
-            CreateDevMgmtDataControls(GathererInfo.MenedzerUrzadzen);
-            CreateNetDevDataControls(GathererInfo.UrzadzeniaSieciowe);
-            CreateDiscDataControls(GathererInfo.Dyski, ref spDyskiGatherer);
+            //Przypisanie listy modeli do grida
+            if (Retriever.ReaderInfo != null)
+            {
+                gridModele.ItemsSource = Retriever.ReaderInfo.listaModeli;
+                gridModele.SelectedIndex = 0;
+            }
+
+            //Próba odczytania modelu komputera
+            if (Retriever.GathererInfo.Komputer.MD != "" && Retriever.ReaderInfo != null)
+            {
+                var model = from z in Retriever.ReaderInfo.listaModeli
+                            where z.MD == Retriever.GathererInfo.Komputer.MD
+                            select z;
+
+                if (model.Count() > 0)
+                    Retriever.ReaderInfo.ReadData(model.First() as Model);
+            }
+            else if (Retriever.ReaderInfo != null)
+                Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+
+            //Tworzenie dynamicznych kontrolek
+            DynamicControls();
 
             //Kod wyszukiwarki modeli
             CollectionView widok = (CollectionView)CollectionViewSource.GetDefaultView(gridModele.ItemsSource);
             widok.Filter = FiltrUzytkownika;
 
-            //Próba określenia modelu i automatycznego wczytania danych konkretnrgo modelu do zestawienia
-            var q = from item in ListSource.ListaModeli
-                    where item.MD.Equals(GathererInfo.Komputer.MD)
-                    select item;
-
-            if (q.Count() != 0)
-            {
-                ReaderInfo = new Reader(q.First() == null ? gridModele.SelectedItem as Model : q.First() as Model);
-                ThisComputer = q.First() == null ? gridModele.SelectedItem as Model : q.First() as Model;
-            }
-               
-            else
-            {
-                ReaderInfo = new Reader(gridModele.SelectedItem as Model);
-                ThisComputer = gridModele.SelectedItem as Model;
-            }
-
-            ReaderInfo_WersjaBios = new Reader(", ReaderInfo.Komputer);
-            spReaderBios.DataContext = ReaderInfo_WersjaBios;
-            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);            
-
-            //Dodanie kontekstu danych do grida
-            Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
-            gridZestawienie.DataContext = Retriever2;
-
-            ////Utworzenie instatncji statusów
-            //Statusy = new Status();
-            //tbWinStatus.DataContext = tbSecureBootStatus.DataContext = Statusy;
-            
         }
 
         #region Wczytywanie nowych danych z pliku excel
         //Metoda wczytująca dane aktualnie zaznaczonego rekordu
         private void gridModele_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ReaderInfo = new Reader((gridModele.SelectedItem as Model) == null ? ThisComputer : gridModele.SelectedItem as Model);
-            Retriever2 = new RetrieverInfo(ReaderInfo, GathererInfo);
-            gridZestawienie.DataContext = Retriever2;
-            spReaderBios.DataContext = ReaderInfo_WersjaBios;
-            CreateDiscDataControls(ReaderInfo.Dyski, ref spDyskiReader);
+            Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+            DynamicControls();
         }
         #endregion
 
@@ -104,7 +72,7 @@ namespace Retriever
         bool FiltrUzytkownika(object item)
         {
             if (String.IsNullOrEmpty(txtWyszukiwarka.Text) || txtWyszukiwarka.Text.Length > 5 || txtWyszukiwarka.Text.Length < 5) return true;
-            else return (((item as Model).MD.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0));
+            else return ((item as Model).MD == Retriever.GathererInfo.Komputer.MD);
             //Wyszukiwanie również po msn: else return (((item as Model).MD.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0) || ((item as Model).MSN.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0));
         }
 
@@ -114,24 +82,35 @@ namespace Retriever
             CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
             if (gridModele.SelectedItem as Model == null)
                 gridModele.SelectedIndex = 1;
-
-            ThisComputer = gridModele.SelectedItem as Model;
         }
         #endregion
 
         #region Ustawienie timera do odświeżania danych
-        void UstawTimer()
-        {
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(Statusy.RefreshBatteriesState);
-            timer.Interval = new TimeSpan(0, 1, 0);
-            timer.Start();
-        }
+        //void UstawTimer()
+        //{
+        //    DispatcherTimer timer = new DispatcherTimer();
+        //    timer.Tick += new EventHandler(Statusy.RefreshBatteriesState);
+        //    timer.Interval = new TimeSpan(0, 1, 0);
+        //    timer.Start();
+        //}
         #endregion
 
         #region Dynamiczne twozenie kontrolek
+        //Metoda wywołująca wszystkie poniższe
+        void DynamicControls()
+        {
+            CreateSwmData(          Retriever.GathererInfo.Swm);
+            CreateWearLevelData(    Retriever.GathererInfo.Komputer.WearLevel);
+            CreateDiscDataHeaders(  Retriever.GathererInfo.Dyski);
+            CreateDevMgmtData(      Retriever.GathererInfo.MenedzerUrzadzen);
+            CreateNetDevData(       Retriever.GathererInfo.UrzadzeniaSieciowe);
+            CreateDiscData(         Retriever.GathererInfo.Dyski, ref spDyskiGatherer);
+            CreateDiscData(         Retriever.ReaderInfo.Dyski, ref spDyskiReader);
+            CreateGraphicCardData(  Retriever.GathererInfo.KartyGraficzne);
+        }
+
         //Dodawanie kontrolek SWM
-        public void CreateSwmDataControls(SWM[] Swm)
+        void CreateSwmData(SWM[] Swm)
         {
             spSwm.Children.Clear();
             for(int i = 0; i < Swm.Length; i++)
@@ -144,7 +123,7 @@ namespace Retriever
         }
 
         //Dodawanie kontrolek Wear Level
-        public void CreateWearLevelDataControls(double[] wl)
+        void CreateWearLevelData(double[] wl)
         {
             spWearLevel.Children.Clear();
             for (int i = 0; i < wl.Length; i++)
@@ -157,7 +136,7 @@ namespace Retriever
         }
 
         //Dodawanie kontrolek z pojemnościami dysków
-        public void CreateDiscDataControls(Storage[] Disc, ref StackPanel control)
+        void CreateDiscData(Storage[] Disc, ref StackPanel control)
         {
             control.Children.Clear();
             for (int i = 0; i < Disc.Length; i++)
@@ -170,23 +149,23 @@ namespace Retriever
         }
 
         //Dodawanie kontrolek z nazwami dysków
-        public void CreateDiscDataHeaders(Storage[] Disc)
+        void CreateDiscDataHeaders(Storage[] Disc)
         {
-            spDyskiNazwa.Children.Clear();
+            dpDyskiNazwa.Children.Clear();
             for (int i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Disc[i].Nazwa);
                 text.Style = Resources["TextBlockDescription"] as Style;
                 DockPanel.SetDock(text, Dock.Top);
-                spDyskiNazwa.Children.Add(text);
+                dpDyskiNazwa.Children.Add(text);
             }
         }
 
         //Dodawanie kontrolek z nazwami urządzeń z błędami
-        public void CreateDevMgmtDataControls(DeviceManager[] Dev)
+        void CreateDevMgmtData(DeviceManager[] Dev)
         {
-            spDeviceManagerCaption.Children.Clear();
+            dpDeviceManagerCaption.Children.Clear();
             spDeviceManagerErrorDescription.Children.Clear();
             for (int i = 0; i < Dev.Length; i++)
             {
@@ -194,7 +173,7 @@ namespace Retriever
                 text.Text = string.Format("{0}", Dev[i].Nazwa);
                 text.Style = Resources["TextBlockDescription"] as Style;
                 DockPanel.SetDock(text, Dock.Top);
-                spDeviceManagerCaption.Children.Add(text);
+                dpDeviceManagerCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].TrescBledu);
                 text.Style = Resources["PropertyValue"] as Style;
@@ -203,10 +182,10 @@ namespace Retriever
         }
 
         //Dodawanie kontrolek z nazwami dysków
-        public void CreateNetDevDataControls(NetDevice[] Dev)
+        void CreateNetDevData(NetDevice[] Dev)
         {
-            spDeviceCaption.Children.Clear();
-            spDeviceMACAddress.Children.Clear();
+            dpDeviceCaption.Children.Clear();
+            dpDeviceMACAddress.Children.Clear();
             for (int i = 0; i < Dev.Length; i++)
             {
                 var text = new TextBlock();
@@ -216,16 +195,39 @@ namespace Retriever
                 text.Height = 50;
                 text.TextWrapping = TextWrapping.Wrap;
                 DockPanel.SetDock(text, Dock.Top);
-                spDeviceCaption.Children.Add(text);
+                dpDeviceCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].AdresMAC);
                 text.Height = 50;
                 text.Style = Resources["PropertyValue"] as Style;
-                spDeviceMACAddress.Children.Add(text);
+                dpDeviceMACAddress.Children.Add(text);
+            }
+        }
+
+        //Dodawanie kontrolek z nazwami kart graficznych
+        void CreateGraphicCardData(GraphicCard[] Card)
+        {
+            dpGraphicCardCaption.Children.Clear();
+            spGraphicCardDescription.Children.Clear();
+            for (int i = 0; i < Card.Length; i++)
+            {
+                var text = new TextBlock();
+                text.Text = string.Format("{0}", Card[i].Nazwa);
+                text.Style = Resources["TextBlockDescription"] as Style;
+                text.MaxWidth = 250;
+                text.Height = 50;
+                text.TextWrapping = TextWrapping.Wrap;
+                DockPanel.SetDock(text, Dock.Top);
+                dpGraphicCardCaption.Children.Add(text);
+                text = new TextBlock();
+                text.Text = string.Format("{0}", Card[i].Opis);
+                text.Height = 50;
+                text.Style = Resources["PropertyValue"] as Style;
+                spGraphicCardDescription.Children.Add(text);
             }
         }
         #endregion
 
-       
+
     }
 }

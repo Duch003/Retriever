@@ -132,7 +132,6 @@
 						<TextBlock Text="" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
-
 					<!--Stan naładowania baterii-->
 					<Border Grid.Row="6" Grid.Column="3" Style="{StaticResource ClassicBorder}">
 						<Label Content="Aktualny stan baterii" Style="{StaticResource BlueHeader}"/>
@@ -269,7 +268,7 @@
 
 					<!--==============================Dyski==============================-->
 					<Border Grid.Row="12" Grid.Column="0" Style="{StaticResource ClassicBorder}">
-						<DockPanel x:Name="spDyskiNazwa">
+						<DockPanel x:Name="dpDyskiNazwa">
 							<DockPanel.Resources>
 								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
 							</DockPanel.Resources>
@@ -307,7 +306,7 @@
 
 					</Border>
 					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spDGraphicCardDescription">
+						<StackPanel x:Name="spGraphicCardDescription">
 							<StackPanel.Resources>
 								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
 							</StackPanel.Resources>
@@ -323,7 +322,7 @@
 					</Border>
 
 					<Border Grid.Row="16" Grid.Column="0" Style="{StaticResource ClassicBorder}">
-						<DockPanel x:Name="spDeviceManagerCaption"/>
+						<DockPanel x:Name="dpDeviceManagerCaption"/>
 					</Border>
 					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
 						<StackPanel x:Name="spDeviceManagerErrorDescription">
@@ -342,14 +341,14 @@
 					</Border>
 
 					<Border Grid.Row="18" Grid.Column="0" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
-						<DockPanel x:Name="spDeviceCaption">
+						<DockPanel x:Name="dpDeviceCaption">
 							<DockPanel.Resources>
 								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
 							</DockPanel.Resources>
 						</DockPanel>
 					</Border>
 					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spDeviceMACAddress">
+						<StackPanel x:Name="dpDeviceMACAddress">
 							<StackPanel.Resources>
 								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
 							</StackPanel.Resources>

@@ -64,7 +64,6 @@ namespace Retriever
         public string Producent { get; set; }   //Producent płyty
         public string CPU { get; set; }         //Procesor
         public string Taktowanie { get; set; }  //Taktowanie
-        public string WersjaBios { get; set; }  //Wersja bios płyty
         public string ID { get; set; }          //Pełna nazwa procesora
 
         public Mainboard(string model = "-", string producent = "-", string cpu = "-", string taktowanie = "-", string bios = "-")
@@ -73,7 +72,6 @@ namespace Retriever
             Producent = producent;
             CPU = cpu;
             Taktowanie = taktowanie;
-            WersjaBios = bios;
             ID = string.Format($"{CPU}" + " @ " + $"{Taktowanie}");
         }
     }
@@ -190,11 +188,13 @@ namespace Retriever
     {
         public Reader ReaderInfo{ get; set; }
         public Gatherer GathererInfo { get; set; }
+        public Status Statusy { get; set; }
 
-        public RetrieverInfo(Reader reader, Gatherer gatherer)
+        public RetrieverInfo(Reader reader, Gatherer gatherer, Status statusy)
         {
             ReaderInfo = reader;
             GathererInfo = gatherer;
+            Statusy = statusy;
         }
     }
 
@@ -487,7 +487,7 @@ namespace Retriever
         public string Wersja { get; set; }
         public string Opis { get; set; }
 
-        public BiosVer(string ver, string opis)
+        public BiosVer(string ver, string opis = "-")
         {
             Wersja = ver;
             Opis = opis;
@@ -579,8 +579,8 @@ namespace Retriever
     //--------------------------------------------------Kontener na dane o kartach graficznych----------------------------------------------------------
     public class GraphicCard
     {
-        string Nazwa { get; set; }
-        string Opis { get; set; }
+        public string Nazwa { get; set; }
+        public string Opis { get; set; }
 
         public GraphicCard(string nazwa, string opis)
         {
