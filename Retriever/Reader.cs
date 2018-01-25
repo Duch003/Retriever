@@ -27,7 +27,10 @@ namespace Retriever
         string Plik = @"/NoteBookiRef_v3.xlsx";
         string AktualnyHash;
 
-        //Konstruktor pobierający listę modeli
+        //Konstruktor główny
+        // - sprawdza czy wszystkie pliki kontrolne są na swoim miejscu
+        // - sprawdza czy baza danych jest osiągalna
+        // - utworzenie obiektu oznacza że baza istnieje i jest aktualna i można dowoi odświezaćrekordy
         public Reader()
         {
             //TEST I - Istnienie bazy danych notebooków
@@ -81,8 +84,6 @@ namespace Retriever
                 excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 result = excelReader.AsDataSet();
                 isOpened = true;
-                
-                
             }
             catch (Exception e)
             {
@@ -199,50 +200,67 @@ namespace Retriever
             writer.WriteEndElement();
         }
 
-        //Metoda przeszukująca plik za bazą danych, następnie tworzy listę modeli
+        void LoadModelList()
+        {
+           
+        }
+
+        //Metoda pobierajaca i układająca listę modeli
         void SaveModelList()
         {
-            IEnumerable<Model> md;
-            //Przeszukuj zeszyty w pliku do póki nie znajdziesz MD
-            for (int i = 0; i < result.Tables.Count; i++)
-            {
-                //Pobierz bazę z MD
-                if (result.Tables[i].TableName.ToString() == "MD")
-                {
-                    listaModeli = GatherModels(result.Tables[i], i, 0, 1);
-                    break;
-                }
-            }
+            listaModeli = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
+            listaModeli = listaModeli.OrderBy(z => z.MD);
         }
 
         // Metoda zwracająca listę modeli z pliku excel.
-        IEnumerable<Model> GatherModels(DataTable table, int sheet, int mdColumn, int msnColumn)
+        IEnumerable<Model> GatherModels(DataTable modelTable, DataTable biosTable)
         {
-            for (int i = 1; i < table.Rows.Count; i++)
+            for (int i = 1; i < modelTable.Rows.Count; i++)
             {
-                
-                
-                
-                yield return new Model(i, sheet, table.Rows[i][msnColumn].ToString(), table.Rows[i][mdColumn].ToString(), table.TableName.ToString());
+                //Zapisz daną linię
+                int mdRow = i;
+                //Zapisz Model i MSN z danej linii
+                string msn = modelTable.Rows[i][1].ToString();
+                string md = modelTable.Rows[i][0].ToString();
+
+                //Na podstawie modelu obudowy przeszukaj tabelę z biosami i znajdź 
+                int biosRow = -1;
+                string temp = modelTable.Rows[i][14].ToString();
+                //Jeżeli jest zapisany model, zacznij poszukiwania
+                if(temp != "-")
+                {
+                    for (int j = 0; i < biosTable.Rows.Count; j++)
+                    {
+                        if (biosTable.Rows[i][0].ToString().Contains(temp))
+                            biosRow = j;
+                        else if (j == biosTable.Rows.Count - 1)
+                            biosRow = -1;
+                    }
+                }
+                yield return new Model(mdRow, biosRow, msn, md);
             }
         }
 
         //Odczytanie informacji o danym modelu z bazy
-        void ReadData(Model model)
+        public void ReadData(Model model)
         {
             //Utworzenie tymaczowego obiektu zeszytu
             if (model != null)
             {
                 Open();
                 DataTable table = result.Tables["MD"];
+                DataTable biosTable = result.Tables["BIOS"];
 
-                //TODO Dodac wyszukiwanie BIOS
+                #region Tworzenie instancji Mainboard
                 PlytaGlowna = new Mainboard(
                     model:      table.Rows[model.WierszModel][14].ToString(),
                     producent:  table.Rows[model.WierszModel][15].ToString(),
                     cpu:        table.Rows[model.WierszModel][7].ToString(),
-                    taktowanie: table.Rows[model.WierszModel][8].ToString());
+                    taktowanie: table.Rows[model.WierszModel][8].ToString(),
+                    bios:       table.Rows[model.WierszModel][13].ToString());
+                #endregion
 
+                #region Tworzenie instancji Computer
                 Komputer = new Computer(
                     md:         table.Rows[model.WierszModel][0].ToString(),
                     //msn:      table.Rows[model.Wiersz][1].ToString(), Opcjonalne wyświetlanie MSN, odkomentować jeżeli potrzeba + dorobić wiersze dla msn w xaml
@@ -254,7 +272,9 @@ namespace Retriever
                     kolor:      table.Rows[model.WierszModel][3].ToString(),
                     shipp:      table.Rows[model.WierszModel][16].ToString() == "Tak" ? true : false,
                     pelnyModel: table.Rows[model.WierszModel][17].ToString());
+                #endregion
 
+                #region Tworzenie instancji SWM, RAM i Storage
                 Swm = new SWM(swm: table.Rows[model.WierszModel][10].ToString());
 
                 Ram = new RAM(table.Rows[model.WierszModel][6].ToString());
@@ -265,37 +285,10 @@ namespace Retriever
                 {
                     Dyski[j] = new Storage(tempMem[j]);
                 }
-                Close();
+                #endregion
 
-            }
-            //W przypadku kiedy nie ma modelu, wpisz wartości null, konstruktory utworzą wartości domyślne
-
-        }
-
-        //Metoda odświeżajaca wartości Readera bez tworzenia nowego obiektu Reader
-        public void RefreshData(Model model, Computer komp)
-        {
-            #region Wyszukiwanie wersji BIOS
-            Plik = @"\Medion_NB_Bios.xlsx";
-            if (Open())
-            {
-                LookForBios(komp);
                 Close();
             }
-            #endregion
-
-            #region Wyszukiwanie pozostałych parametrów
-            Plik = @"/NoteBookiRef_v2.xlsx";
-            if (Open())
-            {
-                ReadData(model);
-                Close();
-            }
-            #endregion
-        }
-
-        
+        }  
     }
-
-    
 }

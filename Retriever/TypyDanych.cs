@@ -14,14 +14,13 @@ namespace Retriever
         public int WierszBios { get; set; } //Nr linii z danymi o BIOSie
         public string MSN { get; set; }
         public string MD { get; set; }
-        public string NazwaZeszytu { get; set; }
-        public Model(int wierszModel, int wierszBios, string msn, string md, string sheetName)
+
+        public Model(int wierszModel, int wierszBios, string msn, string md)
         {
             WierszModel = wierszModel;
             WierszBios = wierszBios;
             MSN = msn;
             MD = md;
-            NazwaZeszytu = (sheetName == "MD") ? "Medion" : "Peaq";
         }
     }
 
