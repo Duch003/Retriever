@@ -11,6 +11,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
+using System.Text.RegularExpressions;
 
 namespace Retriever
 {
@@ -30,7 +31,6 @@ namespace Retriever
         string Plik = @"/NoteBookiRef_v3.xlsx";
         string AktualnyHash;
         
-        //TODO Nie może wiele osób na raz otiwerać pliku, należy go kopiowac z serwera
         //Konstruktor główny
         // - sprawdza czy wszystkie pliki kontrolne są na swoim miejscu
         // - sprawdza czy baza danych jest osiągalna
@@ -246,6 +246,8 @@ namespace Retriever
                 string msn = modelTable.Rows[i][1].ToString();
                 string md = modelTable.Rows[i][0].ToString();
 
+                if (!Regex.IsMatch(modelTable.Rows[i][18].ToString(), @"^\d{5}$"))
+                    biosRow = modelTable.Rows[i][18].ToString();
                 //Na podstawie modelu obudowy przeszukaj tabelę z biosami i znajdź 
                 int biosRow = -1;
                 string temp = modelTable.Rows[i][13].ToString();
@@ -258,7 +260,8 @@ namespace Retriever
                         {
                             biosRow = j;
                             break;
-                        }                            
+                        }   
+                        else if()
                         else if (j == biosTable.Rows.Count - 1)
                             biosRow = -1;
                     }

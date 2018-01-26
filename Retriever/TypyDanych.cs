@@ -14,6 +14,7 @@ namespace Retriever
         public int WierszBios { get; set; } //Nr linii z danymi o BIOSie
         public string MSN { get; set; }
         public string MD { get; set; }
+        public string BiosZeszyt { get; set; }
 
         public Model(int wierszModel, int wierszBios, string msn, string md)
         {
