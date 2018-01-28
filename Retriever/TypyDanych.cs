@@ -1,8 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
 namespace Retriever
@@ -16,13 +14,18 @@ namespace Retriever
         public string MD { get; set; }
         public string BiosZeszyt { get; set; }
 
-        public Model(int wierszModel, int wierszBios, string msn, string md)
+        public Model(int wierszModel, int wierszBios, string biosZeszyt, string msn, string md)
         {
             WierszModel = wierszModel;
             WierszBios = wierszBios;
             MSN = msn;
             MD = md;
+            BiosZeszyt = biosZeszyt;
         }
+
+        //Konstruktor na potrzeby serializowania listy modeli
+        public Model()
+        { }
     }
 
     //--------------------------------------------------Kontener na ogólne i różne dane o komputerze---------------------------------------------------
@@ -37,12 +40,10 @@ namespace Retriever
         public bool ShippingMode { get; set; }          //ShippingMode
         public string StaryMSN { get; set; }             //NowyMSN
         public string LCD { get; set; }                 //Rodzaj matrycy
-        public string PelnyModel { get; set; }          //Dotyczy peaq - pełny model z dodatkowymi informacjami
         public string Kolor { get; set; }               //Kolor obudowy
 
         public Computer(string md = "-", string msn = "-", string system = "-", double[] wearLevel = null,
-            string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string staryMsn = "-",
-            string pelnyModel = "-")
+            string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string staryMsn = "-")
         {
             MD = md;
             MSN = msn;
@@ -53,7 +54,6 @@ namespace Retriever
             ShippingMode = shipp;
             StaryMSN = staryMsn;
             LCD = lcd;
-            PelnyModel = pelnyModel;
             Kolor = kolor;
         }
     }
@@ -128,17 +128,17 @@ namespace Retriever
             //Wzory dla odnajdywania wartości pojemności
             Regex[] size = new Regex[3]
             {
-                new Regex(@"\d{2}"),
+                new Regex(@"\d{4}"),
                 new Regex(@"\d{3}"),
-                new Regex(@"\d{4}")
+                new Regex(@"\d{2}")
             };
             //Wzory dla odnajdywania typu dysku
             Regex[] type = new Regex[4]
             {
-                new Regex(@"[A-Za-z]{3}"),
-                new Regex(@"[A-Za-z]{4}"),
+                new Regex(@"[A-Za-z]{3}\s[A-Za-z]\d"),
                 new Regex(@"[A-Za-z]{5}"),
-                new Regex(@"[A-Za-z]{3}\s[A-Za-z]\d")
+                new Regex(@"[A-Za-z]{4}"),
+                new Regex(@"[A-Za-z]{3}")
             };
             //Test i wynik
             Match result;
@@ -320,16 +320,6 @@ namespace Retriever
         SoftwareLicensingService
     }
 
-    //--------------------------------------------------Kontener przetrzymujący listę modeli-----------------------------------------------------------
-    public class ModelListSource
-    {
-        public IEnumerable<Model> ListaModeli { get; set; }
-        public ModelListSource(Reader reader)
-        {
-            ListaModeli = reader.listaModeli;
-        }
-    }
-
     //--------------------------------------------------Typ wyliczeniowy na błędy Menedżera urządzeń---------------------------------------------------
     public enum ConfigManagerErrorCode : byte
     {
@@ -483,12 +473,12 @@ namespace Retriever
     }
 
     //--------------------------------------------------Kontener na dane o wersji BIOS która powinna być-----------------------------------------------
-    public class BiosVer
+    public class Bios
     {
         public string Wersja { get; set; }
         public string Opis { get; set; }
 
-        public BiosVer(string ver, string opis = "-")
+        public Bios(string ver, string opis = "-")
         {
             Wersja = ver;
             Opis = opis;
@@ -527,6 +517,7 @@ namespace Retriever
         public Status()
         {
             RenewWindowsActivationStatusInfo();
+            RefreshBatteriesState();
             RenewSecureBootInfo();
             RenewWindowsKeyInfo();
             CountUSB();
@@ -556,12 +547,13 @@ namespace Retriever
 
         public void CountUSB()
         {
-            var ans = WMI.GetAll(Win32Hardware.Win32_USBController);
+            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_USBController, "Availability");
             PortyUSB = ans.Where(z => z.Wlasciwosc == "Availability").Count();
         }
 
         public void RefreshBatteriesState()
         {
+            StanBaterii = new double[0];
             int i = 0;
             var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
             foreach(Win32HardwareData z in ans)

@@ -14,7 +14,7 @@ namespace Retriever
         public NetDevice[] UrzadzeniaSieciowe { get; private set; }
         public double PamiecRamSuma { get; private set; }
         public GraphicCard[] KartyGraficzne { get; private set; }    
-        public BiosVer WersjaBios { get; private set; }
+        public Bios WersjaBios { get; private set; }
 
         public Gatherer()
         {
@@ -76,7 +76,7 @@ namespace Retriever
             //Pobierane informacji o wersji BIOS
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
             string mbWersjaBios = (temp.First() as Win32HardwareData).Wartosc;
-            WersjaBios = new BiosVer(mbWersjaBios);
+            WersjaBios = new Bios(mbWersjaBios);
             #endregion
 
             #region Tworzenie instancji RAM
@@ -205,7 +205,7 @@ namespace Retriever
             Regex rgx = new Regex(@"\d{5}");
             Match m = rgx.Match(modelString);
             if (m.Success)
-                return m.Value.ToString();
+                return m.Value;
             else
                 return "";
         }

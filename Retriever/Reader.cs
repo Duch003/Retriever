@@ -12,22 +12,97 @@ using System.Xml.Linq;
 using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace Retriever
 {
-    public class Reader
+    public class Reader : INotifyPropertyChanged
     {
         FileStream stream;
         IExcelDataReader excelReader;
         DataSet result;
-        public Computer Komputer { get; set; }
-        public RAM Ram { get; private set; }
+        Computer _Komputer;
+        public Computer Komputer
+        {
+            get
+            {
+                return _Komputer;
+            }
+            set
+            {
+                if(_Komputer != value)
+                {
+                    _Komputer = value;
+                    OnPropertyChanged("Komputer");
+                }
+            }
+        }
+        RAM _Ram;
+        public RAM Ram
+        {
+            get
+            {
+                return _Ram;
+            }
+            set
+            {
+                if (_Ram != value)
+                {
+                    _Ram = value;
+                    OnPropertyChanged("Ram");
+                }
+            }
+        }
         public Storage[] Dyski { get; private set; }
-        public Mainboard PlytaGlowna { get; private set; }
-        public SWM Swm { get; private set; }
-        public BiosVer WersjaBios { get; private set; }
-        public ObservableCollection<Model> listaModeli { get; private set; }
-        public string BiosZBazy { get; private set; }
+        Mainboard _PlytaGlowna;
+        public Mainboard PlytaGlowna
+        {
+            get
+            {
+                return _PlytaGlowna;
+            }
+            set
+            {
+                if (_PlytaGlowna != value)
+                {
+                    _PlytaGlowna = value;
+                    OnPropertyChanged("PlytaGlowna");
+                }
+            }
+        }
+        SWM _Swm;
+        public SWM Swm
+        {
+            get
+            {
+                return _Swm;
+            }
+            set
+            {
+                if (_Swm != value)
+                {
+                    _Swm = value;
+                    OnPropertyChanged("Swm");
+                }
+            }
+        }
+        Bios _WersjaBios;
+        public Bios WersjaBios
+        {
+            get
+            {
+                return _WersjaBios;
+            }
+            set
+            {
+                if (_WersjaBios != value)
+                {
+                    _WersjaBios = value;
+                    OnPropertyChanged("WersjaBios");
+                }
+            }
+        }
+        public ObservableCollection<Model> ListaModeli { get; private set; }
         string Plik = @"/NoteBookiRef_v3.xlsx";
         string AktualnyHash;
         
@@ -41,7 +116,7 @@ namespace Retriever
             if(!Open()) return;
             else
             {
-                //TEST II - Istnienie pliku staticdata.txt
+                //TEST II - Istnienie pliku sha1.txt
                 //Jeżeli nie istnieje plik hash, utwórz go
                 if (!File.Exists(Environment.CurrentDirectory + @"\sha1.txt"))
                 {
@@ -138,83 +213,12 @@ namespace Retriever
             AktualnyHash = hashhex.ToString();
         }
 
-        ////Utworzenie pliku XML dla bazy danych
-        //bool CreateXMLFile()
-        //{
-        //    bool isCreated = true;
-        //    XmlTextWriter writer = null;
-        //    try
-        //    {
-        //        //Utworz obiekt do zapisywania tekstu
-        //        writer = new XmlTextWriter("Model.xml", System.Text.Encoding.UTF8);
-        //    }
-        //    catch(Exception e)
-        //    {
-        //        if(ErrorWriter.WriteErrorLog(e))
-        //        {
-        //            string opis = string.Format("Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.\n");
-        //            MessageBox.Show(opis + "\n\n" + e.Message, "Błąd utworzenia pliku", MessageBoxButton.OK, MessageBoxImage.Error);
-        //            isCreated = false;
-        //        }
-        //        else
-        //        {
-        //            string opis = "Wystąpił błąd podczas próby utworzenia spisu modeli. Program zostanie załadowany bez zestawienia bazy danych.";
-        //            ErrorWriter.ShowErrorLog(e, "Błąd utworzenia pliku", opis);
-        //            isCreated = false;
-        //        }
-        //    }
-        //    if(writer != null)
-        //    {
-        //        //Parametry zapisu
-        //        writer.WriteStartDocument(true);
-        //        writer.Formatting = Formatting.Indented;
-        //        writer.Indentation = 2;
-        //        //Utworzenie bazowego znacznika
-        //        writer.WriteStartElement("BAZA");
-        //        //Zapisanie bazy
-        //        foreach (Model z in listaModeli)
-        //        {
-        //            CreateNode(z.WierszModel, z.WierszBios, z.MSN, z.MD, writer);
-        //        }
-        //        //Zamknięcie znacznika
-        //        writer.WriteEndElement();
-        //        //Zamknięcie dokumentu
-        //        writer.WriteEndDocument();
-        //        writer.Close();
-        //    }
-        //    return isCreated;           
-        //}
-
-        ////Metoda zapisująca dane Modelu w pliku XML
-        //void CreateNode(int wierszModel, int wierszBios, string msn, string md, XmlTextWriter writer)
-        //{
-        //    //Utworzenie roota MODEL
-        //    writer.WriteStartElement("Model"); //Dodaj pierwotną gałąź
-        //    //Utworzenie gałęzi Wiersz
-        //    writer.WriteStartElement("WierszModel");     //Dodaj subgałąź
-        //    writer.WriteString(wierszModel.ToString());  //Wpisz wartość
-        //    writer.WriteEndElement();               //Zamknij gałąź
-        //    //Utworzenie gałęzi Zeszyt
-        //    writer.WriteStartElement("WierszBios");
-        //    writer.WriteString(wierszBios.ToString());
-        //    writer.WriteEndElement();
-        //    //Utworzenie gałęzi MSN
-        //    writer.WriteStartElement("MSN");
-        //    writer.WriteString(msn);
-        //    writer.WriteEndElement();
-        //    //Utworzenie gałęzi MD
-        //    writer.WriteStartElement("MD");
-        //    writer.WriteString(md);
-        //    writer.WriteEndElement();
-        //    writer.WriteEndElement();
-        //}
-
         //Metoda wczytująca listę modeli do pamięci
         void LoadModelList()
         {
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
             StreamReader sr = new StreamReader(Environment.CurrentDirectory + @"\Model.xml");
-            listaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
+            ListaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
             sr.Close();
         }
 
@@ -224,10 +228,10 @@ namespace Retriever
         {
             IEnumerable<Model> temp = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
             temp = temp.OrderBy(z => z.MD);
-            listaModeli = new ObservableCollection<Model>(temp);
+            ListaModeli = new ObservableCollection<Model>(temp);
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
             StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"\Model.xml");
-            xs.Serialize(sw, listaModeli);
+            xs.Serialize(sw, ListaModeli);
             sw.Close();
         }
 
@@ -246,27 +250,37 @@ namespace Retriever
                 string msn = modelTable.Rows[i][1].ToString();
                 string md = modelTable.Rows[i][0].ToString();
 
-                if (!Regex.IsMatch(modelTable.Rows[i][18].ToString(), @"^\d{5}$"))
-                    biosRow = modelTable.Rows[i][18].ToString();
                 //Na podstawie modelu obudowy przeszukaj tabelę z biosami i znajdź 
                 int biosRow = -1;
-                string temp = modelTable.Rows[i][13].ToString();
-                //Jeżeli jest zapisany model, zacznij poszukiwania
-                if(temp != "-")
+                string biosSheet = "";
+
+                //Jeżeli komputer jest PEAQ
+                if (!Regex.IsMatch(modelTable.Rows[i][17].ToString(), @"^\d{5}$"))
                 {
+                    biosRow = i;
+                    biosSheet = "MD";
+                }
+                //Jeżeli jest to MEDION
+                else
+                {
+                    //Zapisz model obudowy w pamięci
+                    string temp = modelTable.Rows[i][13].ToString();
+                    //Przeszukuj tabelę BIOS
                     for (int j = 0; j < biosTable.Rows.Count; j++)
                     {
+                        //Jeżeli komórka zawiera model obudowy, zapisz
                         if (biosTable.Rows[j][0].ToString().Contains(temp))
                         {
                             biosRow = j;
+                            biosSheet = "BIOS";
                             break;
-                        }   
-                        else if()
+                        }
+                        //Jeżeli nie znaleziono w ogóle, zapisz -1
                         else if (j == biosTable.Rows.Count - 1)
                             biosRow = -1;
                     }
-                }
-                yield return new Model(mdRow, biosRow, msn, md);
+                }  
+                yield return new Model(mdRow, biosRow, biosSheet, msn, md);
             }
         }
 
@@ -282,30 +296,39 @@ namespace Retriever
 
                 #region Tworzenie instancji Mainboard
                 PlytaGlowna = new Mainboard(
-                    model:      table.Rows[model.WierszModel][14].ToString(),
+                    model: table.Rows[model.WierszModel][14].ToString() == "-" ? table.Rows[model.WierszModel][17].ToString() : table.Rows[model.WierszModel][14].ToString(),
                     producent:  table.Rows[model.WierszModel][15].ToString(),
                     cpu:        table.Rows[model.WierszModel][7].ToString(),
                     taktowanie: table.Rows[model.WierszModel][8].ToString());
                 #endregion
 
-                #region Tworzenie instancji BiosVer
-                WersjaBios = new BiosVer(
-                    ver: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][3].ToString(),
-                    opis: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][4].ToString());
+                #region Tworzenie instancji Bios
+                //Dla MEDION
+                if (model.BiosZeszyt == "BIOS")
+                    WersjaBios = new Bios(
+                      ver: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][3].ToString(),
+                      opis: model.WierszBios == -1 ? "Nie znaleziono" : biosTable.Rows[model.WierszBios][4].ToString());
+
+                //Dla PEAQ
+                else
+                    WersjaBios = new Bios(
+                      ver: model.WierszBios == -1 ? "Nie znaleziono" : table.Rows[model.WierszBios][18].ToString(),
+                      opis: "");
+
                 #endregion
 
                 #region Tworzenie instancji Computer
                 Komputer = new Computer(
-                    md:         table.Rows[model.WierszModel][0].ToString(),
+                    md: table.Rows[model.WierszModel][0].ToString(),
                     //msn:      table.Rows[model.Wiersz][1].ToString(), Opcjonalne wyświetlanie MSN, odkomentować jeżeli potrzeba + dorobić wiersze dla msn w xaml
                     //staryMsn: table.Rows[model.Wiersz][2].ToString(),
+                    system: table.Rows[model.WierszModel][9].ToString(),
                     wearLevel: new double[1] { 12 },
-                    wskazowki:  table.Rows[model.WierszModel][12].ToString(),
-                    obudowa:    table.Rows[model.WierszModel][13].ToString(),
-                    lcd:        table.Rows[model.WierszModel][4].ToString(),
-                    kolor:      table.Rows[model.WierszModel][3].ToString(),
-                    shipp:      table.Rows[model.WierszModel][16].ToString() == "Tak" ? true : false,
-                    pelnyModel: table.Rows[model.WierszModel][17].ToString());
+                    wskazowki: table.Rows[model.WierszModel][12].ToString(),
+                    obudowa: table.Rows[model.WierszModel][13].ToString(),
+                    lcd: table.Rows[model.WierszModel][4].ToString(),
+                    kolor: table.Rows[model.WierszModel][3].ToString(),
+                    shipp: table.Rows[model.WierszModel][16].ToString() == "Tak" ? true : false);
                 #endregion
 
                 #region Tworzenie instancji SWM, RAM i Storage
@@ -323,6 +346,16 @@ namespace Retriever
 
                 Close();
             }
-        }  
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void OnPropertyChanged(string property)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
+        }
+
     }
 }

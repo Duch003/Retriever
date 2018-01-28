@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Threading;
 
 namespace Retriever
@@ -13,15 +15,13 @@ namespace Retriever
     
     public partial class MainWindow : Window
     {
-        //public Reader ReaderInfo { get; private set; }
-        //public Gatherer GathererInfo { get; private set; }
         public RetrieverInfo Retriever { get; private set; }
-
+        bool sw = false;
         public MainWindow()
         {
             InitializeComponent();
             PrzygotujAplikacje();
-                //UstawTimer();     
+            UstawTimer();     
         }
 
         void PrzygotujAplikacje()
@@ -33,14 +33,13 @@ namespace Retriever
             //Przypisanie listy modeli do grida
             if (Retriever.ReaderInfo != null)
             {
-                gridModele.ItemsSource = Retriever.ReaderInfo.listaModeli;
-                gridModele.SelectedIndex = 0;
+                gridModele.ItemsSource = Retriever.ReaderInfo.ListaModeli;
             }
 
             //Próba odczytania modelu komputera
             if (Retriever.GathererInfo.Komputer.MD != "" && Retriever.ReaderInfo != null)
             {
-                var model = from z in Retriever.ReaderInfo.listaModeli
+                var model = from z in Retriever.ReaderInfo.ListaModeli
                             where z.MD == Retriever.GathererInfo.Komputer.MD
                             select z;
 
@@ -61,38 +60,43 @@ namespace Retriever
 
         #region Wczytywanie nowych danych z pliku excel
         //Metoda wczytująca dane aktualnie zaznaczonego rekordu
-        private void gridModele_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
-            DynamicControls();
-        }
+        //private void gridModele_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    if ((gridModele.SelectedItem as Model) != null)
+        //    {
+        //        Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+        //        DynamicControls();
+        //    }
+        //}
         #endregion
 
         #region Wyszukiwarka
         bool FiltrUzytkownika(object item)
         {
-            if (String.IsNullOrEmpty(txtWyszukiwarka.Text) || txtWyszukiwarka.Text.Length > 5 || txtWyszukiwarka.Text.Length < 5) return true;
-            else return ((item as Model).MD == Retriever.GathererInfo.Komputer.MD);
+            if (String.IsNullOrEmpty(txtWyszukiwarka.Text)) return true;
+            else return ((item as Model).MD.Contains(txtWyszukiwarka.Text));
+
             //Wyszukiwanie również po msn: else return (((item as Model).MD.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0) || ((item as Model).MSN.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0));
         }
 
         //Metoda wyszukiwania z listy modeli
         void txtWyszukiwarka_TextChanged(object sender, TextChangedEventArgs e)
         {
-            CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
-            if (gridModele.SelectedItem as Model == null)
-                gridModele.SelectedIndex = 1;
+            if ((sender as TextBox).Text.Length < 3)
+                return;
+            else if((sender as TextBox).Text.Length == 0 || (sender as TextBox).Text.Length > 2)
+                CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
         }
         #endregion
 
         #region Ustawienie timera do odświeżania danych
-        //void UstawTimer()
-        //{
-        //    DispatcherTimer timer = new DispatcherTimer();
-        //    timer.Tick += new EventHandler(Statusy.RefreshBatteriesState);
-        //    timer.Interval = new TimeSpan(0, 1, 0);
-        //    timer.Start();
-        //}
+        void UstawTimer()
+        {
+            DispatcherTimer timer = new DispatcherTimer();
+            timer.Tick += new EventHandler(Retriever.Statusy.RefreshBatteriesState);
+            timer.Interval = new TimeSpan(0, 0, 10);
+            timer.Start();
+        }
         #endregion
 
         #region Dynamiczne twozenie kontrolek
@@ -151,14 +155,14 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami dysków
         void CreateDiscDataHeaders(Storage[] Disc)
         {
-            dpDyskiNazwa.Children.Clear();
+            spDyskiNazwa.Children.Clear();
             for (int i = 0; i < Disc.Length; i++)
             {
-                var text = new TextBlock();
-                text.Text = string.Format("{0}", Disc[i].Nazwa);
-                text.Style = Resources["TextBlockDescription"] as Style;
-                DockPanel.SetDock(text, Dock.Top);
-                dpDyskiNazwa.Children.Add(text);
+                var text = new Label();
+                text.Content = string.Format("{0}", Disc[i].Nazwa);
+                text.Style = Resources["BlueDescription"] as Style;
+                //DockPanel.SetDock(text, Dock.Top);
+                spDyskiNazwa.Children.Add(text);
             }
         }
 
@@ -207,7 +211,7 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami kart graficznych
         void CreateGraphicCardData(GraphicCard[] Card)
         {
-            dpGraphicCardCaption.Children.Clear();
+            spGraphicCardCaption.Children.Clear();
             spGraphicCardDescription.Children.Clear();
             for (int i = 0; i < Card.Length; i++)
             {
@@ -217,8 +221,8 @@ namespace Retriever
                 text.MaxWidth = 250;
                 text.Height = 50;
                 text.TextWrapping = TextWrapping.Wrap;
-                DockPanel.SetDock(text, Dock.Top);
-                dpGraphicCardCaption.Children.Add(text);
+                //DockPanel.SetDock(text, Dock.Top);
+                spGraphicCardCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Card[i].Opis);
                 text.Height = 50;
@@ -226,8 +230,47 @@ namespace Retriever
                 spGraphicCardDescription.Children.Add(text);
             }
         }
+
         #endregion
 
+        //Metoda obsługi programu klawiaturą
+        private void KeyUpRecognize(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Tab:
+                    if (TabControl.SelectedIndex == 0) TabControl.SelectedIndex = 1;
+                    else TabControl.SelectedIndex = 0;
+                    break;
+                case Key.Down:
+                    if (TabControl.SelectedIndex == 1) Scroll.ScrollToVerticalOffset(Scroll.VerticalOffset + 100);
+                    else if (txtWyszukiwarka.IsFocused == false && gridModele.IsFocused == false) txtWyszukiwarka.Focus();
+                    else if (txtWyszukiwarka.IsFocused == true) gridModele.Focus();
+                    else if (gridModele.IsFocused == true) gridModele.SelectedIndex += 1;
+                    break;
+                case Key.Up:
+                    if (TabControl.SelectedIndex == 1) Scroll.ScrollToVerticalOffset(Scroll.VerticalOffset - 100);
+                    else if (gridModele.IsFocused == true && gridModele.SelectedIndex == 0) txtWyszukiwarka.Focus();
+                    else if (gridModele.SelectedIndex != 0)
+                    {
+                        gridModele.SelectedIndex -= 1;
+                        gridModele.Focus();
+                    }
+                    break;
+                case Key.Enter:
+                    if (gridModele.IsFocused == true)
+                    {
+                        Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+                        DynamicControls();
+                        TabControl.SelectedIndex = 1;
+                    }
+                    break;
+            }
+        }
 
+        private void DataGrid_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }
