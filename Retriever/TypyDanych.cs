@@ -549,6 +549,7 @@ namespace Retriever
         {
             var ans = WMI.GetSingleProperty(Win32Hardware.Win32_USBController, "Availability");
             PortyUSB = ans.Where(z => z.Wlasciwosc == "Availability").Count();
+
         }
 
         public void RefreshBatteriesState()

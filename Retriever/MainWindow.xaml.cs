@@ -19,9 +19,19 @@ namespace Retriever
         bool sw = false;
         public MainWindow()
         {
-            InitializeComponent();
-            PrzygotujAplikacje();
-            UstawTimer();     
+
+            //TODO Dla modeli ktorych nie ma w bazie wywala blad. Obecnie z trycatchem nie inicjalizuje wszystkiego
+            try
+            {
+                InitializeComponent();
+                PrzygotujAplikacje();
+                UstawTimer();
+            }
+            catch (Exception e)
+            {
+                ErrorWriter.ShowErrorLog(e,"Blad", "");
+            }
+                
         }
 
         void PrzygotujAplikacje()
@@ -108,9 +118,9 @@ namespace Retriever
             CreateDiscDataHeaders(  Retriever.GathererInfo.Dyski);
             CreateDevMgmtData(      Retriever.GathererInfo.MenedzerUrzadzen);
             CreateNetDevData(       Retriever.GathererInfo.UrzadzeniaSieciowe);
-            CreateDiscData(         Retriever.GathererInfo.Dyski, ref spDyskiGatherer);
-            CreateDiscData(         Retriever.ReaderInfo.Dyski, ref spDyskiReader);
+            CreateDiscData(         Retriever.GathererInfo.Dyski, ref spDyskiGatherer);           
             CreateGraphicCardData(  Retriever.GathererInfo.KartyGraficzne);
+            if(Retriever.ReaderInfo.Dyski != null) CreateDiscData(Retriever.ReaderInfo.Dyski, ref spDyskiReader);
         }
 
         //Dodawanie kontrolek SWM

@@ -210,13 +210,13 @@ namespace Retriever
         //Metoda działająca w wypadku kiedy nie można zapisać loga
         public static void ShowErrorLog(Exception e, string naglowek, string opis)
         {
-            string mess = string.Format(@"\n\nObiekt, który wyrzucił wyjątek: {0}\n" +
+            string mess = string.Format("\n\nObiekt, który wyrzucił wyjątek: {0}\n" +
                 "Metoda która wyrzuciła wyjątek: {1}\n" +
                 "Wywołania stosu: {2}\n" +
-                "Pary klucz-wartość: {3}" +
-                "Opis: {4})", 
+                "Pary klucz-wartość: {3}\n" +
+                "Opis: {4}\n)", 
                 e.Source, e.TargetSite, e.StackTrace, e.Data, e.Message);
-            MessageBox.Show(naglowek, opis + mess, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(opis + mess, naglowek,  MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         public static T BinarySearch<T, TKey>(this IList<T> list, Func<T, TKey> keySelector, TKey key)
