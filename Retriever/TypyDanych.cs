@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -506,13 +507,75 @@ namespace Retriever
     }
 
     //--------------------------------------------------Kontener na poszczególne statusy systemu-------------------------------------------------
-    public class Status
+    public class Status : INotifyPropertyChanged
     {
-        public string WinStatus { get; private set; }
-        public string SecureStatus { get; private set; }
-        public string KluczWindows { get; private set; }
+        public string WinStatus
+        {
+            get
+            {
+                return _WinStatus;
+            }
+            private set
+            {
+                if (_WinStatus!= value)
+                {
+                    _WinStatus = value;
+                    OnPropertyChanged("WinStatus");
+                }
+            }
+        }
+        string _WinStatus;
+        public string SecureStatus
+        {
+            get
+            {
+                return _SecureStatus;
+            }
+            private set
+            {
+                if(_SecureStatus != value)
+                {
+                    _SecureStatus = value;
+                    OnPropertyChanged("SecureStatus");
+                }
+            }
+
+        }
+        string _SecureStatus;
+        public string KluczWindows
+        {
+            get
+            {
+                return _KluczWindows;
+            }
+            set
+            {
+                if(_KluczWindows != value)
+                {
+                    _KluczWindows = value;
+                    OnPropertyChanged("KluczWindows");
+                }
+            }
+        }
+        string _KluczWindows;
         public int PortyUSB { get; private set; }
-        public double[] StanBaterii { get; private set; }
+        public double[] StanBaterii
+        {
+            get
+            {
+                return _StanBaterii;
+            }
+            set
+            {
+                if (_StanBaterii != value)
+                {
+                    _StanBaterii = value;
+                    OnPropertyChanged("StanBaterii");
+                }
+            }
+        }
+        double[] _StanBaterii;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public Status()
         {
@@ -547,9 +610,7 @@ namespace Retriever
 
         public void CountUSB()
         {
-            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_USBController, "Availability");
-            PortyUSB = ans.Where(z => z.Wlasciwosc == "Availability").Count();
-
+            PortyUSB = WMI.CountUSB();
         }
 
         public void RefreshBatteriesState()
@@ -566,7 +627,21 @@ namespace Retriever
 
         public void RefreshBatteriesState(object sender, EventArgs e)
         {
-            RefreshBatteriesState();
+            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
+            int i = 0;
+            foreach(Win32HardwareData z in ans)
+            {
+                StanBaterii[i] = Convert.ToInt64(z.Wartosc);
+                i++;
+            }
+        }
+        
+        private void OnPropertyChanged(string property)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(property));
+            }
         }
     }
 

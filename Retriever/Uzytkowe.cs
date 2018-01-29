@@ -108,6 +108,63 @@ namespace Retriever
             }
             return null;
         }
+
+        public static int CountUSB()
+        {
+            int temp = 0;
+            ManagementScope scope = new ManagementScope("root/cimv2");
+            ObjectQuery query = new ObjectQuery("SELECT * FROM Win32_USBControllerDevice");
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher(scope, query);
+
+            foreach (ManagementObject obj in searcher.Get())
+            {
+                foreach (PropertyData prop in obj.Properties)
+                {
+                    //if (prop.Name == "Antecedent")
+                    //{
+                    //    Console.WriteLine("Antecedent:");
+                    //    ManagementObject antecendent = new ManagementObject();
+                    //    ManagementPath aPath = new ManagementPath((string)obj["Antecedent"]);
+                    //    antecendent.Path = aPath;
+                    //    antecendent.Get();
+                    //    foreach (PropertyData inner in antecendent.Properties)
+                    //    {
+                    //        Console.WriteLine("\t{0}: {1}", inner.Name.PadRight(30), inner.Value);
+                    //    }
+                    //    continue;
+                    //}
+                    if (prop.Name == "Dependent")
+                    {
+                        bool flag1 = false, flag2 = false;
+                        Console.WriteLine("Dependent:");
+                        ManagementObject dependent = new ManagementObject();
+                        ManagementPath dPath = new ManagementPath((string)obj["Dependent"]);
+                        dependent.Path = dPath;
+                        dependent.Get();
+
+                        foreach (PropertyData inner in dependent.Properties)
+                        {
+                            //Console.WriteLine("\t{0}: {1}", inner.Name.PadRight(30), inner.Value);
+                            if (inner.Name.ToString() == "Caption" && inner.Value.ToString().ToLower().Contains("wejściowe")
+                                || inner.Name.ToString() == "Caption" && inner.Value.ToString().ToLower().Contains("input"))
+                                flag1 = true;
+                            else if (inner.Name.ToString() == "ConfigManagerErrorCode" && Convert.ToUInt32(inner.Value) == 0)
+                                flag2 = true;
+
+                            if(flag1 && flag2)
+                            {
+                                flag1 = flag2 = false;
+                                temp++;
+                            }
+                        }
+                        continue;
+                    }
+                    //else if (prop.Name == "AccessState") Console.WriteLine("\n\nNOWE URZĄDZENIE\n");
+                    //Console.WriteLine("{0}: {1}", prop.Name.PadRight(30), prop.Value);
+                }
+            }
+            return temp;
+        }
     }
 
     //--------------------------------------------------Klasa obsługująca odnajdywanie i wydobywanie numerów SWM-------------------------------------

@@ -1,7 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Retriever">
-	<!--Opis-->
+	<!--Opis w Labelu-->
 	<Style x:Key="BlueHeader" TargetType="Label">
 		<Setter Property="FontWeight"					Value="Bold"/>
 		<Setter Property="FontSize"						Value="14"/>
@@ -43,6 +43,7 @@
 		<Setter Property="BorderBrush"					Value="Black"/>
 		<Setter Property="BorderThickness"				Value="2"/>
 	</Style>
+	<!--Opis w TextBlocku-->
 	<Style x:Key="TextBlockDescription" TargetType="TextBlock">
 		<Setter Property="Background"					Value="LightSkyBlue"/>
 		<Setter Property="FontFamily"					Value="Comic Sans MS"/>
@@ -51,6 +52,59 @@
 		<Setter Property="HorizontalAlignment"			Value="Stretch"/>
 		<Setter Property="TextAlignment"				Value="Center"/>
 	</Style>
+	
+	<!--Statusy-->
+	<Style x:Key="Status_WindowsKey" TargetType="TextBlock">
+		<Setter Property="FontSize"						Value="15"/>
+		<Setter Property="HorizontalAlignment"			Value="Stretch"/>
+		<Setter Property="TextAlignment"				Value="Center"/>
+		<Setter Property="Padding"						Value="5"/>
+		<Setter Property="Background"					Value="LightSteelBlue"/>
+		<Setter Property="Foreground"					Value="Red"/>
+		<Setter Property="FontWeight"					Value="Bold"/>
+		<Style.Triggers>
+			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="Znaleziono klucz">
+				<Setter Property="Foreground"			Value="Green"/>
+			</DataTrigger>
+		</Style.Triggers>
+	</Style>
 
+	<Style x:Key="Status_WindowsActivation" TargetType="TextBlock">
+		<Setter Property="FontSize"						Value="15"/>
+		<Setter Property="HorizontalAlignment"			Value="Stretch"/>
+		<Setter Property="TextAlignment"				Value="Center"/>
+		<Setter Property="Padding"						Value="5"/>
+		<Setter Property="Background"					Value="LightSteelBlue"/>
+		<Setter Property="Foreground"					Value="Red"/>
+		<Setter Property="FontWeight"					Value="Bold"/>
+		<Style.Triggers>
+			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="Licensed">
+				<Setter Property="Foreground"			Value="Green"/>
+			</DataTrigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="Status_SecureBoot" TargetType="TextBlock">
+		<Setter Property="FontSize"						Value="15"/>
+		<Setter Property="HorizontalAlignment"			Value="Stretch"/>
+		<Setter Property="TextAlignment"				Value="Center"/>
+		<Setter Property="Padding"						Value="5"/>
+		<Setter Property="Background"					Value="LightSteelBlue"/>
+		<Setter Property="Foreground"					Value="Red"/>
+		<Setter Property="FontWeight"					Value="Bold"/>
+		<Style.Triggers>
+			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="True">
+				<Setter Property="Foreground"			Value="Green"/>
+			</DataTrigger>
+		</Style.Triggers>
+	</Style>
+
+	<Style x:Key="Status" TargetType="TextBlock">
+		<Setter Property="FontSize"						Value="15"/>
+		<Setter Property="HorizontalAlignment"			Value="Stretch"/>
+		<Setter Property="TextAlignment"				Value="Center"/>
+		<Setter Property="Padding"						Value="5"/>
+		<Setter Property="Background"					Value="LightSteelBlue"/>
+	</Style>
 
 </ResourceDictionary>

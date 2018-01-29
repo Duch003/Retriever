@@ -112,8 +112,9 @@
 					<Border Grid.Row="1" Grid.Column="3" Style="{StaticResource ClassicBorder}">
 						<Label Content="Klucz Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
+					<!--Style="{StaticResource TextBlockStatus}"-->
 					<Border Grid.Row="2" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.KluczWindows}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding Statusy.KluczWindows}" Style="{StaticResource Status_WindowsKey}"/>
 					</Border>
 
 					<!--Status aktywacji-->
@@ -121,16 +122,16 @@
 						<Label Content="Aktywacja Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="4" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.WinStatus}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding Statusy.WinStatus}" Style="{StaticResource Status_WindowsActivation}"/>
 					</Border>
-					<Border Grid.Row="5" Grid.Column="3" Style="{StaticResource ClassicBorder}"/>
+					<Border Grid.Row="5" Grid.Column="3" Style="{StaticResource ClassicBorder}" Background="LightSteelBlue"/>
 
 					<!--Status SecureBoot-->
 					<Border Grid.Row="6" Grid.Column="3" Style="{StaticResource ClassicBorder}">
 						<Label Content="SecureBoot" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.SecureStatus}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding Statusy.SecureStatus}" Style="{StaticResource Status_SecureBoot}"/>
 					</Border>
 
 					<!--Wykryta ilość portów USB-->
@@ -138,7 +139,7 @@
 						<Label Content="Ilość portów USB" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.PortyUSB}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding Statusy.PortyUSB}" Style="{StaticResource Status}"/>
 					</Border>
 
 					<!--Stan naładowania baterii-->
@@ -146,10 +147,10 @@
 						<Label Content="Aktualny stan baterii" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.StanBaterii[0], StringFormat={}{0}%}" Style="{StaticResource PropertyValue}" />
+						<TextBlock Text="{Binding Statusy.StanBaterii[0], StringFormat={}{0}%, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Status}" />
 					</Border>
 					<Border Grid.Row="12" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.StanBaterii[1],StringFormat={}{0}%}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding Statusy.StanBaterii[1],StringFormat={}{0}%, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource Status}"/>
 					</Border>
 
 					<!--==============================NAGŁÓWEK - DANE PODSTAWOWE==============================-->
