@@ -118,28 +118,19 @@
 					</Border>
 
 					<!--Status aktywacji-->
-					<Border Grid.Row="3" Grid.Column="3" Style="{StaticResource ClassicBorder}">
+					<Border Grid.Row="3" Grid.Column="3"  Style="{StaticResource ClassicBorder}">
 						<Label Content="Aktywacja Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
-					<Border Grid.Row="4" Grid.Column="3" Style="{StaticResource ClassicBorder}">
+					<Border Grid.Row="4" Grid.Column="3" Grid.RowSpan="2" Style="{StaticResource ClassicBorder}">
 						<TextBlock Text="{Binding Statusy.WinStatus}" Style="{StaticResource Status_WindowsActivation}"/>
 					</Border>
-					<Border Grid.Row="5" Grid.Column="3" Style="{StaticResource ClassicBorder}" Background="LightSteelBlue"/>
 
 					<!--Status SecureBoot-->
 					<Border Grid.Row="6" Grid.Column="3" Style="{StaticResource ClassicBorder}">
 						<Label Content="SecureBoot" Style="{StaticResource BlueHeader}"/>
 					</Border>
-					<Border Grid.Row="7" Grid.Column="3" Style="{StaticResource ClassicBorder}">
+					<Border Grid.Row="7" Grid.Column="3" Grid.RowSpan="3" Style="{StaticResource ClassicBorder}">
 						<TextBlock Text="{Binding Statusy.SecureStatus}" Style="{StaticResource Status_SecureBoot}"/>
-					</Border>
-
-					<!--Wykryta ilość portów USB-->
-					<Border Grid.Row="8" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<Label Content="Ilość portów USB" Style="{StaticResource BlueHeader}"/>
-					</Border>
-					<Border Grid.Row="9" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.PortyUSB}" Style="{StaticResource Status}"/>
 					</Border>
 
 					<!--Stan naładowania baterii-->

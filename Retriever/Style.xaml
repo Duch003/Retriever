@@ -93,7 +93,7 @@
 		<Setter Property="Foreground"					Value="Red"/>
 		<Setter Property="FontWeight"					Value="Bold"/>
 		<Style.Triggers>
-			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="True">
+			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="Enabled">
 				<Setter Property="Foreground"			Value="Green"/>
 			</DataTrigger>
 		</Style.Triggers>
