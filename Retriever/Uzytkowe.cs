@@ -246,8 +246,9 @@ namespace Retriever
             StreamWriter sw = null;
             try
             {
-                errorInfo = new FileInfo(File.Create(Environment.CurrentDirectory + $"\\{DateTime.Now.ToLongTimeString()}.log").Name);
-                sw = new StreamWriter(new FileStream(errorInfo.DirectoryName, FileMode.Open));
+                string name = string.Format(@"{0}.{1}.log", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
+                errorInfo = new FileInfo(name);
+                sw = new StreamWriter(new FileStream(errorInfo.DirectoryName, FileMode.OpenOrCreate));
                 sw.WriteLine("Obiekt, który wyrzucił wyjątek: {0}", e.Source);
                 sw.WriteLine("Metoda która wyrzuciła wyjątek: {0}", e.TargetSite);
                 sw.WriteLine("Wywołania stosu: {0}", e.StackTrace);
@@ -274,42 +275,6 @@ namespace Retriever
                 "Opis: {4}\n)", 
                 e.Source, e.TargetSite, e.StackTrace, e.Data, e.Message);
             MessageBox.Show(opis + mess, naglowek,  MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-
-        public static T BinarySearch<T, TKey>(this IList<T> list, Func<T, TKey> keySelector, TKey key)
-        where TKey : IComparable<TKey>
-        {
-            if (list.Count == 0)
-                throw new InvalidOperationException("Item not found");
-
-            int min = 0;
-            int max = list.Count;
-            while (min < max)
-            {
-                int mid = min + ((max - min) / 2);
-                T midItem = list[mid];
-                TKey midKey = keySelector(midItem);
-                int comp = midKey.CompareTo(key);
-                if (comp < 0)
-                {
-                    min = mid + 1;
-                }
-                else if (comp > 0)
-                {
-                    max = mid - 1;
-                }
-                else
-                {
-                    return midItem;
-                }
-            }
-            if (min == max &&
-                min < list.Count &&
-                keySelector(list[min]).CompareTo(key) == 0)
-            {
-                return list[min];
-            }
-            throw new InvalidOperationException("Item not found");
         }
     }
 }
