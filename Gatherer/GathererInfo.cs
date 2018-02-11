@@ -1,26 +1,48 @@
-﻿using System;
+﻿using DataTypes;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using Utilities;
 
-namespace Retriever
+namespace Gatherer
 {
-    public class Gatherer
+    public class GathererInfo : IDBData, IDeviceData
     {
-        public Computer Komputer { get; private set; }
-        public Storage[] Dyski { get; private set; }
-        public Mainboard PlytaGlowna { get; private set; }
-        public SWM[] Swm { get; private set; }
-        public DeviceManager[] MenedzerUrzadzen { get; private set; }
-        public NetDevice[] UrzadzeniaSieciowe { get; private set; }
-        public double PamiecRamSuma { get; private set; }
-        public GraphicCard[] KartyGraficzne { get; private set; }    
-        public Bios WersjaBios { get; private set; }
+        public Computer Komputer { get; set; }
+        public Storage[] Dyski { get; set; }
+        public Mainboard PlytaGlowna { get; set; }
+        public SWM[] Swm { get; set; }
+        public DeviceManager[] MenedzerUrzadzen { get; set; }
+        public NetDevice[] UrzadzeniaSieciowe { get; set; }
+        public double PamiecRamSuma { get; set; }
+        public RAM[] Ram { get; set; }
+        public GraphicCard[] KartyGraficzne { get; set; }
+        public Bios WersjaBios { get; set; }
 
-        public Gatherer()
+        public GathererInfo()
         {
-            int i = 0; //Iterator dla pętli foreach
+            Komputer = GatherComputerInfo();
+            PlytaGlowna = GatherMainboardInfo();
+            WersjaBios = GatherBiosInfo();
+            Ram = GatherRamSize();
+            PamiecRamSuma = 0;
+            for(int i = 0; i < Ram.Length; i++)
+            {
+                PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
+            }
+            Dyski = GatherStorageInfo();
+            Swm = GatherSwmNumbers();
+            MenedzerUrzadzen = GatherDeviceManagerInfo();
+            UrzadzeniaSieciowe = GatherNetDevicesLanAdresses();
+            KartyGraficzne = GatherGraphicCardInfo();
+        }
 
-            #region Tworzenie instancji Computer
+        Computer GatherComputerInfo()
+        {
+            int i = 0;
             //Pobranie modelu
             var temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
             string model = GatherModel((temp.First() as Win32HardwareData).Wartosc);
@@ -37,7 +59,6 @@ namespace Retriever
                 (temp2.First() as Win32HardwareData).Wartosc);
 
             //Pobranie wartości WearLevel
-            i = 0;
             var temp3 = WMI.WearLevel();
             double[] wearLevel = new double[temp3.Count()];
             foreach (double value in temp3)
@@ -46,15 +67,18 @@ namespace Retriever
                 i++;
             }
 
-            //Pobieranie obudowy - jest to zamienne z biosem
+            //Pobieranie obudowy
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
             string obudowa = GatherCase((temp.First() as Win32HardwareData).Wartosc);
-            #endregion
-            Komputer = new Computer(md: model, msn: msn, system: system, wearLevel: wearLevel, obudowa: obudowa);
 
-            #region Tworzenie instancji Mainboard
+            return new Computer(md: model, msn: msn, system: system, wearLevel: wearLevel, obudowa: obudowa);
+        }
+
+        Mainboard GatherMainboardInfo()
+        {
+            
             //Pobranie modelu płyty głównej
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Product");
+            var temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Product");
             string mbModel = (temp.First() as Win32HardwareData).Wartosc;
 
             //Pobranie producenta procesora
@@ -69,44 +93,46 @@ namespace Retriever
             temp = WMI.GetSingleProperty(Win32Hardware.Win32_Processor, "MaxClockSpeed");
             double tempTaktowanie = double.Parse((temp.First() as Win32HardwareData).Wartosc);
             string mbTaktowanie = Math.Round((tempTaktowanie / 1000), 2).ToString() + " GHz";
-            #endregion
-            PlytaGlowna = new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie);
 
-            #region Tworzenie instancji BiosVer
+            return new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie);
+        }
+
+        Bios GatherBiosInfo()
+        {
             //Pobierane informacji o wersji BIOS
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
+            var temp = WMI.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
             string mbWersjaBios = (temp.First() as Win32HardwareData).Wartosc;
-            WersjaBios = new Bios(mbWersjaBios);
-            #endregion
+            return new Bios(mbWersjaBios);
+        }
 
-            #region Tworzenie instancji RAM
+        RAM[] GatherRamSize()
+        {
             //Pobieranie informacji o bankach
-            i = 0;
-            RAM[] Ram = new RAM[0];
-            
+            int i = 0;
+            var temp = new RAM[0];
+
             //Pobieranie informacji o poejmności
             //Pojemność wyrażona w GiB
             //1073741824 B = 1 GiB
-            i = 0;
             double[] pojemnosc = new double[0];
-            PamiecRamSuma = 0;
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PhysicalMemory, "Capacity"))
             {
                 pojemnosc = ExpandArr.Expand(pojemnosc);
                 pojemnosc[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
-                Ram = ExpandArr.Expand(Ram);
-                Ram[i] = new RAM(size: pojemnosc[i]);
-                PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new RAM(size: pojemnosc[i]);
                 i++;
             }
-            #endregion
+            return temp;
+        }
 
-            #region Tworzenie instancji Storage
+        Storage[] GatherStorageInfo()
+        {
             //Pobieranie informacji o nazwach dysków
-            i = 0;
-            Dyski = new Storage[0];
-            string[] nazwa = new string[0];
+            int i = 0;
+            var temp = new Storage[0];
+            var nazwa = new string[0];
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_DiskDrive, "Caption"))
             {
                 nazwa = ExpandArr.Expand(nazwa);
@@ -121,27 +147,31 @@ namespace Retriever
                 size = ExpandArr.Expand(size);
                 size[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
-                Dyski = ExpandArr.Expand<Storage>(Dyski);
-                Dyski[i] = new Storage(size: size[i], nazwa: nazwa[i]);
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new Storage(size: size[i], nazwa: nazwa[i]);
                 i++;
             }
-            #endregion
+            return temp;
+        }
 
-            #region Tworzenie instancji SWM
-            i = 0;
-            Swm = new SWM[0];
+        SWM[] GatherSwmNumbers()
+        {
+            int i = 0;
+            var temp = new SWM[0];
             foreach (SWM z in SWMSearcher.GetSWM())
             {
-                Swm = ExpandArr.Expand(Swm);
-                Swm[i] = new SWM(z.Dysk, z.Swm);
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new SWM(z.Dysk, z.Swm);
                 i++;
             }
-            #endregion
+            return temp;
+        }
 
-            #region Tworzenie instancji DeviceManager
-            i = 0;
-            MenedzerUrzadzen = new DeviceManager[0];
-            string[] nazwaUrzadzenia = new string[0];
+        DeviceManager[] GatherDeviceManagerInfo()
+        {
+            int i = 0;
+            var temp = new DeviceManager[0];
+            var nazwaUrzadzenia = new string[0];
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "Caption", condition: "ConfigManagerErrorCode != 0"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
@@ -152,16 +182,18 @@ namespace Retriever
             i = 0;
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "ConfigManagerErrorCode", condition: "ConfigManagerErrorCode != 0"))
             {
-                MenedzerUrzadzen = ExpandArr.Expand(MenedzerUrzadzen);
-                MenedzerUrzadzen[i] = new DeviceManager(nazwaUrzadzenia[i], Convert.ToInt32(z.Wartosc));
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new DeviceManager(nazwaUrzadzenia[i], Convert.ToInt32(z.Wartosc));
                 i++;
             }
-            #endregion
+            return temp;
+        }
 
-            #region Tworzenie instancji NetDevice
-            i = 0;
-            UrzadzeniaSieciowe = new NetDevice[0];
-            nazwaUrzadzenia = new string[0];
+        NetDevice[] GatherNetDevicesLanAdresses()
+        {
+            int i = 0;
+            var temp = new NetDevice[0];
+            var nazwaUrzadzenia = new string[0];
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Description", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
@@ -172,16 +204,18 @@ namespace Retriever
             i = 0;
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
-                UrzadzeniaSieciowe = ExpandArr.Expand(UrzadzeniaSieciowe);
-                UrzadzeniaSieciowe[i] = new NetDevice(nazwaUrzadzenia[i], z.Wartosc);
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new NetDevice(nazwaUrzadzenia[i], z.Wartosc);
                 i++;
             }
-            #endregion
+            return temp;
+        }
 
-            #region Tworzenie instancji GraphicCard
-            i = 0;
-            KartyGraficzne = new GraphicCard[0];
-            nazwaUrzadzenia = new string[0];
+        GraphicCard[] GatherGraphicCardInfo()
+        {
+            int i = 0;
+            var temp = new GraphicCard[0];
+            var nazwaUrzadzenia = new string[0];
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "AdapterCompatibility"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
@@ -192,11 +226,11 @@ namespace Retriever
             i = 0;
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "Caption"))
             {
-                KartyGraficzne = ExpandArr.Expand(KartyGraficzne);
-                KartyGraficzne[i] = new GraphicCard(nazwaUrzadzenia[i], z.Wartosc);
+                temp = ExpandArr.Expand(temp);
+                temp[i] = new GraphicCard(nazwaUrzadzenia[i], z.Wartosc);
                 i++;
             }
-            #endregion
+            return temp;
         }
 
         //Metoda poszukująca modelu komputera
@@ -219,7 +253,6 @@ namespace Retriever
                 return m.Value.ToString();
             else
                 return "";
-
         }
     }
 }

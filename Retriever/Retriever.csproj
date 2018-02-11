@@ -42,17 +42,8 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ExcelDataReader, Version=3.3.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.3.3.0\lib\net20\ExcelDataReader.dll</HintPath>
-    </Reference>
-    <Reference Include="ExcelDataReader.DataSet, Version=3.3.0.0, Culture=neutral, PublicKeyToken=93517dbe6a4012fa, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDataReader.DataSet.3.3.0\lib\net20\ExcelDataReader.DataSet.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="ManagedWifi, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\managedwifi.1.1.0\lib\net20\ManagedWifi.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Management.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Management.Infrastructure.4.0.0\lib\Microsoft.Management.Infrastructure.dll</HintPath>
@@ -81,10 +72,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Gatherer.cs" />
-    <Compile Include="Reader.cs" />
-    <Compile Include="TypyDanych.cs" />
-    <Compile Include="Uzytkowe.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,6 +80,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Containers.cs" />
+    <Compile Include="FileSystemManager.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -128,6 +117,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DataTypes\DataTypes.csproj">
+      <Project>{b1a4ee03-99af-4d51-8b3d-7cdfcf7eca8b}</Project>
+      <Name>DataTypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Gatherer\Gatherer.csproj">
+      <Project>{92990891-0bb5-4f96-adc6-2977f35aee66}</Project>
+      <Name>Gatherer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Reader\Reader.csproj">
+      <Project>{1f40c84d-76fb-4f41-a5d9-c694e662460a}</Project>
+      <Name>Reader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{e20fd3b4-1b45-4fb3-b277-3715ed269621}</Project>
+      <Name>Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

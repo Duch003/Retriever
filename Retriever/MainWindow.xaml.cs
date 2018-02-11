@@ -1,63 +1,88 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
+﻿using DataTypes;
+using Gatherer;
+using Reader;
+using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using Utilities;
 
 namespace Retriever
 {
-    
+
     public partial class MainWindow : Window
     {
         public RetrieverInfo Retriever { get; private set; }
+        FileSystemManager settings;
+        DatabaseManager dbManager;
         bool sw = false;
         public MainWindow()
         {
+            InitializeComponent();
+            OdczytajKonfiguracjęIHasz();
+            PrzygotujAplikacje();
+            UstawTimer();
+        }
 
-            //TODO Dla modeli ktorych nie ma w bazie wywala blad. Obecnie z trycatchem nie inicjalizuje wszystkiego
+        void OdczytajKonfiguracjęIHasz()
+        {
             try
             {
-                InitializeComponent();
-                PrzygotujAplikacje();
-                UstawTimer();
-            }
-            catch (Exception e)
-            {
-                ErrorWriter.ShowErrorLog(e,"Blad", "");
-            }
+                settings = new FileSystemManager();
                 
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message, "Błąd odczytu pliku konfiguracyjnego lub hasza", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
+            }
+            try
+            {
+                dbManager = new DatabaseManager(settings);
+            }
+            catch(Exception e)
+            {
+                MessageBox.Show(e.Message, "Błąd odczytu bazy danych.", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            
         }
 
         void PrzygotujAplikacje()
         {
             //Utworzenie instancji Retriever
-            Retriever = new RetrieverInfo(new Reader(), new Gatherer(), new Status());
+            try
+            {
+                Retriever = new RetrieverInfo(new ReaderInfo(dbManager), new GathererInfo(), new Status());
+            }
+            catch(Exception e)
+            {
+                var message = string.Format("Wystąpił błąd podczas otwierania aplikacji:\n{0}", e.Message);
+                MessageBox.Show(message, "Nie można otworzyć aplikacji", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.Close();
+            }
+            
             gridZestawienie.DataContext = Retriever;
 
             //Przypisanie listy modeli do grida
-            if (Retriever.ReaderInfo != null)
+            if (Retriever.ReaderData.ListaModeli != null)
             {
-                gridModele.ItemsSource = Retriever.ReaderInfo.ListaModeli;
+                gridModele.ItemsSource = Retriever.ReaderData.ListaModeli;
             }
 
             //Próba odczytania modelu komputera
-            if (Retriever.GathererInfo.Komputer.MD != "" && Retriever.ReaderInfo != null)
+            if (Retriever.GathererData.Komputer.MD != "" && Retriever.ReaderData.ListaModeli != null)
             {
-                var model = from z in Retriever.ReaderInfo.ListaModeli
-                            where z.MD == Retriever.GathererInfo.Komputer.MD
+                var model = from z in Retriever.ReaderData.ListaModeli
+                            where z.MD == Retriever.GathererData.Komputer.MD
                             select z;
-
                 if (model.Count() > 0)
-                    Retriever.ReaderInfo.ReadData(model.First() as Model);
+                    Retriever.ReaderData.ReadData(model.First() as Model);
             }
-            else if (Retriever.ReaderInfo != null)
-                Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+            else if (Retriever.ReaderData != null)
+                Retriever.ReaderData.ReadData(gridModele.SelectedItem as Model);
 
             //Tworzenie dynamicznych kontrolek
             DynamicControls();
@@ -113,14 +138,14 @@ namespace Retriever
         //Metoda wywołująca wszystkie poniższe
         void DynamicControls()
         {
-            CreateSwmData(          Retriever.GathererInfo.Swm);
-            CreateWearLevelData(    Retriever.GathererInfo.Komputer.WearLevel);
-            CreateDiscDataHeaders(  Retriever.GathererInfo.Dyski);
-            CreateDevMgmtData(      Retriever.GathererInfo.MenedzerUrzadzen);
-            CreateNetDevData(       Retriever.GathererInfo.UrzadzeniaSieciowe);
-            CreateDiscData(         Retriever.GathererInfo.Dyski, ref spDyskiGatherer);           
-            CreateGraphicCardData(  Retriever.GathererInfo.KartyGraficzne);
-            if(Retriever.ReaderInfo.Dyski != null) CreateDiscData(Retriever.ReaderInfo.Dyski, ref spDyskiReader);
+            CreateSwmData(          Retriever.GathererData.Swm);
+            CreateWearLevelData(    Retriever.GathererData.Komputer.WearLevel);
+            CreateDiscDataHeaders(  Retriever.GathererData.Dyski);
+            CreateDevMgmtData(      Retriever.GathererData.MenedzerUrzadzen);
+            CreateNetDevData(       Retriever.GathererData.UrzadzeniaSieciowe);
+            CreateDiscData(         Retriever.GathererData.Dyski, ref spDyskiGatherer);           
+            CreateGraphicCardData(  Retriever.GathererData.KartyGraficzne);
+            if(Retriever.ReaderData.Dyski != null) CreateDiscData(Retriever.ReaderData.Dyski, ref spDyskiReader);
         }
 
         //Dodawanie kontrolek SWM
@@ -270,7 +295,7 @@ namespace Retriever
                 case Key.Enter:
                     if (gridModele.IsFocused == true)
                     {
-                        Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
+                        Retriever.ReaderData.ReadData(gridModele.SelectedItem as Model);
                         DynamicControls();
                         TabControl.SelectedIndex = 1;
                     }

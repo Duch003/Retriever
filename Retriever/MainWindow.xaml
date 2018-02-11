@@ -154,13 +154,13 @@
 						<Label Content="Model" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
 						<!--<ComboBox x:Name="cbModel" ItemsSource="{Binding ReaderInfo.ListaModeli}" DisplayMemberPath="MD" Text="{Binding Path=Text, ElementName=txtWyszukiwarka}"
 								  IsEditable="True" IsTextSearchEnabled="True" FontSize="17" HorizontalContentAlignment="Center"
 								  SelectedItem="{Binding ElementName=gridModele, Path=SelectedItem, Mode=TwoWay}" SelectionChanged="gridModele_SelectionChanged"/>-->
 					</Border>
 					<Border Grid.Row="2" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================OS==============================-->
@@ -168,10 +168,10 @@
 						<Label Content="OS" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border  Grid.Row="3" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.System, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.System, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border  Grid.Row="3" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.Komputer.System}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.Komputer.System}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================SWM==============================-->
@@ -179,7 +179,7 @@
 						<Label Content="SWM" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="4" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Swm.Swm, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Swm[0].Swm, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<!--Dodatkowy panel do którego programowo dodawane są kontolki z informacjami-->
 					<Border Grid.Row="4" Grid.Column="2" Style="{StaticResource ClassicBorder}">
@@ -195,7 +195,7 @@
 						<Label Content="Wear Level" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.WearLevel[0], StringFormat={}{0}%>}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.WearLevel[0], StringFormat={}{0}%>}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="2" Style="{StaticResource ClassicBorder}">
 						<StackPanel Orientation="Vertical" x:Name="spWearLevel">
@@ -218,10 +218,10 @@
 						<Label Content="Model płyty" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.PlytaGlowna.Model}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================CPU==============================-->
@@ -229,10 +229,10 @@
 						<Label Content="CPU" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.PlytaGlowna.ID}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.PlytaGlowna.ID}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.PlytaGlowna.CPU}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.PlytaGlowna.CPU}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Wersja Bios==============================-->
@@ -241,12 +241,12 @@
 					</Border>
 					<Border Grid.Row="9" Grid.Column="1" Style="{StaticResource ClassicBorder}">
 						<StackPanel Orientation="Vertical" x:Name="spReaderBios">
-							<TextBlock Text="{Binding ReaderInfo.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
-							<TextBlock Text="{Binding ReaderInfo.WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}"/>
+							<TextBlock Text="{Binding ReaderData.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
+							<TextBlock Text="{Binding ReaderData.WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}"/>
 						</StackPanel>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					
@@ -264,10 +264,10 @@
 						<Label Content="RAM" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Ram.Pojemnosc, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Ram.Pojemnosc, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererInfo.PamiecRamSuma, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.PamiecRamSuma, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Dyski==============================-->
@@ -371,7 +371,7 @@
 						<Label Content="Kolor obudowy" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="14" Grid.Column="3" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.Kolor}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.Kolor}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Obudowa==============================--><!--
@@ -387,7 +387,7 @@
 						<Label Content="Shipping Mode" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="16" Grid.Column="3" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.ShippingMode}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.ShippingMode}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Rodzaj LCD==============================-->
@@ -395,7 +395,7 @@
 						<Label Content="Rodzaj LCD" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="18" Grid.Column="3" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderInfo.Komputer.LCD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.LCD}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 				</Grid>
 			</ScrollViewer>

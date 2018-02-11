@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Management;
-using System.IO;
-using System.Windows;
+using DataTypes;
 
-namespace Retriever
+namespace Utilities
 {
     //--------------------------------------------------Klasa obsługująca WMI do wydobywania danych--------------------------------------------------
     public static class WMI
@@ -20,7 +18,7 @@ namespace Retriever
             {
                 yield return new Win32HardwareData(property, (mo[property] == null) ? "" : mo[property].ToString());
             }
-            
+
         }
 
         //Metoda zwracająca pojedyńczą właściwość z określonej klasy
@@ -151,7 +149,7 @@ namespace Retriever
                             else if (inner.Name.ToString() == "ConfigManagerErrorCode" && Convert.ToUInt32(inner.Value) == 0)
                                 flag2 = true;
 
-                            if(flag1 && flag2)
+                            if (flag1 && flag2)
                             {
                                 flag1 = flag2 = false;
                                 temp++;
@@ -164,117 +162,6 @@ namespace Retriever
                 }
             }
             return temp;
-        }
-    }
-
-    //--------------------------------------------------Klasa obsługująca odnajdywanie i wydobywanie numerów SWM-------------------------------------
-    public static class SWMSearcher
-    {
-        public static string[] SWM { get; private set; }
-        public static string[] Drive { get; private set; }
-        static DriveInfo[] allDrives = DriveInfo.GetDrives(); //Pobranie informacji o dyskach logicznych an komputerze
-
-        //Pobieranie SWM z plików swconf.dat
-        public static IEnumerable<SWM> GetSWM()
-        {
-            int i = 0; //Iterator słuzący do poruszania się po tablicy
-            SWM = new string[0]; //Początkowa wartość tablicy
-            Drive = new string[0];
-            foreach (DriveInfo d in allDrives)
-            {
-                //Sprawdza gotowość dysku do odczytu
-                if (d.IsReady == true)
-                {
-                    //Utwórz instancję pliku swconf.dat na danym dysku
-                    FileInfo fInfo = new FileInfo(d.Name + "swconf.dat");
-                    //Jeżeli pliku nie ma na dysku, przejdź do następnego
-                    if (!fInfo.Exists)
-                    {
-                        continue;
-                    }
-                    //W innym wypadku odczytaj 3 linię z pliku i dodaj do smiennej SWM
-                    else
-                    {
-                        Expand();
-                        //Daną wyjściową jest np: D:\12345678
-                        SWM[i] = string.Format($"{File.ReadLines(d.Name + "swconf.dat").Skip(2).Take(1).First()}");
-                        Drive[i] = string.Format($"{d.Name}");
-                        yield return new SWM(Drive[i], SWM[i]);
-                        i++;
-                    }
-                }
-            }
-            if (SWM.Length == 0)
-            {
-                Expand();
-                SWM[0] = "Brak SWM w plikach";
-                Drive[0] = "-";
-            }
-        }
-
-        //Metoda powiększająca tablice SWM i Drive
-        static void Expand()
-        {
-            SWM = ExpandArr.Expand(SWM);
-            Drive = ExpandArr.Expand(Drive);
-        }
-    }
-
-    //--------------------------------------------------Klasa powiększająca tablice------------------------------------------------------------------
-    public static class ExpandArr
-    { 
-        public static T[] Expand<T>(T[] arr)
-        {
-            var temp = arr;
-            arr = new T[temp.Length + 1];
-            for (int i = 0; i < temp.Length; i++)
-            {
-                arr[i] = temp[i];
-            }
-            return arr;
-        }
-    }
-
-    //--------------------------------------------------Klasa obsługująca zapisywanie i wyświetlanie błędów------------------------------------------
-    public static class ErrorWriter
-    {
-        //Metoda zapisująca loga
-        public static bool WriteErrorLog(Exception e)
-        {
-            bool logCreated = true;
-            FileInfo errorInfo;
-            StreamWriter sw = null;
-            try
-            {
-                string name = string.Format(@"{0}.{1}.log", DateTime.Now.ToLongDateString(), DateTime.Now.ToLongTimeString());
-                errorInfo = new FileInfo(name);
-                sw = new StreamWriter(new FileStream(errorInfo.DirectoryName, FileMode.OpenOrCreate));
-                sw.WriteLine("Obiekt, który wyrzucił wyjątek: {0}", e.Source);
-                sw.WriteLine("Metoda która wyrzuciła wyjątek: {0}", e.TargetSite);
-                sw.WriteLine("Wywołania stosu: {0}", e.StackTrace);
-                sw.WriteLine("Pary klucz-wartość: {0}", e.Data);
-                sw.WriteLine("Opis: {0}", e.Message);
-                sw.Close();
-                sw.Dispose();
-            }
-            catch (Exception logEx)
-            {
-                MessageBox.Show($"Nie można utworzyć loga błędu. Treść błędu:\n{logEx.Message}", "Błąd przy tworzeniu loga błędu.", MessageBoxButton.OK, MessageBoxImage.Error);
-                logCreated = false;
-            }
-            return logCreated;
-        }
-
-        //Metoda działająca w wypadku kiedy nie można zapisać loga
-        public static void ShowErrorLog(Exception e, string naglowek, string opis)
-        {
-            string mess = string.Format("\n\nObiekt, który wyrzucił wyjątek: {0}\n" +
-                "Metoda która wyrzuciła wyjątek: {1}\n" +
-                "Wywołania stosu: {2}\n" +
-                "Pary klucz-wartość: {3}\n" +
-                "Opis: {4}\n)", 
-                e.Source, e.TargetSite, e.StackTrace, e.Data, e.Message);
-            MessageBox.Show(opis + mess, naglowek,  MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 }
