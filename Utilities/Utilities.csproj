@@ -51,13 +51,13 @@
     <Compile Include="WMI.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\..\Desktop\Nowy folder\sourceCode\ManagedWifi.csproj">
-      <Project>{6aa425c9-ea6a-4b01-aaed-5ff122e8b663}</Project>
-      <Name>ManagedWifi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\DataTypes\DataTypes.csproj">
       <Project>{b1a4ee03-99af-4d51-8b3d-7cdfcf7eca8b}</Project>
       <Name>DataTypes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ManagedWiFi\ManagedWifi.csproj">
+      <Project>{6aa425c9-ea6a-4b01-aaed-5ff122e8b663}</Project>
+      <Name>ManagedWifi</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
