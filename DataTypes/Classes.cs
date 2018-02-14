@@ -342,6 +342,14 @@ namespace DataTypes
         }
     }
 
+    public class Settings
+    {
+        public string DBPath;
+        public bool Security;
+
+        public Settings() { }
+    }
+
     //--------------------------------------------------Kontener na dane pobrane już z bazy lub WMI----------------------------------------------------------
     public struct DataPack : IDBData, IDeviceData
     {

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Classes.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Exceptions.cs" />
     <Compile Include="Interfaces.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

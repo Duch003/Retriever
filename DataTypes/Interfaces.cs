@@ -33,11 +33,7 @@ namespace DataTypes
     //--------------------------------------------------Interfejs z danymi lokalnymi---------------------------------------------------------
     public interface IFileSystemManager
     {
-        string DbPath { get; set; }
-        string SSID { get; set; }
-        string WifiPassword { get; set; }
-        string Encryption { get; set; }
-        string Authetication { get; set; }
+        Settings set { get; set; }
         string HashCode { get; set; }
     }
 

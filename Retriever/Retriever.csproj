@@ -136,5 +136,17 @@
       <Name>Utilities</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Settings.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="WlanProfile_noPassword.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="WlanProfile_Password.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="HashCode.xml" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
