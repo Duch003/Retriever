@@ -25,10 +25,20 @@ namespace Retriever
             {
                 try
                 {
-                    FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
-                    StreamReader sr = new StreamReader(stream);
-                    var temp = sr.ReadLine();
-                    stream.Close();
+                    FileStream stream;
+                    string temp;
+                    if (File.Exists(Environment.CurrentDirectory + @"\SHA1.txt"))
+                    {
+                        stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                        StreamReader sr = new StreamReader(stream);
+                        temp = sr.ReadLine();
+                        stream.Close();
+                    }
+                    else
+                    {
+                        temp = "";
+                        File.Create(Environment.CurrentDirectory + @"\SHA1.txt").Close();
+                    }
                     XmlSerializer xml = new XmlSerializer(typeof(Settings));
                     stream = new FileStream(@"..\.." + @"\Settings.xml", FileMode.Open);
                     Set = (Settings)xml.Deserialize(stream);

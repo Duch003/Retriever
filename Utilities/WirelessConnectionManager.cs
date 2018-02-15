@@ -23,11 +23,11 @@ namespace Utilities
                 {
                     client = new WlanClient();
                     wlanIface = client.Interfaces.First();
-                    XmlSerializer xml = new XmlSerializer(typeof(string));
-                    FileStream stream = new FileStream(@"C:\Users\Duch003\Documents\GitHub\Retriever\Retriever\WlanProfile_Password.xml", FileMode.Open);
-                    string profileXml = (string)xml.Deserialize(stream);
+                    FileStream stream = new FileStream(Environment.CurrentDirectory + @"..\..\..\WlanProfile_Password.xml", FileMode.Open);
+                    StreamReader sr = new StreamReader(stream);
+                    string profileXml = sr.ReadToEnd();
                     wlanIface.SetProfile(Wlan.WlanProfileFlags.AllUser, profileXml, true);
-                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, "WindowsActivation"); //Ustawione na sztywno, zmienić
+                    wlanIface.Connect(Wlan.WlanConnectionMode.Profile, Wlan.Dot11BssType.Any, "Duch003"); //Ustawione na sztywno, zmienić
                 }
                 catch(Exception e)
                 {
@@ -41,8 +41,7 @@ namespace Utilities
                 {
                     client = new WlanClient();
                     wlanIface = client.Interfaces.First();
-                    XmlSerializer xml = new XmlSerializer(typeof(string));
-                    FileStream stream = new FileStream(Environment.CurrentDirectory + @"..\..\..\XMLFile1.xml", FileMode.Open);
+                    FileStream stream = new FileStream(Environment.CurrentDirectory + @"..\..\..\WlanProfile_noPassword.xml", FileMode.Open);
                     StreamReader sr = new StreamReader(stream);
                     string profileXml = sr.ReadToEnd()/*.Replace("\n", "").Replace(" ", "").Replace("\r", "");*/;
                     //string profileXml = (string)xml.Deserialize(stream);
