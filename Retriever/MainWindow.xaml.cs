@@ -32,22 +32,14 @@ namespace Retriever
             try
             {
                 settings = new FileSystemManager();
-                
+                dbManager = new DatabaseManager(settings);
+
             }
             catch(Exception e)
             {
                 MessageBox.Show(e.Message, "Błąd odczytu pliku konfiguracyjnego lub hasza", MessageBoxButton.OK, MessageBoxImage.Error);
                 this.Close();
-            }
-            try
-            {
-                dbManager = new DatabaseManager(settings);
-            }
-            catch(Exception e)
-            {
-                MessageBox.Show(e.Message, "Błąd odczytu bazy danych.", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-            
+            }           
         }
 
         void PrzygotujAplikacje()

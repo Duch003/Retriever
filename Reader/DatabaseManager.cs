@@ -26,23 +26,27 @@ namespace Reader
         public DatabaseManager(IFileSystemManager FSManager)
         {
             Manager = FSManager;
-            WirelessConnectionManager.Connect(Manager.SSID, Manager.WifiPassword ?? "", Manager.Encryption ?? "AES", Manager.Authetication ?? "WPA2PSK");
+            WirelessConnectionManager.Connect(Manager.Set.Security);
 
-            Open(Manager.DbPath);
+            Open(Manager.Set.DBPath);
 
              //TODO Zmienić gdy będzie możliwość testowania sieci WIFI
 
             var aktualnyHash = ComputeHashCode();
             //Brak dostępu do bazy danych
             //Hasze są takie same, istnieje już lista modeli - załadować listę do pamięci
-            if (FSManager.HashCode == aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
+            if (FSManager.Set.SHA1 == aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
                 ListaModeli = LoadModelList();
             }
             //Hasze są różne, istnieje już lista modeli - trzeba napisać listę od nowa
-            else if (FSManager.HashCode != aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
+            else if (FSManager.Set.SHA1 != aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
                 ListaModeli = SaveAndLoadModelList(result);
+                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                StreamWriter sr = new StreamWriter(stream);
+                sr.Write(FSManager.Set.SHA1);
+                sr.Close();
             }
             //Hasze są różne, nie istnieje lista modeli - trzeba utworzyć listę modeli
             //Hasze są takie same, nie istnieje lista modeli - trzeba utworzyć listę modeli
@@ -50,6 +54,10 @@ namespace Reader
             {
                 File.Create(Environment.CurrentDirectory + @"\Model.xml");
                 ListaModeli = SaveAndLoadModelList(result);
+                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                StreamWriter sr = new StreamWriter(stream);
+                sr.Write(FSManager.Set.SHA1);
+                sr.Close();
             }
             Close();
         }  
@@ -78,8 +86,8 @@ namespace Reader
         public DataPack ReadModel(Model model)
         {
             DataPack ans;
-            WirelessConnectionManager.Connect(Manager.SSID, Manager.WifiPassword ?? "", Manager.Encryption ?? "AES", Manager.Authetication ?? "WPA2PSK");
-            Open(Environment.CurrentDirectory + @"/NoteBookiRef_v3.xlsx"); //TODO Zmienić gdy będzie możliwość testowania sieci WIFI
+            WirelessConnectionManager.Connect(Manager.Set.Security);
+            Open(Manager.Set.DBPath);
             if (model != null)
             {
                 DataTable table = result.Tables["MD"];

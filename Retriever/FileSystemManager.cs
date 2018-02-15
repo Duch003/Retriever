@@ -10,15 +10,13 @@ using System.Xml.Serialization;
 
 namespace Retriever
 {
-    class FileSystemManager /*: IFileSystemManager*/
+    class FileSystemManager : IFileSystemManager
     {
-        public Settings set { get; set; }
-        string HashCode { get; set; }
+        public Settings Set { get; set; }
 
         public FileSystemManager()
         {
             LoadSettings();
-            ReadSHA1();
         }
 
         void LoadSettings()
@@ -27,11 +25,14 @@ namespace Retriever
             {
                 try
                 {
-                    set = new Settings();
+                    FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                    StreamReader sr = new StreamReader(stream);
+                    var temp = sr.ReadLine();
                     XmlSerializer xml = new XmlSerializer(typeof(Settings));
-                    FileStream stream = new FileStream(@"..\.." + @"\Settings.xml", FileMode.Open);
-                    set = (Settings)xml.Deserialize(stream);
-                    set.DBPath = set.DBPath == "" || set.DBPath == null ? @"..\.." + @"\NoteBookiRef_v3.xlsx" : set.DBPath;
+                    stream = new FileStream(@"..\.." + @"\Settings.xml", FileMode.Open);
+                    Set = (Settings)xml.Deserialize(stream);
+                    Set.DBPath = Set.DBPath == "" || Set.DBPath == null ? @"..\.." + @"\NoteBookiRef_v3.xlsx" : Set.DBPath;
+                    Set.SHA1 = temp;
                     stream.Close();
                 }
                 catch (UnauthorizedAccessException ex)
@@ -50,29 +51,6 @@ namespace Retriever
                 var message = string.Format("Nie odnaleziono pliku konficuracyjnego settings.txt w katalogu.");
                 var file = @"..\.." + @"\Settings.xml";
                 throw new FileNotFoundException(message, file);
-            }
-        }
-
-        void ReadSHA1()
-        {
-            if (File.Exists(@"..\.." + @"\HashCode.xml"))
-            {
-                try
-                {
-                    XmlSerializer xml = new XmlSerializer(typeof(Settings));
-                    FileStream stream = new FileStream(@"..\.." + @"\HashCode.xml", FileMode.Open);
-                    HashCode = (string)xml.Deserialize(stream);
-                    stream.Close();
-                }
-                catch (Exception e)
-                {
-                    File.Delete(@"..\.." + @"\HashCode.xml");
-                    HashCode = "";
-                }
-            }
-            else
-            {
-                HashCode = "";
             }
         }
     }

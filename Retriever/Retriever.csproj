@@ -146,7 +146,7 @@
     <Resource Include="WlanProfile_Password.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="HashCode.xml" />
+    <Resource Include="XMLFile1.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

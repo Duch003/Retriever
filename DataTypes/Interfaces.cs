@@ -33,8 +33,7 @@ namespace DataTypes
     //--------------------------------------------------Interfejs z danymi lokalnymi---------------------------------------------------------
     public interface IFileSystemManager
     {
-        Settings set { get; set; }
-        string HashCode { get; set; }
+        Settings Set { get; set; }
     }
 
     public interface IDBManager
