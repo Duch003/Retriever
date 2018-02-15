@@ -52,7 +52,7 @@ namespace Reader
             //Hasze są takie same, nie istnieje lista modeli - trzeba utworzyć listę modeli
             else if (!File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
-                File.Create(Environment.CurrentDirectory + @"\Model.xml");
+                File.Create(Environment.CurrentDirectory + @"\Model.xml").Close(); 
                 ListaModeli = SaveAndLoadModelList(result);
                 FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
                 StreamWriter sr = new StreamWriter(stream);

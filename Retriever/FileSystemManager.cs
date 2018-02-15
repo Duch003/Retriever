@@ -28,6 +28,7 @@ namespace Retriever
                     FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
                     StreamReader sr = new StreamReader(stream);
                     var temp = sr.ReadLine();
+                    stream.Close();
                     XmlSerializer xml = new XmlSerializer(typeof(Settings));
                     stream = new FileStream(@"..\.." + @"\Settings.xml", FileMode.Open);
                     Set = (Settings)xml.Deserialize(stream);

@@ -38,7 +38,7 @@ namespace Retriever
             catch(Exception e)
             {
                 MessageBox.Show(e.Message, "Błąd odczytu pliku konfiguracyjnego lub hasza", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                Application.Current.Shutdown();
             }           
         }
 
