@@ -24,20 +24,29 @@ namespace Gatherer
 
         public GathererInfo()
         {
-            Komputer = GatherComputerInfo();
-            PlytaGlowna = GatherMainboardInfo();
-            WersjaBios = GatherBiosInfo();
-            Ram = GatherRamSize();
-            PamiecRamSuma = 0;
-            for(int i = 0; i < Ram.Length; i++)
+            try
             {
-                PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
+                Komputer = GatherComputerInfo();
+                PlytaGlowna = GatherMainboardInfo();
+                WersjaBios = GatherBiosInfo();
+                Ram = GatherRamSize();
+                PamiecRamSuma = 0;
+                for (int i = 0; i < Ram.Length; i++)
+                {
+                    PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
+                }
+                Dyski = GatherStorageInfo();
+                Swm = GatherSwmNumbers();
+                MenedzerUrzadzen = GatherDeviceManagerInfo();
+                UrzadzeniaSieciowe = GatherNetDevicesLanAdresses();
+                KartyGraficzne = GatherGraphicCardInfo();
             }
-            Dyski = GatherStorageInfo();
-            Swm = GatherSwmNumbers();
-            MenedzerUrzadzen = GatherDeviceManagerInfo();
-            UrzadzeniaSieciowe = GatherNetDevicesLanAdresses();
-            KartyGraficzne = GatherGraphicCardInfo();
+            catch(Exception e)
+            {
+                string message = string.Format("Zainstalowano zły image!\n{0}", e.Message);
+                throw new Exception(message);
+            }
+            
         }
 
         Computer GatherComputerInfo()

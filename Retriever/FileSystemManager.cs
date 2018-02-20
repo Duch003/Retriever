@@ -32,6 +32,8 @@ namespace Retriever
                         stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
                         StreamReader sr = new StreamReader(stream);
                         temp = sr.ReadLine();
+                        temp = temp == null ? "" : temp;
+                        sr.Close();
                         stream.Close();
                     }
                     else

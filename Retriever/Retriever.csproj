@@ -140,10 +140,7 @@
     <Resource Include="Settings.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="WlanProfile_Password.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="WlanProfile_noPassword.xml" />
+    <Resource Include="WlanProfile.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

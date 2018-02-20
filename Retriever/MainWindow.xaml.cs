@@ -52,7 +52,7 @@ namespace Retriever
             {
                 var message = string.Format("Wystąpił błąd podczas otwierania aplikacji:\n{0}", e.Message);
                 MessageBox.Show(message, "Nie można otworzyć aplikacji", MessageBoxButton.OK, MessageBoxImage.Error);
-                this.Close();
+                Environment.Exit(0);
             }
             
             gridZestawienie.DataContext = Retriever;

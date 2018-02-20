@@ -26,7 +26,7 @@ namespace Reader
         public DatabaseManager(IFileSystemManager FSManager)
         {
             Manager = FSManager;
-            WirelessConnectionManager.Connect(Manager.Set.Security);
+            WirelessConnectionManager.Connect();
 
             Open(Manager.Set.DBPath);
 
@@ -43,9 +43,9 @@ namespace Reader
             else if (FSManager.Set.SHA1 != aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
                 ListaModeli = SaveAndLoadModelList(result);
-                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
                 StreamWriter sr = new StreamWriter(stream);
-                sr.Write(FSManager.Set.SHA1);
+                sr.WriteLine(aktualnyHash);
                 sr.Close();
             }
             //Hasze są różne, nie istnieje lista modeli - trzeba utworzyć listę modeli
@@ -54,9 +54,9 @@ namespace Reader
             {
                 File.Create(Environment.CurrentDirectory + @"\Model.xml").Close(); 
                 ListaModeli = SaveAndLoadModelList(result);
-                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
+                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
                 StreamWriter sr = new StreamWriter(stream);
-                sr.Write(FSManager.Set.SHA1);
+                sr.WriteLine(aktualnyHash);
                 sr.Close();
             }
             Close();
@@ -86,7 +86,7 @@ namespace Reader
         public DataPack ReadModel(Model model)
         {
             DataPack ans;
-            WirelessConnectionManager.Connect(Manager.Set.Security);
+            WirelessConnectionManager.Connect();
             Open(Manager.Set.DBPath);
             if (model != null)
             {

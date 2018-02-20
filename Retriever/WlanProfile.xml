@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
+  <name>Mankin Wi-Fi</name>
+  <SSIDConfig>
+    <SSID>
+      <hex>4D616E6B696E2057692D4669</hex>
+      <name>Mankin Wi-Fi</name>
+    </SSID>
+  </SSIDConfig>
+  <connectionType>ESS</connectionType>
+  <connectionMode>auto</connectionMode>
+  <MSM>
+    <security>
+      <authEncryption>
+        <authentication>WPA2PSK</authentication>
+        <encryption>AES</encryption>
+        <useOneX>false</useOneX>
+      </authEncryption>
+      <sharedKey>
+        <keyType>passPhrase</keyType>
+        <protected>true</protected>
+        <keyMaterial>01000000D08C9DDF0115D1118C7A00C04FC297EB010000004C0404186766D74E9A9026EFA183F21E0000000002000000000010660000000100002000000017A0CD2DEA9A02E4F2D3A515058E01900D75A740B87E2F9F401E7F08C066618B000000000E8000000002000020000000BDB618FD21DB49503D6C745A000173D46EA7A81101876289C269608688C0C325100000004C28BF4EB86A3DE61FBBCCFE49A336144000000045520EBBD4E62AFFF4EBEF190A084434675B04595ECD8D1C477EF1EDF93A82EB1CECB17DD43123DB5E6714B680AB634012FCB84407ECA6E6E6733771C461E80A</keyMaterial>
+      </sharedKey>
+    </security>
+  </MSM>
+  <MacRandomization xmlns="http://www.microsoft.com/networking/WLAN/profile/v3">
+    <enableRandomization>false</enableRandomization>
+    <randomizationSeed>384252165</randomizationSeed>
+  </MacRandomization>
+</WLANProfile>

@@ -5,7 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="Retriever"
-		SizeToContent="WidthAndHeight" MaxHeight="700"
+		SizeToContent="WidthAndHeight"
+		WindowStartupLocation="Manual" 
+		Left="50" Top="0"
 		x:Name="mainWindow" KeyUp="KeyUpRecognize">
 	<Window.Resources>
 		<ResourceDictionary>

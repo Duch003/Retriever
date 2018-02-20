@@ -1,5 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Settings>
   <DBPath></DBPath> <!--Jezeli puste, domyslnie wyszuka w katalogu z programem.-->
-  <Security>true</Security> <!--Wybor schametu polaczenia z siecia WiFi-->
 </Settings>

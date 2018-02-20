@@ -345,7 +345,6 @@ namespace DataTypes
     public class Settings
     {
         public string DBPath;
-        public bool Security;
         public string SHA1 { get; set; }
 
         public Settings() { }
