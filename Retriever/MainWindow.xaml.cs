@@ -84,18 +84,6 @@ namespace Retriever
 
         }
 
-        #region Wczytywanie nowych danych z pliku excel
-        //Metoda wczytująca dane aktualnie zaznaczonego rekordu
-        //private void gridModele_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        //{
-        //    if ((gridModele.SelectedItem as Model) != null)
-        //    {
-        //        Retriever.ReaderInfo.ReadData(gridModele.SelectedItem as Model);
-        //        DynamicControls();
-        //    }
-        //}
-        #endregion
-
         #region Wyszukiwarka
         bool FiltrUzytkownika(object item)
         {

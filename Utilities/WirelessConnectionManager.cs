@@ -22,11 +22,11 @@ namespace Utilities
             {
                 client = new WlanClient();
                 wlanIface = client.Interfaces.First();
-                FileStream stream = new FileStream(Environment.CurrentDirectory + @"..\..\..\WlanProfile.xml", FileMode.Open);
+                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\WlanProfile.xml", FileMode.Open);
                 var profile = from z in XElement.Load(stream).DescendantNodes().OfType<XElement>() select z.Value;
                 name = profile.First().ToString();
                 stream.Close();
-                stream = new FileStream(Environment.CurrentDirectory + @"..\..\..\WlanProfile.xml", FileMode.Open);
+                stream = new FileStream(Environment.CurrentDirectory + @"\WlanProfile.xml", FileMode.Open);
                 StreamReader sr = new StreamReader(stream);
                 string profileXml = sr.ReadToEnd();
                 sr.Close();

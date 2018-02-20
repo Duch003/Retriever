@@ -21,7 +21,7 @@ namespace Retriever
 
         void LoadSettings()
         {
-            if (File.Exists(@"..\.." + @"\Settings.xml"))
+            if (File.Exists(Environment.CurrentDirectory + @"\Settings.xml"))
             {
                 try
                 {
@@ -42,9 +42,9 @@ namespace Retriever
                         File.Create(Environment.CurrentDirectory + @"\SHA1.txt").Close();
                     }
                     XmlSerializer xml = new XmlSerializer(typeof(Settings));
-                    stream = new FileStream(@"..\.." + @"\Settings.xml", FileMode.Open);
+                    stream = new FileStream(Environment.CurrentDirectory + @"\Settings.xml", FileMode.Open);
                     Set = (Settings)xml.Deserialize(stream);
-                    Set.DBPath = Set.DBPath == "" || Set.DBPath == null ? @"..\.." + @"\NoteBookiRef_v3.xlsx" : Set.DBPath;
+                    Set.DBPath = Set.DBPath == "" || Set.DBPath == null ? Environment.CurrentDirectory + @"\NoteBookiRef_v3.xlsx" : Set.DBPath;
                     Set.SHA1 = temp;
                     stream.Close();
                 }
@@ -62,7 +62,7 @@ namespace Retriever
             else
             {
                 var message = string.Format("Nie odnaleziono pliku konficuracyjnego settings.txt w katalogu.");
-                var file = @"..\.." + @"\Settings.xml";
+                var file = @"\Settings.xml";
                 throw new FileNotFoundException(message, file);
             }
         }

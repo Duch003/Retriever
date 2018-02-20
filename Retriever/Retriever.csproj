@@ -137,9 +137,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Settings.xml" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="settings.xml" />
     <Resource Include="WlanProfile.xml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

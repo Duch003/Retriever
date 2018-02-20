@@ -74,7 +74,6 @@ namespace Retriever
             }
         }
         string _KluczWindows;
-        public int PortyUSB { get; private set; }
         public double[] StanBaterii
         {
             get
@@ -99,7 +98,6 @@ namespace Retriever
             RefreshBatteriesState();
             RenewSecureBootInfo();
             RenewWindowsKeyInfo();
-            CountUSB();
         }
 
         public void RenewWindowsActivationStatusInfo()
@@ -121,12 +119,7 @@ namespace Retriever
 
         public void RenewWindowsKeyInfo()
         {
-            KluczWindows = WMI.GetOriginalProductKey() == null ? "Brak klucza" : "Znaleziono klucz";
-        }
-
-        public void CountUSB()
-        {
-            PortyUSB = WMI.CountUSB();
+            KluczWindows = WMI.GetOriginalProductKey();
         }
 
         public void RefreshBatteriesState()

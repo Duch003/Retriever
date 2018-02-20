@@ -83,6 +83,7 @@ namespace Reader
             }
         }
 
+        //TODO Zweryfikowac problem dla 99525 - brak biosu
         public DataPack ReadModel(Model model)
         {
             DataPack ans;
@@ -228,12 +229,12 @@ namespace Reader
                 else
                 {
                     //Zapisz model obudowy w pamięci
-                    string temp = modelTable.Rows[i][13].ToString();
+                    string temp = modelTable.Rows[i][13].ToString().ToLower();
                     //Przeszukuj tabelę BIOS
                     for (int j = 0; j < biosTable.Rows.Count; j++)
                     {
                         //Jeżeli komórka zawiera model obudowy, zapisz
-                        if (biosTable.Rows[j][0].ToString().Contains(temp))
+                        if (biosTable.Rows[j][0].ToString().ToLower().Contains(temp))
                         {
                             biosRow = j;
                             biosSheet = "BIOS";

@@ -60,13 +60,7 @@
 		<Setter Property="TextAlignment"				Value="Center"/>
 		<Setter Property="Padding"						Value="5"/>
 		<Setter Property="Background"					Value="LightSteelBlue"/>
-		<Setter Property="Foreground"					Value="Red"/>
 		<Setter Property="FontWeight"					Value="Bold"/>
-		<Style.Triggers>
-			<DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Text}" Value="Znaleziono klucz">
-				<Setter Property="Foreground"			Value="Green"/>
-			</DataTrigger>
-		</Style.Triggers>
 	</Style>
 
 	<Style x:Key="Status_WindowsActivation" TargetType="TextBlock">
