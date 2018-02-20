@@ -17,8 +17,34 @@
 		</ResourceDictionary>
 	</Window.Resources>
 
-	<!--Definicja TabControl - wewnątrz znajduje się wsyzstko inne-->
-	<TabControl Margin="5" SelectedIndex="1" x:Name="TabControl">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="*"/>
+		</Grid.ColumnDefinitions>
+
+		<Menu Grid.Row="0">
+			<MenuItem Header="Diagnostyka">
+				<MenuItem Header="WMI Manager"/>
+				<MenuItem Header="EventViewer"/>
+				<MenuItem Header="Regedit"/>
+			</MenuItem>
+			<MenuItem Header="O programie">
+				<MenuItem Header="Licencja"/>
+				<MenuItem Header="O programie"/>
+				<Separator/>
+				<MenuItem Header="Zrób mi kawę"/>
+			</MenuItem>
+			
+
+		</Menu>
+			
+
+		<!--Definicja TabControl - wewnątrz znajduje się wsyzstko inne-->
+		<TabControl Margin="5" SelectedIndex="1" x:Name="TabControl"  Grid.Row="1">
 		<!--==============================LISTA MODELI==============================-->
 		<!--Zakładka z DataGridem przechowującym wszystkie modele odczytane z pliku-->
 		<TabItem Header="Lista modeli">
@@ -244,7 +270,7 @@
 					<Border Grid.Row="9" Grid.Column="1" Style="{StaticResource ClassicBorder}">
 						<StackPanel Orientation="Vertical" x:Name="spReaderBios">
 							<TextBlock Text="{Binding ReaderData.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
-							<TextBlock Text="{Binding ReaderData.WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}"/>
+							<TextBlock Text="{Binding ReaderData.WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}" MaxWidth="300"/>
 						</StackPanel>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="2" Style="{StaticResource ClassicBorder}">
@@ -403,4 +429,5 @@
 			</ScrollViewer>
 		</TabItem>
 	</TabControl>
+	</Grid>
 </Window>
