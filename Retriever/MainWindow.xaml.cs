@@ -50,7 +50,12 @@ namespace Retriever
             }
             catch(Exception e)
             {
-                var message = string.Format("Wystąpił błąd podczas otwierania aplikacji:\n{0}", e.Message);
+                var message = string.Format("Wystąpił błąd podczas otwierania aplikacji:\n{0}" +
+                    "\n{1}" +
+                    "\n{2}" +
+                    "\n{3}" +
+                    "\n{4}" +
+                    "", e.Message, e.StackTrace, e.Source, e.TargetSite, e.HelpLink);
                 MessageBox.Show(message, "Nie można otworzyć aplikacji", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
             }

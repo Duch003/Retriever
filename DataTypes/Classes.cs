@@ -97,8 +97,8 @@ namespace DataTypes
         {
             Regex[] size = new Regex[2]
             {
-                new Regex(@"\d\d"),
-                new Regex(@"\d")
+                new Regex(@"[0-9][0-9]"),
+                new Regex(@"[0-9]")
             };
             Match result;
             foreach (Regex rgx in size)
@@ -130,11 +130,14 @@ namespace DataTypes
         public Storage(string info)
         {
             //Wzory dla odnajdywania wartości pojemności
-            Regex[] size = new Regex[3]
+            Regex[] size = new Regex[5]
             {
                 new Regex(@"\d{4}"),
                 new Regex(@"\d{3}"),
-                new Regex(@"\d{2}")
+                new Regex(@"\d{2}"),
+                new Regex(@"\d\W|_\d"),
+                new Regex(@"\d{1}")
+                
             };
             //Wzory dla odnajdywania typu dysku
             Regex[] type = new Regex[4]
@@ -146,10 +149,16 @@ namespace DataTypes
             };
             //Test i wynik
             Match result;
+            
             foreach (Regex rgx in size)
             {
                 result = rgx.Match(info);
-                if (result.Success)
+                if(result.Success && info.ToLower().Contains("tb"))
+                {
+                    Pojemnosc = Convert.ToDouble(result.Value.Replace(",", ".")) * 1000;
+                    break;
+                }
+                else if (result.Success)
                 {
                     Pojemnosc = Convert.ToDouble(result.Value);
                     break;

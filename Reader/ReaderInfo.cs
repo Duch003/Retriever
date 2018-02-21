@@ -131,4 +131,6 @@ namespace Retriever
         }
 
     }
+
+    //TODO Regex dla wartosci 8 GB nie wyszukuje nic
 }

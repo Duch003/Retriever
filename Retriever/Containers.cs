@@ -129,6 +129,8 @@ namespace Retriever
             var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
             foreach (Win32HardwareData z in ans)
             {
+                //TODO Dla wyczerpanej baterii zwraca nie-liczbe
+                //Zmienic stan baterii na string, dopisywac "WYMIANA BATERII" w takiej sytuacji
                 StanBaterii = ExpandArr.Expand(StanBaterii);
                 StanBaterii[i] = Convert.ToInt64(z.Wartosc);
             }

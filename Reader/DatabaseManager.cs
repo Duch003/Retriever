@@ -136,7 +136,7 @@ namespace Reader
 
                 ans.Ram = new RAM[1] { new RAM(info: table.Rows[model.WierszModel][6].ToString()) };
 
-                var tempMem = table.Rows[model.WierszModel][5].ToString().Split(';');
+                var tempMem = table.Rows[model.WierszModel][5].ToString().Replace("+", ";").Split(';');
                 ans.Dyski = new Storage[tempMem.Length];
                 for (int j = 0; j < tempMem.Length; j++)
                 {

@@ -292,7 +292,7 @@
 						<Label Content="RAM" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderData.Ram.Pojemnosc, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Ram[0].Pojemnosc, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="11" Grid.Column="2" Style="{StaticResource ClassicBorder}">
 						<TextBlock Text="{Binding GathererData.PamiecRamSuma, StringFormat={}{0}GB}" Style="{StaticResource PropertyValue}"/>
