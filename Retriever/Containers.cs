@@ -23,73 +23,13 @@ namespace Retriever
         }
     }
     //--------------------------------------------------Kontener na poszczególne statusy systemu-------------------------------------------------
-    public class Status : INotifyPropertyChanged
+    public class Status
     {
-        public string WinStatus
-        {
-            get
-            {
-                return _WinStatus;
-            }
-            private set
-            {
-                if (_WinStatus != value)
-                {
-                    _WinStatus = value;
-                    OnPropertyChanged("WinStatus");
-                }
-            }
-        }
-        string _WinStatus;
-        public string SecureStatus
-        {
-            get
-            {
-                return _SecureStatus;
-            }
-            private set
-            {
-                if (_SecureStatus != value)
-                {
-                    _SecureStatus = value;
-                    OnPropertyChanged("SecureStatus");
-                }
-            }
+        public string WinStatus { get; set; }
+        public string SecureStatus { get; set; }
+        public string KluczWindows { get; set; }
+        public string[] StanBaterii { get; set; }
 
-        }
-        string _SecureStatus;
-        public string KluczWindows
-        {
-            get
-            {
-                return _KluczWindows;
-            }
-            set
-            {
-                if (_KluczWindows != value)
-                {
-                    _KluczWindows = value;
-                    OnPropertyChanged("KluczWindows");
-                }
-            }
-        }
-        string _KluczWindows;
-        public double[] StanBaterii
-        {
-            get
-            {
-                return _StanBaterii;
-            }
-            set
-            {
-                if (_StanBaterii != value)
-                {
-                    _StanBaterii = value;
-                    OnPropertyChanged("StanBaterii");
-                }
-            }
-        }
-        double[] _StanBaterii;
         public event PropertyChangedEventHandler PropertyChanged;
 
         public Status()
@@ -124,34 +64,17 @@ namespace Retriever
 
         public void RefreshBatteriesState()
         {
-            StanBaterii = new double[0];
+            StanBaterii = new string[0];
+            double temp;
             int i = 0;
             var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
             foreach (Win32HardwareData z in ans)
             {
-                //TODO Dla wyczerpanej baterii zwraca nie-liczbe
-                //Zmienic stan baterii na string, dopisywac "WYMIANA BATERII" w takiej sytuacji
                 StanBaterii = ExpandArr.Expand(StanBaterii);
-                StanBaterii[i] = Convert.ToInt64(z.Wartosc);
-            }
-        }
-
-        public void RefreshBatteriesState(object sender, EventArgs e)
-        {
-            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
-            int i = 0;
-            foreach (Win32HardwareData z in ans)
-            {
-                StanBaterii[i] = Convert.ToInt64(z.Wartosc);
-                i++;
-            }
-        }
-
-        private void OnPropertyChanged(string property)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
+                if (double.TryParse(z.Wartosc, out temp))
+                    StanBaterii[i] = z.Wartosc;
+                else
+                    StanBaterii[i] = "Wymiana baterii!";
             }
         }
     }

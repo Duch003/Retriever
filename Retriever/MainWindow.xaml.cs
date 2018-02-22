@@ -23,7 +23,6 @@ namespace Retriever
             InitializeComponent();
             OdczytajKonfiguracjęIHasz();
             PrzygotujAplikacje();
-            UstawTimer();
         }
 
         void OdczytajKonfiguracjęIHasz()
@@ -38,7 +37,10 @@ namespace Retriever
             {
                 MessageBox.Show(e.Message, "Błąd odczytu pliku konfiguracyjnego lub hasza", MessageBoxButton.OK, MessageBoxImage.Error);
                 Environment.Exit(0);
-            }           
+            }   
+            //EmptyNetworkListException - gdy brak dostępnych połączeń sieciowych
+            //DriversNotInstalledException - gdy nagrano zły image
+            //Exception podczas próby otwarcia pliku bazy danych
         }
 
         void PrzygotujAplikacje()
@@ -105,16 +107,6 @@ namespace Retriever
                 return;
             else if((sender as TextBox).Text.Length == 0 || (sender as TextBox).Text.Length > 2)
                 CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
-        }
-        #endregion
-
-        #region Ustawienie timera do odświeżania danych
-        void UstawTimer()
-        {
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Tick += new EventHandler(Retriever.Statusy.RefreshBatteriesState);
-            timer.Interval = new TimeSpan(0, 0, 10);
-            timer.Start();
         }
         #endregion
 

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Windows;
+using System.Threading;
 using System.Xml.Serialization;
 using Utilities;
 
@@ -25,15 +25,22 @@ namespace Reader
 
         public DatabaseManager(IFileSystemManager FSManager)
         {
+            //Zapisanie informacjio z pliku settings.xml
             Manager = FSManager;
+
+            //Połączenie z siecią
             WirelessConnectionManager.Connect();
 
+            //Odczekanie 5 sekund aby ustanowić połączenie
+            Thread.Sleep(3000);
+
+            //Otwrcie pliku we wskazanym miejscu
             Open(Manager.Set.DBPath);
 
-             //TODO Zmienić gdy będzie możliwość testowania sieci WIFI
-
+            //SPRAWDZANIE WERSJI BAZY DANYCH
+            //Utworzenie aktualnego hasha pliku bazy danych
             var aktualnyHash = ComputeHashCode();
-            //Brak dostępu do bazy danych
+            
             //Hasze są takie same, istnieje już lista modeli - załadować listę do pamięci
             if (FSManager.Set.SHA1 == aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
@@ -52,6 +59,7 @@ namespace Reader
             //Hasze są takie same, nie istnieje lista modeli - trzeba utworzyć listę modeli
             else if (!File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
+                //Utworzenie nowego pliku listy modeli
                 File.Create(Environment.CurrentDirectory + @"\Model.xml").Close(); 
                 ListaModeli = SaveAndLoadModelList(result);
                 FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
@@ -65,10 +73,8 @@ namespace Reader
         //Metoda otwierająca plik bazy danych
         void Open(string FilePath)
         {
-            //Spróbuj otworzyć plik bazy danych
             try
             {
-                //Otwarcie pliku
                 stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                 excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
                 result = excelReader.AsDataSet();
@@ -76,10 +82,8 @@ namespace Reader
             catch (Exception e)
             {
                 var message = string.Format("Wystąpił błąd podczas próby otwarcia bazy danych:\n{0}", e.Message);
-                MessageBox.Show(message, "Błąd przy otwieraniu pliku bazy danych", MessageBoxButton.OK, MessageBoxImage.Information);
-                stream = null;
-                excelReader = null;
-                result = null;
+                Close();
+                throw new Exception(message);
             }
         }
 
@@ -87,10 +91,17 @@ namespace Reader
         public DataPack ReadModel(Model model)
         {
             DataPack ans;
+
+            //Połączenie z siecią
             WirelessConnectionManager.Connect();
+
+            //Otwarcie pliku bazy danych
             Open(Manager.Set.DBPath);
+
+            //Sprawdzenie argumentu - w razie braku argumentu wyrzucić pusty kontener ans
             if (model != null)
             {
+                //Ustawienie zmiennych na kontkretne arkusze w bazie
                 DataTable table = result.Tables["MD"];
                 DataTable biosTable = result.Tables["BIOS"];
 
@@ -183,9 +194,15 @@ namespace Reader
         //Metoda wczytująca listę modeli do pamięci
         ObservableCollection<Model> LoadModelList()
         {
+            //Utwórz obiekt deserializera o typie listy modeli
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+
+            //Utworzenie streamu danych na lokalnym pliku modeli
             StreamReader sr = new StreamReader(Environment.CurrentDirectory + @"\Model.xml");
+
+            //Deserializacja
             ObservableCollection<Model> ListaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
+
             sr.Close();
             return ListaModeli;
         }
@@ -193,13 +210,24 @@ namespace Reader
         //Metoda pobierajaca i układająca listę modeli
         ObservableCollection<Model> SaveAndLoadModelList(DataSet result)
         {
-            
+            //Wczytanie surowej listy modeli z bazy
             IEnumerable<Model> temp = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
+
+            //Sortowanie listy
             temp = temp.OrderBy(z => z.MD);
+
+            //Utworzenie prawidłowej listy na podstawie posortowanej surowej listy
             ObservableCollection<Model> lista = new ObservableCollection<Model>(temp);
+
+            //Utworzenie obiektu do serializacji danych
             XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+
+            //Utworzenie nowego streamu na plik lokalny w którym będzie zapisana lista modeli
             StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"\Model.xml");
+
+            //Serializacja
             xs.Serialize(sw, lista);
+
             sw.Close();
             return lista;
         }
@@ -215,7 +243,6 @@ namespace Reader
                 string msn = modelTable.Rows[i][1].ToString();
                 string md = modelTable.Rows[i][0].ToString();
 
-                //Na podstawie modelu obudowy przeszukaj tabelę z biosami i znajdź 
                 int biosRow = -1;
                 string biosSheet = "";
 

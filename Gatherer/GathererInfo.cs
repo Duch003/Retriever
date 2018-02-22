@@ -43,12 +43,13 @@ namespace Gatherer
             }
             catch(Exception e)
             {
-                string message = string.Format("Zainstalowano zły image!\n{0}", e.Message);
-                throw new Exception(message);
+                string message = string.Format("Nie można pobrać informacji o sprzęcie - prawdopdobnie\nzainstalowany zły image//złe sterowniki.\n{0}", e.Message);
+                throw new DriversNotInstalledException(message);
             }
             
         }
 
+        //------------------------------------------Model, MSN, OS, WearLevel, Model obudowy------------------------------------------
         Computer GatherComputerInfo()
         {
             int i = 0;
@@ -83,9 +84,9 @@ namespace Gatherer
             return new Computer(md: model, msn: msn, system: system, wearLevel: wearLevel, obudowa: obudowa);
         }
 
+        //------------------------------------------Model MB, Producent procesora, Model CPU, Taktowanie maksymalne-------------------
         Mainboard GatherMainboardInfo()
         {
-            
             //Pobranie modelu płyty głównej
             var temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Product");
             string mbModel = (temp.First() as Win32HardwareData).Wartosc;
@@ -106,6 +107,7 @@ namespace Gatherer
             return new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie);
         }
 
+        //------------------------------------------Aktualna wersja BIOS--------------------------------------------------------------
         Bios GatherBiosInfo()
         {
             //Pobierane informacji o wersji BIOS
@@ -114,9 +116,9 @@ namespace Gatherer
             return new Bios(mbWersjaBios);
         }
 
+        //------------------------------------------Pojemność RAM---------------------------------------------------------------------
         RAM[] GatherRamSize()
         {
-            //Pobieranie informacji o bankach
             int i = 0;
             var temp = new RAM[0];
 
@@ -136,6 +138,7 @@ namespace Gatherer
             return temp;
         }
 
+        //------------------------------------------Dyski twarde----------------------------------------------------------------------
         Storage[] GatherStorageInfo()
         {
             //Pobieranie informacji o nazwach dysków
@@ -163,6 +166,7 @@ namespace Gatherer
             return temp;
         }
 
+        //------------------------------------------SWM-------------------------------------------------------------------------------
         SWM[] GatherSwmNumbers()
         {
             int i = 0;
@@ -176,11 +180,13 @@ namespace Gatherer
             return temp;
         }
 
+        //------------------------------------------Menedżer urządzeń-----------------------------------------------------------------
         DeviceManager[] GatherDeviceManagerInfo()
         {
             int i = 0;
             var temp = new DeviceManager[0];
             var nazwaUrzadzenia = new string[0];
+            //Pobieranie nazw urządzeń
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "Caption", condition: "ConfigManagerErrorCode != 0"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
@@ -189,6 +195,7 @@ namespace Gatherer
             }
 
             i = 0;
+            //Pobieranie błędów
             foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "ConfigManagerErrorCode", condition: "ConfigManagerErrorCode != 0"))
             {
                 temp = ExpandArr.Expand(temp);
@@ -198,6 +205,7 @@ namespace Gatherer
             return temp;
         }
 
+        //------------------------------------------Urządzenia sieciowe---------------------------------------------------------------
         NetDevice[] GatherNetDevicesLanAdresses()
         {
             int i = 0;
@@ -220,6 +228,7 @@ namespace Gatherer
             return temp;
         }
 
+        //------------------------------------------Karty graficzne-------------------------------------------------------------------
         GraphicCard[] GatherGraphicCardInfo()
         {
             int i = 0;
