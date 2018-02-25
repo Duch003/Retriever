@@ -275,7 +275,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					Dot11PhyType[] ret = new Dot11PhyType[numberOfPhyTypes];
+					var ret = new Dot11PhyType[numberOfPhyTypes];
 					Array.Copy(dot11PhyTypes, ret, numberOfPhyTypes);
 					return ret;
 				}
@@ -781,7 +781,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					ushort[] rates = new ushort[rateSetLength / sizeof(ushort)];
+					var rates = new ushort[rateSetLength / sizeof(ushort)];
 					Array.Copy(rateSet, rates, rates.Length);
 					return rates;
 				}
@@ -832,7 +832,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					StringBuilder sb = new StringBuilder(1024);
+					var sb = new StringBuilder(1024);
 					return
 						WlanReasonCodeToString(reasonCode, sb.Capacity, sb, IntPtr.Zero) == 0 ?
 							sb.ToString() :
@@ -1645,7 +1645,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					WlanPhyRadioState[] ret = new WlanPhyRadioState[numberofItems];
+					var ret = new WlanPhyRadioState[numberofItems];
 					Array.Copy(phyRadioState, ret, numberofItems);
 					return ret;
 				}

@@ -1,11 +1,5 @@
-﻿using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
+﻿using System;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DataTypes
 {
@@ -14,16 +8,16 @@ namespace DataTypes
     {
         public int WierszModel { get; set; } //Nr linii danego modelu
         public int WierszBios { get; set; } //Nr linii z danymi o BIOSie
-        public string MSN { get; set; }
-        public string MD { get; set; }
+        public string Msn { get; set; }
+        public string Md { get; set; }
         public string BiosZeszyt { get; set; }
 
         public Model(int wierszModel, int wierszBios, string biosZeszyt, string msn, string md)
         {
             WierszModel = wierszModel;
             WierszBios = wierszBios;
-            MSN = msn;
-            MD = md;
+            Msn = msn;
+            Md = md;
             BiosZeszyt = biosZeszyt;
         }
 
@@ -35,29 +29,29 @@ namespace DataTypes
     //--------------------------------------------------Kontener na ogólne i różne dane o komputerze---------------------------------------------------
     public class Computer
     {
-        public string MD { get; set; }                  //Model komputera
-        public string MSN { get; set; }                 //MSN komputera
+        public string Md { get; set; }                  //Model komputera
+        public string Msn { get; set; }                 //MSN komputera
         public string System { get; set; }              //System operacyjny   
         public double[] WearLevel { get; set; }         //Przegrzanie baterii
         public string Wskazowki { get; set; }           //Dodatkowe informacje odnośnie komputera
         public string Obudowa { get; set; }             //Model obudowy
         public bool ShippingMode { get; set; }          //ShippingMode
-        public string StaryMSN { get; set; }             //NowyMSN
-        public string LCD { get; set; }                 //Rodzaj matrycy
+        public string StaryMsn { get; set; }             //NowyMSN
+        public string Lcd { get; set; }                 //Rodzaj matrycy
         public string Kolor { get; set; }               //Kolor obudowy
 
         public Computer(string md = "-", string msn = "-", string system = "-", double[] wearLevel = null,
             string wskazowki = "-", string obudowa = "-", string lcd = "-", string kolor = "-", bool shipp = false, string staryMsn = "-")
         {
-            MD = md;
-            MSN = msn;
+            Md = md;
+            Msn = msn;
             System = system;
-            WearLevel = (wearLevel == null) ? new double[1] { -999 } : wearLevel;
+            WearLevel = wearLevel ?? new double[] { -999 };
             Wskazowki = wskazowki;
             Obudowa = obudowa;
             ShippingMode = shipp;
-            StaryMSN = staryMsn;
-            LCD = lcd;
+            StaryMsn = staryMsn;
+            Lcd = lcd;
             Kolor = kolor;
         }
     }
@@ -67,49 +61,49 @@ namespace DataTypes
     {
         public string Model { get; set; }       //Model płyty głównej
         public string Producent { get; set; }   //Producent płyty
-        public string CPU { get; set; }         //Procesor
+        public string Cpu { get; set; }         //Procesor
         public string Taktowanie { get; set; }  //Taktowanie
-        public string ID { get; set; }          //Pełna nazwa procesora
+        public string Id { get; set; }          //Pełna nazwa procesora
 
-        public Mainboard(string model = "-", string producent = "-", string cpu = "-", string taktowanie = "-", string bios = "-")
+        public Mainboard(string model = "-", string producent = "-", string cpu = "-", string taktowanie = "-")
         {
             Model = model;
             Producent = producent;
-            CPU = cpu;
+            Cpu = cpu;
             Taktowanie = taktowanie;
-            ID = string.Format($"{CPU}" + " @ " + $"{Taktowanie}");
+            Id = string.Format($"{Cpu}" + " @ " + $"{Taktowanie}");
         }
     }
 
     //--------------------------------------------------Kontener na dane o pamięci RAM-----------------------------------------------------------------
-    public class RAM
+    public class Ram
     {
         public double Pojemnosc { get; set; } //Pojemność
 
         //Konstruktor standardowy
-        public RAM(double size = 0, string bank = "-")
+        public Ram(double size = 0)
         {
             Pojemnosc = size;
         }
 
         //Konstruktor na potrzeby bazy danych w pliku excel
-        public RAM(string info)
+        public Ram(string info)
         {
-            Regex[] size = new Regex[2]
+            var size = new[]
             {
                 new Regex(@"[0-9][0-9]"),
                 new Regex(@"[0-9]")
             };
-            Match result;
-            foreach (Regex rgx in size)
+            foreach (var rgx in size)
             {
-                result = rgx.Match(info);
+                var result = rgx.Match(info);
                 if (result.Success)
                 {
                     Pojemnosc = Convert.ToDouble(result.Value);
                     break;
                 }
-                else Pojemnosc = -999;
+
+                Pojemnosc = -999;
             }
         }
     }
@@ -130,7 +124,7 @@ namespace DataTypes
         public Storage(string info)
         {
             //Wzory dla odnajdywania wartości pojemności
-            Regex[] size = new Regex[5]
+            var size = new[]
             {
                 new Regex(@"\d{4}"),
                 new Regex(@"\d{3}"),
@@ -140,7 +134,7 @@ namespace DataTypes
                 
             };
             //Wzory dla odnajdywania typu dysku
-            Regex[] type = new Regex[4]
+            var type = new[]
             {
                 new Regex(@"[A-Za-z]{3}\s[A-Za-z]\d"),
                 new Regex(@"[A-Za-z]{5}"),
@@ -150,7 +144,7 @@ namespace DataTypes
             //Test i wynik
             Match result;
             
-            foreach (Regex rgx in size)
+            foreach (var rgx in size)
             {
                 result = rgx.Match(info);
                 if(result.Success && info.ToLower().Contains("tb"))
@@ -165,7 +159,7 @@ namespace DataTypes
                 }
                 else Pojemnosc = 0;
             }
-            foreach (Regex rgx in type)
+            foreach (var rgx in type)
             {
                 result = rgx.Match(info);
                 if (result.Success)
@@ -180,7 +174,7 @@ namespace DataTypes
         //Nadpisana metoda ToString na potrzeby wyświetlania w tabeli wartości z bazy danych
         public override string ToString()
         {
-            return string.Format("{0}: {1}", Nazwa, Pojemnosc);
+            return $"{Nazwa}: {Pojemnosc}";
         }
     }
 
@@ -213,12 +207,13 @@ namespace DataTypes
     //--------------------------------------------------Klasa obsługująca opisy błędów z menedżera urządzeń--------------------------------------------
     public class ConfigManagerErrorDescription
     {
-        int index;
-        public ConfigManagerErrorDescription(ConfigManagerErrorCode Code)
+        private readonly int _index;
+        public ConfigManagerErrorDescription(ConfigManagerErrorCode code)
         {
-            index = (int)Code;
+            _index = (int)code;
         }
-        string ReturnDescription(int index)
+
+        private static string ReturnDescription(int index)
         {
             switch (index)
             {
@@ -293,7 +288,7 @@ namespace DataTypes
 
         public override string ToString()
         {
-            return string.Format(ReturnDescription(index));
+            return string.Format(ReturnDescription(_index));
         }
     }
 
@@ -302,13 +297,12 @@ namespace DataTypes
     {
         public string Nazwa { get; set; }
         public string TrescBledu { get; set; }
-        ConfigManagerErrorDescription Descriptor;
 
         public DeviceManager(string nazwa, int kod)
         {
             Nazwa = nazwa;
-            Descriptor = new ConfigManagerErrorDescription((ConfigManagerErrorCode)kod);
-            TrescBledu = Descriptor.ToString();
+            var descriptor = new ConfigManagerErrorDescription((ConfigManagerErrorCode)kod);
+            TrescBledu = descriptor.ToString();
         }
     }
 
@@ -316,12 +310,12 @@ namespace DataTypes
     public class NetDevice
     {
         public string Nazwa { get; set; }
-        public string AdresMAC { get; set; }
+        public string AdresMac { get; set; }
 
         public NetDevice(string nazwa, string adres)
         {
             Nazwa = nazwa;
-            AdresMAC = adres;
+            AdresMac = adres;
         }
     }
 
@@ -353,17 +347,15 @@ namespace DataTypes
 
     public class Settings
     {
-        public string DBPath;
-        public string SHA1 { get; set; }
-
-        public Settings() { }
+        public string DbPath;
+        public string Sha1 { get; set; }
     }
 
     //--------------------------------------------------Kontener na dane pobrane już z bazy lub WMI----------------------------------------------------------
-    public struct DataPack : IDBData, IDeviceData
+    public struct DataPack : IDbData, IDeviceData
     {
         public Computer Komputer { get; set; }
-        public RAM[] Ram { get; set; }
+        public Ram[] Ram { get; set; }
         public Storage[] Dyski { get; set; }
         public Mainboard PlytaGlowna { get; set; }
         public Bios WersjaBios { get; set; }

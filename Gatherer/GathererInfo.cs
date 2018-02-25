@@ -1,15 +1,12 @@
-﻿using DataTypes;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using DataTypes;
 using Utilities;
 
 namespace Gatherer
 {
-    public class GathererInfo : IDBData, IDeviceData
+    public class GathererInfo : IDbData, IDeviceData
     {
         public Computer Komputer { get; set; }
         public Storage[] Dyski { get; set; }
@@ -18,7 +15,7 @@ namespace Gatherer
         public DeviceManager[] MenedzerUrzadzen { get; set; }
         public NetDevice[] UrzadzeniaSieciowe { get; set; }
         public double PamiecRamSuma { get; set; }
-        public RAM[] Ram { get; set; }
+        public Ram[] Ram { get; set; }
         public GraphicCard[] KartyGraficzne { get; set; }
         public Bios WersjaBios { get; set; }
 
@@ -31,9 +28,9 @@ namespace Gatherer
                 WersjaBios = GatherBiosInfo();
                 Ram = GatherRamSize();
                 PamiecRamSuma = 0;
-                for (int i = 0; i < Ram.Length; i++)
+                foreach (var t in Ram)
                 {
-                    PamiecRamSuma = PamiecRamSuma + Ram[i].Pojemnosc;
+                    PamiecRamSuma = PamiecRamSuma + t.Pojemnosc;
                 }
                 Dyski = GatherStorageInfo();
                 Swm = GatherSwmNumbers();
@@ -43,109 +40,104 @@ namespace Gatherer
             }
             catch(Exception e)
             {
-                string message = string.Format("Nie można pobrać informacji o sprzęcie - prawdopdobnie\nzainstalowany zły image//złe sterowniki.\n{0}", e.Message);
+                var message =
+                    $"Nie można pobrać informacji o sprzęcie - prawdopdobnie\nzainstalowany zły image//złe sterowniki.\n{e.Message}";
                 throw new DriversNotInstalledException(message);
             }
             
         }
 
         //------------------------------------------Model, MSN, OS, WearLevel, Model obudowy------------------------------------------
-        Computer GatherComputerInfo()
+        private static Computer GatherComputerInfo()
         {
-            int i = 0;
             //Pobranie modelu
-            var temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
-            string model = GatherModel((temp.First() as Win32HardwareData).Wartosc);
+            var temp = Wmi.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
+            var model = GatherModel(temp.First().Wartosc);
 
             //Pobranie MSN
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "SKU");
-            string msn = ((temp.First() as Win32HardwareData).Wartosc);
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "SKU");
+            var msn = temp.First().Wartosc;
 
             //Pobranie informacji o systemie operacyjnym
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_OperatingSystem, "Caption");
-            var temp2 = WMI.GetSingleProperty(Win32Hardware.Win32_OperatingSystem, "OSArchitecture");
-            string system = string.Format(
-                (temp.First() as Win32HardwareData).Wartosc + " " +
-                (temp2.First() as Win32HardwareData).Wartosc);
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_OperatingSystem, "Caption");
+            var temp2 = Wmi.GetSingleProperty(Win32Hardware.Win32_OperatingSystem, "OSArchitecture");
+            var system = string.Format(
+                temp.First().Wartosc + " " +
+                temp2.First().Wartosc);
 
             //Pobranie wartości WearLevel
-            var temp3 = WMI.WearLevel();
-            double[] wearLevel = new double[temp3.Count()];
-            foreach (double value in temp3)
-            {
-                wearLevel[i] = value;
-                i++;
-            }
+            var temp3 = Wmi.WearLevel();
+            var wearLevel = temp3.ToArray();
 
             //Pobieranie obudowy
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
-            string obudowa = GatherCase((temp.First() as Win32HardwareData).Wartosc);
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_ComputerSystem, "Model");
+            var obudowa = GatherCase(temp.First().Wartosc);
 
-            return new Computer(md: model, msn: msn, system: system, wearLevel: wearLevel, obudowa: obudowa);
+            return new Computer(model, msn, system, wearLevel, obudowa: obudowa);
         }
 
         //------------------------------------------Model MB, Producent procesora, Model CPU, Taktowanie maksymalne-------------------
-        Mainboard GatherMainboardInfo()
+        private static Mainboard GatherMainboardInfo()
         {
             //Pobranie modelu płyty głównej
-            var temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Product");
-            string mbModel = (temp.First() as Win32HardwareData).Wartosc;
+            var temp = Wmi.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Product");
+            var mbModel = temp.First().Wartosc;
 
             //Pobranie producenta procesora
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Manufacturer");
-            string mbProducent = (temp.First() as Win32HardwareData).Wartosc;
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_BaseBoard, "Manufacturer");
+            var mbProducent = temp.First().Wartosc;
 
             //Pobranie nazwy CPU
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_Processor, "Name");
-            string mbCpu = (temp.First() as Win32HardwareData).Wartosc;
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_Processor, "Name");
+            var mbCpu = temp.First().Wartosc;
 
             //Pobranie informacji o taktowaniu (maksymalne)
-            temp = WMI.GetSingleProperty(Win32Hardware.Win32_Processor, "MaxClockSpeed");
-            double tempTaktowanie = double.Parse((temp.First() as Win32HardwareData).Wartosc);
-            string mbTaktowanie = Math.Round((tempTaktowanie / 1000), 2).ToString() + " GHz";
+            temp = Wmi.GetSingleProperty(Win32Hardware.Win32_Processor, "MaxClockSpeed");
+            var tempTaktowanie = double.Parse(temp.First().Wartosc);
+            var mbTaktowanie = Math.Round((tempTaktowanie / 1000), 2) + " GHz";
 
-            return new Mainboard(model: mbModel, producent: mbProducent, cpu: mbCpu, taktowanie: mbTaktowanie);
+            return new Mainboard(mbModel, mbProducent, mbCpu, mbTaktowanie);
         }
 
         //------------------------------------------Aktualna wersja BIOS--------------------------------------------------------------
-        Bios GatherBiosInfo()
+        private static Bios GatherBiosInfo()
         {
             //Pobierane informacji o wersji BIOS
-            var temp = WMI.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
-            string mbWersjaBios = (temp.First() as Win32HardwareData).Wartosc;
+            var temp = Wmi.GetSingleProperty(Win32Hardware.Win32_BIOS, "SMBIOSBIOSVersion");
+            var mbWersjaBios = temp.First().Wartosc;
             return new Bios(mbWersjaBios);
         }
 
         //------------------------------------------Pojemność RAM---------------------------------------------------------------------
-        RAM[] GatherRamSize()
+        private static Ram[] GatherRamSize()
         {
-            int i = 0;
-            var temp = new RAM[0];
+            var i = 0;
+            var temp = new Ram[0];
 
             //Pobieranie informacji o poejmności
             //Pojemność wyrażona w GiB
             //1073741824 B = 1 GiB
-            double[] pojemnosc = new double[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PhysicalMemory, "Capacity"))
+            var pojemnosc = new double[0];
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_PhysicalMemory, "Capacity"))
             {
                 pojemnosc = ExpandArr.Expand(pojemnosc);
                 pojemnosc[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
                 temp = ExpandArr.Expand(temp);
-                temp[i] = new RAM(size: pojemnosc[i]);
+                temp[i] = new Ram(pojemnosc[i]);
                 i++;
             }
             return temp;
         }
 
         //------------------------------------------Dyski twarde----------------------------------------------------------------------
-        Storage[] GatherStorageInfo()
+        private static Storage[] GatherStorageInfo()
         {
             //Pobieranie informacji o nazwach dysków
-            int i = 0;
+            var i = 0;
             var temp = new Storage[0];
             var nazwa = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_DiskDrive, "Caption"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_DiskDrive, "Caption"))
             {
                 nazwa = ExpandArr.Expand(nazwa);
                 nazwa[i] = z.Wartosc;
@@ -153,25 +145,25 @@ namespace Gatherer
             }
             //Pobieranie informacji o poejmności
             i = 0;
-            double[] size = new double[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_DiskDrive, "Size"))
+            var size = new double[0];
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_DiskDrive, "Size"))
             {
                 size = ExpandArr.Expand(size);
                 size[i] = Math.Round(double.Parse(z.Wartosc) / 1073741824, 1);
                 //Tworzenie instancji
                 temp = ExpandArr.Expand(temp);
-                temp[i] = new Storage(size: size[i], nazwa: nazwa[i]);
+                temp[i] = new Storage(size[i], nazwa[i]);
                 i++;
             }
             return temp;
         }
 
         //------------------------------------------SWM-------------------------------------------------------------------------------
-        SWM[] GatherSwmNumbers()
+        private static SWM[] GatherSwmNumbers()
         {
-            int i = 0;
+            var i = 0;
             var temp = new SWM[0];
-            foreach (SWM z in SWMSearcher.GetSWM())
+            foreach (var z in SwmSearcher.GetSwm())
             {
                 temp = ExpandArr.Expand(temp);
                 temp[i] = new SWM(z.Dysk, z.Swm);
@@ -181,13 +173,13 @@ namespace Gatherer
         }
 
         //------------------------------------------Menedżer urządzeń-----------------------------------------------------------------
-        DeviceManager[] GatherDeviceManagerInfo()
+        private static DeviceManager[] GatherDeviceManagerInfo()
         {
-            int i = 0;
+            var i = 0;
             var temp = new DeviceManager[0];
             var nazwaUrzadzenia = new string[0];
             //Pobieranie nazw urządzeń
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "Caption", condition: "ConfigManagerErrorCode != 0"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "Caption", condition: "ConfigManagerErrorCode != 0"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
                 nazwaUrzadzenia[i] = z.Wartosc;
@@ -196,7 +188,7 @@ namespace Gatherer
 
             i = 0;
             //Pobieranie błędów
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "ConfigManagerErrorCode", condition: "ConfigManagerErrorCode != 0"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_PNPEntity, "ConfigManagerErrorCode", condition: "ConfigManagerErrorCode != 0"))
             {
                 temp = ExpandArr.Expand(temp);
                 temp[i] = new DeviceManager(nazwaUrzadzenia[i], Convert.ToInt32(z.Wartosc));
@@ -206,12 +198,12 @@ namespace Gatherer
         }
 
         //------------------------------------------Urządzenia sieciowe---------------------------------------------------------------
-        NetDevice[] GatherNetDevicesLanAdresses()
+        private static NetDevice[] GatherNetDevicesLanAdresses()
         {
-            int i = 0;
+            var i = 0;
             var temp = new NetDevice[0];
             var nazwaUrzadzenia = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Description", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "Description", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
                 nazwaUrzadzenia[i] = z.Wartosc;
@@ -219,7 +211,7 @@ namespace Gatherer
             }
 
             i = 0;
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_NetworkAdapter, "MACAddress", condition: "MACAddress != null AND ServiceName != 'vwifimp' AND ServiceName != 'NdisWan'"))
             {
                 temp = ExpandArr.Expand(temp);
                 temp[i] = new NetDevice(nazwaUrzadzenia[i], z.Wartosc);
@@ -229,12 +221,12 @@ namespace Gatherer
         }
 
         //------------------------------------------Karty graficzne-------------------------------------------------------------------
-        GraphicCard[] GatherGraphicCardInfo()
+        private static GraphicCard[] GatherGraphicCardInfo()
         {
-            int i = 0;
+            var i = 0;
             var temp = new GraphicCard[0];
             var nazwaUrzadzenia = new string[0];
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "AdapterCompatibility"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_VideoController, "AdapterCompatibility"))
             {
                 nazwaUrzadzenia = ExpandArr.Expand(nazwaUrzadzenia);
                 nazwaUrzadzenia[i] = z.Wartosc;
@@ -242,7 +234,7 @@ namespace Gatherer
             }
 
             i = 0;
-            foreach (Win32HardwareData z in WMI.GetSingleProperty(Win32Hardware.Win32_VideoController, "Caption"))
+            foreach (var z in Wmi.GetSingleProperty(Win32Hardware.Win32_VideoController, "Caption"))
             {
                 temp = ExpandArr.Expand(temp);
                 temp[i] = new GraphicCard(nazwaUrzadzenia[i], z.Wartosc);
@@ -252,25 +244,19 @@ namespace Gatherer
         }
 
         //Metoda poszukująca modelu komputera
-        string GatherModel(string modelString)
+        private static string GatherModel(string modelString)
         {
-            Regex rgx = new Regex(@"\d{5}");
-            Match m = rgx.Match(modelString);
-            if (m.Success)
-                return m.Value;
-            else
-                return "";
+            var rgx = new Regex(@"\d{5}");
+            var m = rgx.Match(modelString);
+            return m.Success ? m.Value : "";
         }
 
         //Metoda poszukujaca modelu obudowy komputera
-        string GatherCase(string caseString)
+        private static string GatherCase(string caseString)
         {
-            Regex rgx = new Regex(@"[A-Za-z]{1}\d{4}");
-            Match m = rgx.Match(caseString);
-            if (m.Success)
-                return m.Value.ToString();
-            else
-                return "";
+            var rgx = new Regex(@"[A-Za-z]{1}\d{4}");
+            var m = rgx.Match(caseString);
+            return m.Success ? m.Value : "";
         }
     }
 }

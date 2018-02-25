@@ -8,7 +8,7 @@
 		SizeToContent="WidthAndHeight"
 		WindowStartupLocation="Manual" 
 		Left="50" Top="0"
-		x:Name="mainWindow" KeyUp="KeyUpRecognize">
+		x:Name="RetrieverWindow" KeyUp="KeyUpRecognize">
 	<Window.Resources>
 		<ResourceDictionary>
 			<ResourceDictionary.MergedDictionaries>
@@ -62,20 +62,20 @@
 				<!--Kod wyszukiwarki modeli-->
 				<TextBlock Text="Wyszukiwarka:" Margin="5" Grid.Row="0" Grid.Column="0" 
                            VerticalAlignment="Center"/>
-				<TextBox MinHeight="25" x:Name="txtWyszukiwarka" Margin="5" Grid.Column="1" Grid.Row="0" 
+				<TextBox MinHeight="25" x:Name="TxtWyszukiwarka" Margin="5" Grid.Column="1" Grid.Row="0" 
                          TextChanged="txtWyszukiwarka_TextChanged" FontSize="18"/>
 
 				<!--==============================TABELA Z MODELAMI==============================-->
 				<!--Tabele tworzone ręcznie-->
-				<DataGrid x:Name="gridModele" AutoGenerateColumns="False" IsReadOnly="True" 
+				<DataGrid x:Name="GridModele" AutoGenerateColumns="False" IsReadOnly="True" 
                           CanUserAddRows="False" CanUserDeleteRows="False" CanUserResizeRows="False" SelectedIndex="0"
 					      CanUserSortColumns="true" AlternatingRowBackground="LightBlue"
                           GridLinesVisibility="None" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
                           Margin="5">
 					<!--SelectionChanged="gridModele_SelectionChanged"-->
 					<DataGrid.Columns>
-						<DataGridTextColumn Header="Model" Binding="{Binding MD}" Width="100"/>
-						<DataGridTextColumn Header="MSN" Binding="{Binding MSN}" Width="250"/>
+						<DataGridTextColumn Header="Model" Binding="{Binding Md}" Width="100"/>
+						<DataGridTextColumn Header="MSN" Binding="{Binding Msn}" Width="250"/>
 					</DataGrid.Columns>
 				</DataGrid>
 			</Grid>
@@ -86,12 +86,13 @@
 		<TabItem Header="Zestawienie">
 			<!--Całość umieszczona w kontrolce ScrollViever dzięki której można przewijać stronę-->
 			<ScrollViewer HorizontalScrollBarVisibility="Visible" x:Name="Scroll">
-				<Grid x:Name="gridZestawienie">
+				<Grid x:Name="GridZestawienie">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
 						<ColumnDefinition Width="*"/>
+						<ColumnDefinition />
 					</Grid.ColumnDefinitions>
 					<Grid.RowDefinitions>
 						<RowDefinition Height="Auto"/>
@@ -142,7 +143,7 @@
 					</Border>
 					<!--Style="{StaticResource TextBlockStatus}"-->
 					<Border Grid.Row="2" Grid.Column="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.KluczWindows}" Style="{StaticResource Status_WindowsKey}"/>
+						<TextBlock Text="{Binding Statusy.KluczWindows}" Style="{StaticResource StatusWindowsKey}"/>
 					</Border>
 
 					<!--Status aktywacji-->
@@ -150,7 +151,7 @@
 						<Label Content="Aktywacja Windows" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="4" Grid.Column="3" Grid.RowSpan="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.WinStatus}" Style="{StaticResource Status_WindowsActivation}"/>
+						<TextBlock Text="{Binding Statusy.WinStatus}" Style="{StaticResource StatusWindowsActivation}"/>
 					</Border>
 
 					<!--Status SecureBoot-->
@@ -158,7 +159,7 @@
 						<Label Content="SecureBoot" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="7" Grid.Column="3" Grid.RowSpan="3" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding Statusy.SecureStatus}" Style="{StaticResource Status_SecureBoot}"/>
+						<TextBlock Text="{Binding Statusy.SecureStatus}" Style="{StaticResource StatusSecureBoot}"/>
 					</Border>
 
 					<!--Stan naładowania baterii-->
@@ -182,13 +183,13 @@
 						<Label Content="Model" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="2" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderData.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.Md}" Style="{StaticResource PropertyValue}"/>
 						<!--<ComboBox x:Name="cbModel" ItemsSource="{Binding ReaderInfo.ListaModeli}" DisplayMemberPath="MD" Text="{Binding Path=Text, ElementName=txtWyszukiwarka}"
 								  IsEditable="True" IsTextSearchEnabled="True" FontSize="17" HorizontalContentAlignment="Center"
 								  SelectedItem="{Binding ElementName=gridModele, Path=SelectedItem, Mode=TwoWay}" SelectionChanged="gridModele_SelectionChanged"/>-->
 					</Border>
 					<Border Grid.Row="2" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererData.Komputer.MD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.Komputer.Md}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================OS==============================-->
@@ -211,9 +212,9 @@
 					</Border>
 					<!--Dodatkowy panel do którego programowo dodawane są kontolki z informacjami-->
 					<Border Grid.Row="4" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel Orientation="Vertical" x:Name="spSwm">
+						<StackPanel Orientation="Vertical" x:Name="SpSwm">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -226,9 +227,9 @@
 						<TextBlock Text="{Binding ReaderData.Komputer.WearLevel[0], StringFormat={}{0}%>}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="5" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel Orientation="Vertical" x:Name="spWearLevel">
+						<StackPanel Orientation="Vertical" x:Name="SpWearLevel">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -257,10 +258,10 @@
 						<Label Content="CPU" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderData.PlytaGlowna.ID}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.PlytaGlowna.Id}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 					<Border Grid.Row="8" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding GathererData.PlytaGlowna.CPU}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding GathererData.PlytaGlowna.Cpu}" Style="{StaticResource PropertyValue}"/>
 					</Border>
 
 					<!--==============================Wersja Bios==============================-->
@@ -268,7 +269,7 @@
 						<Label Content="Wersja bios" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="9" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<StackPanel Orientation="Vertical" x:Name="spReaderBios">
+						<StackPanel Orientation="Vertical" x:Name="SpReaderBios">
 							<TextBlock Text="{Binding ReaderData.WersjaBios.Wersja}" Style="{StaticResource PropertyValue}"/>
 							<TextBlock Text="{Binding ReaderData.WersjaBios.Opis}" TextWrapping="WrapWithOverflow" Style="{StaticResource PropertyValue}" MaxWidth="300"/>
 						</StackPanel>
@@ -300,7 +301,7 @@
 
 					<!--==============================Dyski==============================-->
 					<Border Grid.Row="12" Grid.Column="0" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
-						<StackPanel x:Name="spDyskiNazwa">
+						<StackPanel x:Name="SpDyskiNazwa">
 						<StackPanel.Resources>
 								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
 							</StackPanel.Resources>
@@ -308,16 +309,16 @@
 
 					</Border>
 					<Border Grid.Row="12" Grid.Column="1" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spDyskiReader">
+						<StackPanel x:Name="SpDyskiReader">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
 					<Border Grid.Row="12" Grid.Column="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spDyskiGatherer">
+						<StackPanel x:Name="SpDyskiGatherer">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -330,7 +331,7 @@
 						<Label Content="KARTY GRAFICZNE" Style="{StaticResource BlueHeader}"/>
 					</Border>
 					<Border Grid.Row="14" Grid.Column="0" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
-						<StackPanel x:Name="spGraphicCardCaption">
+						<StackPanel x:Name="SpGraphicCardCaption">
 							<StackPanel.Resources>
 								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
 							</StackPanel.Resources>
@@ -338,9 +339,9 @@
 
 					</Border>
 					<Border Grid.Row="14" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spGraphicCardDescription">
+						<StackPanel x:Name="SpGraphicCardDescription">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -354,12 +355,12 @@
 					</Border>
 
 					<Border Grid.Row="16" Grid.Column="0" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
-						<StackPanel x:Name="dpDeviceManagerCaption"/>
+						<StackPanel x:Name="DpDeviceManagerCaption"/>
 					</Border>
 					<Border Grid.Row="16" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="spDeviceManagerErrorDescription">
+						<StackPanel x:Name="SpDeviceManagerErrorDescription">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -373,16 +374,16 @@
 					</Border>
 
 					<Border Grid.Row="18" Grid.Column="0" Style="{StaticResource ClassicBorder}" Background="LightSkyBlue">
-						<StackPanel x:Name="dpDeviceCaption">
+						<StackPanel x:Name="DpDeviceCaption">
 							<StackPanel.Resources>
 								<Style BasedOn="{StaticResource BlueDescription}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
 					<Border Grid.Row="18" Grid.Column="1" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<StackPanel x:Name="dpDeviceMACAddress">
+						<StackPanel x:Name="DpDeviceMacAddress">
 							<StackPanel.Resources>
-								<Style BasedOn="{StaticResource PropertyValue}" TargetType="Label"/>
+									<Style BasedOn="{StaticResource PropertyValueLabel}" TargetType="Label"/>
 							</StackPanel.Resources>
 						</StackPanel>
 					</Border>
@@ -423,7 +424,8 @@
 						<Label Content="Rodzaj LCD" Style="{StaticResource BlueDescription}"/>
 					</Border>
 					<Border Grid.Row="18" Grid.Column="3" Grid.ColumnSpan="2" Style="{StaticResource ClassicBorder}">
-						<TextBlock Text="{Binding ReaderData.Komputer.LCD}" Style="{StaticResource PropertyValue}"/>
+						<TextBlock Text="{Binding ReaderData.Komputer.Lcd}" Style="{StaticResource PropertyValue}"
+						           d:DataContext="{d:DesignData }" />
 					</Border>
 				</Grid>
 			</ScrollViewer>

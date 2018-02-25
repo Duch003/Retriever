@@ -1,16 +1,11 @@
 ﻿using DataTypes;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Xml.Serialization;
 
 namespace Retriever
 {
-    class FileSystemManager : IFileSystemManager
+    internal class FileSystemManager : IFileSystemManager
     {
         public Settings Set { get; set; }
 
@@ -19,7 +14,7 @@ namespace Retriever
             LoadSettings();
         }
 
-        void LoadSettings()
+        private void LoadSettings()
         {
             if (File.Exists(Environment.CurrentDirectory + @"\Settings.xml"))
             {
@@ -30,9 +25,9 @@ namespace Retriever
                     if (File.Exists(Environment.CurrentDirectory + @"\SHA1.txt"))
                     {
                         stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open);
-                        StreamReader sr = new StreamReader(stream);
+                        var sr = new StreamReader(stream);
                         temp = sr.ReadLine();
-                        temp = temp == null ? "" : temp;
+                        temp = temp ?? "";
                         sr.Close();
                         stream.Close();
                     }
@@ -41,28 +36,28 @@ namespace Retriever
                         temp = "";
                         File.Create(Environment.CurrentDirectory + @"\SHA1.txt").Close();
                     }
-                    XmlSerializer xml = new XmlSerializer(typeof(Settings));
+                    var xml = new XmlSerializer(typeof(Settings));
                     stream = new FileStream(Environment.CurrentDirectory + @"\Settings.xml", FileMode.Open);
                     Set = (Settings)xml.Deserialize(stream);
-                    Set.DBPath = Set.DBPath == "" || Set.DBPath == null ? Environment.CurrentDirectory + @"\NoteBookiRef_v3.xlsx" : Set.DBPath;
-                    Set.SHA1 = temp;
+                    Set.DbPath = string.IsNullOrEmpty(Set.DbPath) ? Environment.CurrentDirectory + @"\NoteBookiRef_v3.xlsx" : Set.DbPath;
+                    Set.Sha1 = temp;
                     stream.Close();
                 }
                 catch (UnauthorizedAccessException ex)
                 {
-                    var message = string.Format("Brak uprawnień dostępu do pliku konfiguracyjnego.\n{0}", ex.Message);
+                    var message = $"Brak uprawnień dostępu do pliku konfiguracyjnego.\n{ex.Message}";
                     throw new UnauthorizedAccessException(message);
                 }
                 catch (Exception e)
                 {
-                    var message = string.Format("Wystąpił błąd przy próbie otwarcia pliku kofiguracyjnego:\n{0}", e.Message);
+                    var message = $"Wystąpił błąd przy próbie otwarcia pliku kofiguracyjnego:\n{e.Message}";
                     throw new Exception(message);
                 }
             }
             else
             {
-                var message = string.Format("Nie odnaleziono pliku konficuracyjnego settings.txt w katalogu.");
-                var file = @"\Settings.xml";
+                const string message = "Nie odnaleziono pliku konficuracyjnego settings.txt w katalogu.";
+                const string file = @"\Settings.xml";
                 throw new FileNotFoundException(message, file);
             }
         }

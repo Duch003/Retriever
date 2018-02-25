@@ -15,18 +15,18 @@ using Utilities;
 
 namespace Reader
 {
-    public class DatabaseManager : IDBManager
+    public class DatabaseManager : IDbManager
     {
         public ObservableCollection<Model> ListaModeli { get; set; }
-        public FileStream stream { get; set; }
-        public IExcelDataReader excelReader { get; set; }
-        public DataSet result { get; set; }
-        IFileSystemManager Manager;
+        public FileStream Stream { get; set; }
+        public IExcelDataReader ExcelReader { get; set; }
+        public DataSet Result { get; set; }
+        private readonly IFileSystemManager _manager;
 
-        public DatabaseManager(IFileSystemManager FSManager)
+        public DatabaseManager(IFileSystemManager fsManager)
         {
             //Zapisanie informacjio z pliku settings.xml
-            Manager = FSManager;
+            _manager = fsManager;
 
             //Połączenie z siecią
             WirelessConnectionManager.Connect();
@@ -35,23 +35,23 @@ namespace Reader
             Thread.Sleep(3000);
 
             //Otwrcie pliku we wskazanym miejscu
-            Open(Manager.Set.DBPath);
+            Open(_manager.Set.DbPath);
 
             //SPRAWDZANIE WERSJI BAZY DANYCH
             //Utworzenie aktualnego hasha pliku bazy danych
             var aktualnyHash = ComputeHashCode();
             
             //Hasze są takie same, istnieje już lista modeli - załadować listę do pamięci
-            if (FSManager.Set.SHA1 == aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
+            if (fsManager.Set.Sha1 == aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
                 ListaModeli = LoadModelList();
             }
             //Hasze są różne, istnieje już lista modeli - trzeba napisać listę od nowa
-            else if (FSManager.Set.SHA1 != aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
+            else if (fsManager.Set.Sha1 != aktualnyHash && File.Exists(Environment.CurrentDirectory + @"\Model.xml"))
             {
-                ListaModeli = SaveAndLoadModelList(result);
-                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
-                StreamWriter sr = new StreamWriter(stream);
+                ListaModeli = SaveAndLoadModelList(Result);
+                var stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
+                var sr = new StreamWriter(stream);
                 sr.WriteLine(aktualnyHash);
                 sr.Close();
             }
@@ -61,9 +61,9 @@ namespace Reader
             {
                 //Utworzenie nowego pliku listy modeli
                 File.Create(Environment.CurrentDirectory + @"\Model.xml").Close(); 
-                ListaModeli = SaveAndLoadModelList(result);
-                FileStream stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
-                StreamWriter sr = new StreamWriter(stream);
+                ListaModeli = SaveAndLoadModelList(Result);
+                var stream = new FileStream(Environment.CurrentDirectory + @"\SHA1.txt", FileMode.Open, FileAccess.Write);
+                var sr = new StreamWriter(stream);
                 sr.WriteLine(aktualnyHash);
                 sr.Close();
             }
@@ -71,17 +71,17 @@ namespace Reader
         }  
 
         //Metoda otwierająca plik bazy danych
-        void Open(string FilePath)
+        private void Open(string filePath)
         {
             try
             {
-                stream = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
-                result = excelReader.AsDataSet();
+                Stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                ExcelReader = ExcelReaderFactory.CreateOpenXmlReader(Stream);
+                Result = ExcelReader.AsDataSet();
             }
             catch (Exception e)
             {
-                var message = string.Format("Wystąpił błąd podczas próby otwarcia bazy danych:\n{0}", e.Message);
+                var message = $"Wystąpił błąd podczas próby otwarcia bazy danych:\n{e.Message}";
                 Close();
                 throw new Exception(message);
             }
@@ -96,14 +96,14 @@ namespace Reader
             WirelessConnectionManager.Connect();
 
             //Otwarcie pliku bazy danych
-            Open(Manager.Set.DBPath);
+            Open(_manager.Set.DbPath);
 
             //Sprawdzenie argumentu - w razie braku argumentu wyrzucić pusty kontener ans
             if (model != null)
             {
                 //Ustawienie zmiennych na kontkretne arkusze w bazie
-                DataTable table = result.Tables["MD"];
-                DataTable biosTable = result.Tables["BIOS"];
+                var table = Result.Tables["MD"];
+                var biosTable = Result.Tables["BIOS"];
 
                 #region Tworzenie instancji Mainboard
                 ans.PlytaGlowna = new Mainboard(
@@ -145,11 +145,11 @@ namespace Reader
                 #region Tworzenie instancji SWM, RAM i Storage
                 ans.Swm = new SWM[1] { new SWM(swm: table.Rows[model.WierszModel][10].ToString()) };
 
-                ans.Ram = new RAM[1] { new RAM(info: table.Rows[model.WierszModel][6].ToString()) };
+                ans.Ram = new Ram[1] { new Ram(info: table.Rows[model.WierszModel][6].ToString()) };
 
                 var tempMem = table.Rows[model.WierszModel][5].ToString().Replace("+", ";").Split(';');
                 ans.Dyski = new Storage[tempMem.Length];
-                for (int j = 0; j < tempMem.Length; j++)
+                for (var j = 0; j < tempMem.Length; j++)
                 {
                     ans.Dyski[j] = new Storage(tempMem[j]);
                 }
@@ -161,30 +161,30 @@ namespace Reader
         //Czyszczenie końcowe po zakończeniu używania programu
         void Close()
         {
-            if(stream != null)
+            if(Stream != null)
             {
-                stream.Close();
-                stream.Dispose();
+                Stream.Close();
+                Stream.Dispose();
             }
-            if(excelReader != null)
+            if(ExcelReader != null)
             {
-                excelReader.Close();
-                excelReader.Dispose();
+                ExcelReader.Close();
+                ExcelReader.Dispose();
             }
-            if(result != null)
-                result.Dispose();
+
+            Result?.Dispose();
             WirelessConnectionManager.Disconnect();
         }
 
         //Metoda tworząca SHA1
-        string ComputeHashCode()
+        private string ComputeHashCode()
         {
             //Utworzenie hasha do porównania z zapisanym
-            BufferedStream bs = new BufferedStream(stream);
-            SHA1Managed sha1 = new SHA1Managed();
-            byte[] hash = sha1.ComputeHash(bs);
-            StringBuilder hashhex = new StringBuilder(2 * hash.Length);
-            foreach (byte b in hash)
+            var bs = new BufferedStream(Stream);
+            var sha1 = new SHA1Managed();
+            var hash = sha1.ComputeHash(bs);
+            var hashhex = new StringBuilder(2 * hash.Length);
+            foreach (var b in hash)
             {
                 hashhex.AppendFormat("{0:X2}", b);
             }
@@ -192,38 +192,38 @@ namespace Reader
         }
 
         //Metoda wczytująca listę modeli do pamięci
-        ObservableCollection<Model> LoadModelList()
+        private static ObservableCollection<Model> LoadModelList()
         {
             //Utwórz obiekt deserializera o typie listy modeli
-            XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+            var xs = new XmlSerializer(typeof(ObservableCollection<Model>));
 
             //Utworzenie streamu danych na lokalnym pliku modeli
-            StreamReader sr = new StreamReader(Environment.CurrentDirectory + @"\Model.xml");
+            var sr = new StreamReader(Environment.CurrentDirectory + @"\Model.xml");
 
             //Deserializacja
-            ObservableCollection<Model> ListaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
+            var listaModeli = xs.Deserialize(sr) as ObservableCollection<Model>;
 
             sr.Close();
-            return ListaModeli;
+            return listaModeli;
         }
 
         //Metoda pobierajaca i układająca listę modeli
-        ObservableCollection<Model> SaveAndLoadModelList(DataSet result)
+        private ObservableCollection<Model> SaveAndLoadModelList(DataSet result)
         {
             //Wczytanie surowej listy modeli z bazy
-            IEnumerable<Model> temp = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
+            var temp = GatherModels(result.Tables["MD"], result.Tables["BIOS"]);
 
             //Sortowanie listy
-            temp = temp.OrderBy(z => z.MD);
+            temp = temp.OrderBy(z => z.Md);
 
             //Utworzenie prawidłowej listy na podstawie posortowanej surowej listy
-            ObservableCollection<Model> lista = new ObservableCollection<Model>(temp);
+            var lista = new ObservableCollection<Model>(temp);
 
             //Utworzenie obiektu do serializacji danych
-            XmlSerializer xs = new XmlSerializer(typeof(ObservableCollection<Model>));
+            var xs = new XmlSerializer(typeof(ObservableCollection<Model>));
 
             //Utworzenie nowego streamu na plik lokalny w którym będzie zapisana lista modeli
-            StreamWriter sw = new StreamWriter(Environment.CurrentDirectory + @"\Model.xml");
+            var sw = new StreamWriter(Environment.CurrentDirectory + @"\Model.xml");
 
             //Serializacja
             xs.Serialize(sw, lista);
@@ -233,18 +233,18 @@ namespace Reader
         }
 
         // Metoda zwracająca listę modeli z pliku excel.
-        IEnumerable<Model> GatherModels(DataTable modelTable, DataTable biosTable)
+        private static IEnumerable<Model> GatherModels(DataTable modelTable, DataTable biosTable)
         {
-            for (int i = 1; i < modelTable.Rows.Count; i++)
+            for (var i = 1; i < modelTable.Rows.Count; i++)
             {
                 //Zapisz daną linię
-                int mdRow = i;
+                var mdRow = i;
                 //Zapisz Model i MSN z danej linii
-                string msn = modelTable.Rows[i][1].ToString();
-                string md = modelTable.Rows[i][0].ToString();
+                var msn = modelTable.Rows[i][1].ToString();
+                var md = modelTable.Rows[i][0].ToString();
 
-                int biosRow = -1;
-                string biosSheet = "";
+                var biosRow = -1;
+                var biosSheet = "";
 
                 //Jeżeli komputer jest PEAQ
                 if (!Regex.IsMatch(modelTable.Rows[i][17].ToString(), @"^\d{5}$"))
@@ -256,9 +256,9 @@ namespace Reader
                 else
                 {
                     //Zapisz model obudowy w pamięci
-                    string temp = modelTable.Rows[i][13].ToString().ToLower();
+                    var temp = modelTable.Rows[i][13].ToString().ToLower();
                     //Przeszukuj tabelę BIOS
-                    for (int j = 0; j < biosTable.Rows.Count; j++)
+                    for (var j = 0; j < biosTable.Rows.Count; j++)
                     {
                         //Jeżeli komórka zawiera model obudowy, zapisz
                         if (biosTable.Rows[j][0].ToString().ToLower().Contains(temp))
@@ -268,7 +268,8 @@ namespace Reader
                             break;
                         }
                         //Jeżeli nie znaleziono w ogóle, zapisz -1
-                        else if (j == biosTable.Rows.Count - 1)
+
+                        if (j == biosTable.Rows.Count - 1)
                             biosRow = -1;
                     }
                 }

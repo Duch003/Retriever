@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 namespace DataTypes
 {
     //--------------------------------------------------Interfejs z danymi z bazy danych---------------------------------------------------------
-    public interface IDBData
+    public interface IDbData
     {
         Computer Komputer { get; set; }
-        RAM[] Ram { get; set; }
+        Ram[] Ram { get; set; }
         Storage[] Dyski { get; set; }
         Mainboard PlytaGlowna { get; set; }
         Bios WersjaBios { get; set; }
@@ -36,12 +36,12 @@ namespace DataTypes
         Settings Set { get; set; }
     }
 
-    public interface IDBManager
+    public interface IDbManager
     {
         ObservableCollection<Model> ListaModeli { get; set; }
-        FileStream stream { get; set; }
-        IExcelDataReader excelReader { get; set; }
-        DataSet result { get; set; }
+        FileStream Stream { get; set; }
+        IExcelDataReader ExcelReader { get; set; }
+        DataSet Result { get; set; }
 
         DataPack ReadModel(Model model);
     }

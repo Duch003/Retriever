@@ -62,31 +62,31 @@ namespace Retriever
                 Environment.Exit(0);
             }
             
-            gridZestawienie.DataContext = Retriever;
+            GridZestawienie.DataContext = Retriever;
 
             //Przypisanie listy modeli do grida
             if (Retriever.ReaderData.ListaModeli != null)
             {
-                gridModele.ItemsSource = Retriever.ReaderData.ListaModeli;
+                GridModele.ItemsSource = Retriever.ReaderData.ListaModeli;
             }
 
             //Próba odczytania modelu komputera
-            if (Retriever.GathererData.Komputer.MD != "" && Retriever.ReaderData.ListaModeli != null)
+            if (Retriever.GathererData.Komputer.Md != "" && Retriever.ReaderData.ListaModeli != null)
             {
                 var model = from z in Retriever.ReaderData.ListaModeli
-                            where z.MD == Retriever.GathererData.Komputer.MD
+                            where z.Md == Retriever.GathererData.Komputer.Md
                             select z;
                 if (model.Count() > 0)
                     Retriever.ReaderData.ReadData(model.First() as Model);
             }
             else if (Retriever.ReaderData != null)
-                Retriever.ReaderData.ReadData(gridModele.SelectedItem as Model);
+                Retriever.ReaderData.ReadData(GridModele.SelectedItem as Model);
 
             //Tworzenie dynamicznych kontrolek
             DynamicControls();
 
             //Kod wyszukiwarki modeli
-            CollectionView widok = (CollectionView)CollectionViewSource.GetDefaultView(gridModele.ItemsSource);
+            var widok = (CollectionView)CollectionViewSource.GetDefaultView(GridModele.ItemsSource);
             widok.Filter = FiltrUzytkownika;
 
         }
@@ -94,8 +94,8 @@ namespace Retriever
         #region Wyszukiwarka
         bool FiltrUzytkownika(object item)
         {
-            if (String.IsNullOrEmpty(txtWyszukiwarka.Text)) return true;
-            else return ((item as Model).MD.Contains(txtWyszukiwarka.Text));
+            if (String.IsNullOrEmpty(TxtWyszukiwarka.Text)) return true;
+            else return ((item as Model).Md.Contains(TxtWyszukiwarka.Text));
 
             //Wyszukiwanie również po msn: else return (((item as Model).MD.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0) || ((item as Model).MSN.IndexOf(txtWyszukiwarka.Text, StringComparison.OrdinalIgnoreCase) >= 0));
         }
@@ -106,7 +106,7 @@ namespace Retriever
             if ((sender as TextBox).Text.Length < 3)
                 return;
             else if((sender as TextBox).Text.Length == 0 || (sender as TextBox).Text.Length > 2)
-                CollectionViewSource.GetDefaultView(gridModele.ItemsSource).Refresh();
+                CollectionViewSource.GetDefaultView(GridModele.ItemsSource).Refresh();
         }
         #endregion
 
@@ -119,34 +119,34 @@ namespace Retriever
             CreateDiscDataHeaders(  Retriever.GathererData.Dyski);
             CreateDevMgmtData(      Retriever.GathererData.MenedzerUrzadzen);
             CreateNetDevData(       Retriever.GathererData.UrzadzeniaSieciowe);
-            CreateDiscData(         Retriever.GathererData.Dyski, ref spDyskiGatherer);           
+            CreateDiscData(         Retriever.GathererData.Dyski, ref SpDyskiGatherer);           
             CreateGraphicCardData(  Retriever.GathererData.KartyGraficzne);
-            if(Retriever.ReaderData.Dyski != null) CreateDiscData(Retriever.ReaderData.Dyski, ref spDyskiReader);
+            if(Retriever.ReaderData.Dyski != null) CreateDiscData(Retriever.ReaderData.Dyski, ref SpDyskiReader);
         }
 
         //Dodawanie kontrolek SWM
         void CreateSwmData(SWM[] Swm)
         {
-            spSwm.Children.Clear();
-            for(int i = 0; i < Swm.Length; i++)
+            SpSwm.Children.Clear();
+            for(var i = 0; i < Swm.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}: {1}", Swm[i].Dysk[0], Swm[i].Swm);
                 text.Style = Resources["PropertyValue"] as Style;
-                spSwm.Children.Add(text);
+                SpSwm.Children.Add(text);
             }  
         }
 
         //Dodawanie kontrolek Wear Level
         void CreateWearLevelData(double[] wl)
         {
-            spWearLevel.Children.Clear();
-            for (int i = 0; i < wl.Length; i++)
+            SpWearLevel.Children.Clear();
+            for (var i = 0; i < wl.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}%", wl[i]);
                 text.Style = Resources["PropertyValue"] as Style;
-                spWearLevel.Children.Add(text);
+                SpWearLevel.Children.Add(text);
             }
         }
 
@@ -154,7 +154,7 @@ namespace Retriever
         void CreateDiscData(Storage[] Disc, ref StackPanel control)
         {
             control.Children.Clear();
-            for (int i = 0; i < Disc.Length; i++)
+            for (var i = 0; i < Disc.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}GB", Disc[i].Pojemnosc);
@@ -166,42 +166,42 @@ namespace Retriever
         //Dodawanie kontrolek z nazwami dysków
         void CreateDiscDataHeaders(Storage[] Disc)
         {
-            spDyskiNazwa.Children.Clear();
-            for (int i = 0; i < Disc.Length; i++)
+            SpDyskiNazwa.Children.Clear();
+            for (var i = 0; i < Disc.Length; i++)
             {
                 var text = new Label();
                 text.Content = string.Format("{0}", Disc[i].Nazwa);
                 text.Style = Resources["BlueDescription"] as Style;
                 //DockPanel.SetDock(text, Dock.Top);
-                spDyskiNazwa.Children.Add(text);
+                SpDyskiNazwa.Children.Add(text);
             }
         }
 
         //Dodawanie kontrolek z nazwami urządzeń z błędami
         void CreateDevMgmtData(DeviceManager[] Dev)
         {
-            dpDeviceManagerCaption.Children.Clear();
-            spDeviceManagerErrorDescription.Children.Clear();
-            for (int i = 0; i < Dev.Length; i++)
+            DpDeviceManagerCaption.Children.Clear();
+            SpDeviceManagerErrorDescription.Children.Clear();
+            for (var i = 0; i < Dev.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].Nazwa);
                 text.Style = Resources["TextBlockDescription"] as Style;
                 DockPanel.SetDock(text, Dock.Top);
-                dpDeviceManagerCaption.Children.Add(text);
+                DpDeviceManagerCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].TrescBledu);
                 text.Style = Resources["PropertyValue"] as Style;
-                spDeviceManagerErrorDescription.Children.Add(text);
+                SpDeviceManagerErrorDescription.Children.Add(text);
             }
         }
 
         //Dodawanie kontrolek z nazwami dysków
         void CreateNetDevData(NetDevice[] Dev)
         {
-            dpDeviceCaption.Children.Clear();
-            dpDeviceMACAddress.Children.Clear();
-            for (int i = 0; i < Dev.Length; i++)
+            DpDeviceCaption.Children.Clear();
+            DpDeviceMacAddress.Children.Clear();
+            for (var i = 0; i < Dev.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Dev[i].Nazwa);
@@ -210,21 +210,21 @@ namespace Retriever
                 text.Height = 50;
                 text.TextWrapping = TextWrapping.Wrap;
                 DockPanel.SetDock(text, Dock.Top);
-                dpDeviceCaption.Children.Add(text);
+                DpDeviceCaption.Children.Add(text);
                 text = new TextBlock();
-                text.Text = string.Format("{0}", Dev[i].AdresMAC);
+                text.Text = string.Format("{0}", Dev[i].AdresMac);
                 text.Height = 50;
                 text.Style = Resources["PropertyValue"] as Style;
-                dpDeviceMACAddress.Children.Add(text);
+                DpDeviceMacAddress.Children.Add(text);
             }
         }
 
         //Dodawanie kontrolek z nazwami kart graficznych
         void CreateGraphicCardData(GraphicCard[] Card)
         {
-            spGraphicCardCaption.Children.Clear();
-            spGraphicCardDescription.Children.Clear();
-            for (int i = 0; i < Card.Length; i++)
+            SpGraphicCardCaption.Children.Clear();
+            SpGraphicCardDescription.Children.Clear();
+            for (var i = 0; i < Card.Length; i++)
             {
                 var text = new TextBlock();
                 text.Text = string.Format("{0}", Card[i].Nazwa);
@@ -233,12 +233,12 @@ namespace Retriever
                 text.Height = 50;
                 text.TextWrapping = TextWrapping.Wrap;
                 //DockPanel.SetDock(text, Dock.Top);
-                spGraphicCardCaption.Children.Add(text);
+                SpGraphicCardCaption.Children.Add(text);
                 text = new TextBlock();
                 text.Text = string.Format("{0}", Card[i].Opis);
                 text.Height = 50;
                 text.Style = Resources["PropertyValue"] as Style;
-                spGraphicCardDescription.Children.Add(text);
+                SpGraphicCardDescription.Children.Add(text);
             }
         }
 
@@ -255,23 +255,23 @@ namespace Retriever
                     break;
                 case Key.Down:
                     if (TabControl.SelectedIndex == 1) Scroll.ScrollToVerticalOffset(Scroll.VerticalOffset + 100);
-                    else if (txtWyszukiwarka.IsFocused == false && gridModele.IsFocused == false) txtWyszukiwarka.Focus();
-                    else if (txtWyszukiwarka.IsFocused == true) gridModele.Focus();
-                    else if (gridModele.IsFocused == true) gridModele.SelectedIndex += 1;
+                    else if (TxtWyszukiwarka.IsFocused == false && GridModele.IsFocused == false) TxtWyszukiwarka.Focus();
+                    else if (TxtWyszukiwarka.IsFocused == true) GridModele.Focus();
+                    else if (GridModele.IsFocused == true) GridModele.SelectedIndex += 1;
                     break;
                 case Key.Up:
                     if (TabControl.SelectedIndex == 1) Scroll.ScrollToVerticalOffset(Scroll.VerticalOffset - 100);
-                    else if (gridModele.IsFocused == true && gridModele.SelectedIndex == 0) txtWyszukiwarka.Focus();
-                    else if (gridModele.SelectedIndex != 0)
+                    else if (GridModele.IsFocused == true && GridModele.SelectedIndex == 0) TxtWyszukiwarka.Focus();
+                    else if (GridModele.SelectedIndex != 0)
                     {
-                        gridModele.SelectedIndex -= 1;
-                        gridModele.Focus();
+                        GridModele.SelectedIndex -= 1;
+                        GridModele.Focus();
                     }
                     break;
                 case Key.Enter:
-                    if (gridModele.IsFocused == true)
+                    if (GridModele.IsFocused == true)
                     {
-                        Retriever.ReaderData.ReadData(gridModele.SelectedItem as Model);
+                        Retriever.ReaderData.ReadData(GridModele.SelectedItem as Model);
                         DynamicControls();
                         TabControl.SelectedIndex = 1;
                     }

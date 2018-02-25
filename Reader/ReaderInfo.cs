@@ -4,96 +4,77 @@ using System.ComponentModel;
 
 namespace Retriever
 {
-    public class ReaderInfo : INotifyPropertyChanged, IDBData
+    public class ReaderInfo : INotifyPropertyChanged, IDbData
     {
-        IDBManager DBManager;
-        Computer _Komputer;
+        private readonly IDbManager _dbManager;
+        private Computer _komputer;
         public Computer Komputer
         {
-            get
-            {
-                return _Komputer;
-            }
+            get => _komputer;
             set
             {
-                if (_Komputer != value)
-                {
-                    _Komputer = value;
-                    OnPropertyChanged("Komputer");
-                }
+                if (_komputer == value) return;
+                _komputer = value;
+                OnPropertyChanged("Komputer");
             }
         }
-        RAM[] _Ram;
-        public RAM[] Ram
+
+        private Ram[] _ram;
+        public Ram[] Ram
         {
-            get
-            {
-                return _Ram;
-            }
+            get => _ram;
             set
             {
-                if (_Ram != value)
-                {
-                    _Ram = value;
-                    OnPropertyChanged("Ram");
-                }
+                if (_ram == value) return;
+                _ram = value;
+                OnPropertyChanged("Ram");
             }
         }
+
         public Storage[] Dyski { get; set; }
-        Mainboard _PlytaGlowna;
+
+        private Mainboard _plytaGlowna;
         public Mainboard PlytaGlowna
         {
-            get
-            {
-                return _PlytaGlowna;
-            }
+            get => _plytaGlowna;
             set
             {
-                if (_PlytaGlowna != value)
-                {
-                    _PlytaGlowna = value;
-                    OnPropertyChanged("PlytaGlowna");
-                }
+                if (_plytaGlowna == value) return;
+                _plytaGlowna = value;
+                OnPropertyChanged("PlytaGlowna");
             }
         }
-        SWM[] _Swm;
+
+        private SWM[] _swm;
         public SWM[] Swm
         {
-            get
-            {
-                return _Swm;
-            }
+            get => _swm;
             set
             {
-                if (_Swm != value)
-                {
-                    _Swm = value;
-                    OnPropertyChanged("Swm");
-                }
+                if (_swm == value) return;
+                _swm = value;
+                OnPropertyChanged("Swm");
             }
         }
-        Bios _WersjaBios;
+
+        private Bios _wersjaBios;
         public Bios WersjaBios
         {
-            get
-            {
-                return _WersjaBios;
-            }
+            get => _wersjaBios;
             set
             {
-                if (_WersjaBios != value)
-                {
-                    _WersjaBios = value;
-                    OnPropertyChanged("WersjaBios");
-                }
+                if (_wersjaBios == value) return;
+                _wersjaBios = value;
+                OnPropertyChanged("WersjaBios");
             }
         }
-        public ObservableCollection<Model> ListaModeli { get; private set; }
+
+        public ObservableCollection<Model> ListaModeli { get; }
 
         //Konstruktor główny
-        public ReaderInfo(IDBManager dbManager)
+        public ReaderInfo(IDbManager dbManager)
         {
-            DBManager = dbManager;
+            _dbManager = dbManager;
             ListaModeli = dbManager.ListaModeli;
         }
 
@@ -102,7 +83,7 @@ namespace Retriever
         {
             if(ListaModeli.Contains(model))
             {
-                DataPack readerPack = DBManager.ReadModel(model);
+                var readerPack = _dbManager.ReadModel(model);
                 PlytaGlowna = readerPack.PlytaGlowna;
                 Komputer = readerPack.Komputer;
                 Ram = readerPack.Ram;
@@ -124,13 +105,7 @@ namespace Retriever
         public event PropertyChangedEventHandler PropertyChanged;
         private void OnPropertyChanged(string property)
         {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(property));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
-
     }
-
-    //TODO Regex dla wartosci 8 GB nie wyszukuje nic
 }

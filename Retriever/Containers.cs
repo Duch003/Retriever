@@ -2,7 +2,6 @@
 using Gatherer;
 using Microsoft.Win32;
 using System;
-using System.ComponentModel;
 using System.Linq;
 using Utilities;
 
@@ -30,8 +29,6 @@ namespace Retriever
         public string KluczWindows { get; set; }
         public string[] StanBaterii { get; set; }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public Status()
         {
             RenewWindowsActivationStatusInfo();
@@ -42,8 +39,8 @@ namespace Retriever
 
         public void RenewWindowsActivationStatusInfo()
         {
-            WindowsActivationStatus result = (WindowsActivationStatus)Convert.ToInt16(WMI.GetSingleProperty
-                (Win32Hardware.SoftwareLicensingProduct, property: "LicenseStatus",
+            var result = (WindowsActivationStatus)Convert.ToInt16(Wmi.GetSingleProperty
+                (Win32Hardware.SoftwareLicensingProduct, "LicenseStatus",
                 condition: "ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f' AND PartialProductKey != null")
                 .First().Wartosc);
             WinStatus = result.ToString();
@@ -51,7 +48,7 @@ namespace Retriever
 
         public void RenewSecureBootInfo()
         {
-            SecureBootStatus secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
+            var secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
                @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
                "UEFISecureBootEnabled", -1));
             SecureStatus = secure.ToString();
@@ -59,19 +56,18 @@ namespace Retriever
 
         public void RenewWindowsKeyInfo()
         {
-            KluczWindows = WMI.GetOriginalProductKey();
+            KluczWindows = Wmi.GetOriginalProductKey();
         }
 
         public void RefreshBatteriesState()
         {
             StanBaterii = new string[0];
-            double temp;
-            int i = 0;
-            var ans = WMI.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
-            foreach (Win32HardwareData z in ans)
+            const int i = 0;
+            var ans = Wmi.GetSingleProperty(Win32Hardware.Win32_Battery, "EstimatedChargeRemaining");
+            foreach (var z in ans)
             {
                 StanBaterii = ExpandArr.Expand(StanBaterii);
-                if (double.TryParse(z.Wartosc, out temp))
+                if (double.TryParse(z.Wartosc, out _))
                     StanBaterii[i] = z.Wartosc;
                 else
                     StanBaterii[i] = "Wymiana baterii!";
