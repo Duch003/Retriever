@@ -10,9 +10,9 @@ namespace Retriever
     //--------------------------------------------------Kontener danych porównwczych-------------------------------------------------------------------
     public class RetrieverInfo
     {
-        public ReaderInfo ReaderData { get; set; }
-        public GathererInfo GathererData { get; set; }
-        public Status Statusy { get; set; }
+        public ReaderInfo ReaderData { get; }
+        public GathererInfo GathererData { get; }
+        public Status Statusy { get; }
 
         public RetrieverInfo(ReaderInfo reader, GathererInfo gatherer, Status statusy)
         {
@@ -37,7 +37,7 @@ namespace Retriever
             RenewWindowsKeyInfo();
         }
 
-        public void RenewWindowsActivationStatusInfo()
+        private void RenewWindowsActivationStatusInfo()
         {
             var result = (WindowsActivationStatus)Convert.ToInt16(Wmi.GetSingleProperty
                 (Win32Hardware.SoftwareLicensingProduct, "LicenseStatus",
@@ -46,7 +46,7 @@ namespace Retriever
             WinStatus = result.ToString();
         }
 
-        public void RenewSecureBootInfo()
+        private void RenewSecureBootInfo()
         {
             var secure = (SecureBootStatus)Convert.ToInt16(Registry.GetValue(
                @"HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\SecureBoot\State",
@@ -54,12 +54,12 @@ namespace Retriever
             SecureStatus = secure.ToString();
         }
 
-        public void RenewWindowsKeyInfo()
+        private void RenewWindowsKeyInfo()
         {
             KluczWindows = Wmi.GetOriginalProductKey();
         }
 
-        public void RefreshBatteriesState()
+        private void RefreshBatteriesState()
         {
             StanBaterii = new string[0];
             const int i = 0;

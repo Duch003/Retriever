@@ -18,7 +18,8 @@ namespace Gatherer
         public Ram[] Ram { get; set; }
         public GraphicCard[] KartyGraficzne { get; set; }
         public Bios WersjaBios { get; set; }
-
+        
+        //TODO: Czasami model jest w nazwie plyty glownej
         public GathererInfo()
         {
             try
