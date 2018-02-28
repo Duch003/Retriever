@@ -28,7 +28,7 @@
 
 		<Menu Grid.Row="0">
 			<MenuItem Header="Diagnostyka">
-				<MenuItem Header="WMI Manager"/>
+				<MenuItem Header="WMI Manager" Click="WmiManager_Click"/>
 				<MenuItem Header="EventViewer"/>
 				<MenuItem Header="Regedit"/>
 			</MenuItem>

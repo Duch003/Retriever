@@ -38,6 +38,10 @@ namespace Gatherer
                 MenedzerUrzadzen = GatherDeviceManagerInfo();
                 UrzadzeniaSieciowe = GatherNetDevicesLanAdresses();
                 KartyGraficzne = GatherGraphicCardInfo();
+
+                if (!string.IsNullOrEmpty(Komputer.Md)) return;
+                var temp = GatherModel(PlytaGlowna.Model) ?? "";
+                Komputer.Md = temp;
             }
             catch(Exception e)
             {
