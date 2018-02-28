@@ -24,7 +24,6 @@ namespace Retriever
         public WmiManager()
         {
             InitializeComponent();
-            CbxWin32.DataContext = Enum.GetValues(typeof(Win32Hardware)).Cast<string>();
         }
 
         internal class Win32HardwareToInt : IValueConverter

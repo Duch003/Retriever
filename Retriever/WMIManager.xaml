@@ -3,18 +3,28 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		mc:Ignorable="d"
-        Title="WMIManager" Height="300" Width="300">
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        xmlns:dataTypes="clr-namespace:DataTypes;assembly=DataTypes"
+        mc:Ignorable="d"
+        Title="WMIManager" Height="500" Width="500">
+	<Window.Resources>
+		<ObjectDataProvider x:Key="Win32" 
+		                    MethodName="GetNames" ObjectType="{x:Type sys:Enum}">
+			<ObjectDataProvider.MethodParameters>
+				<x:Type TypeName="dataTypes:Win32Hardware" />
+			</ObjectDataProvider.MethodParameters>
+		</ObjectDataProvider>
+	</Window.Resources>
 	<Grid x:Name="WmiGrid" Margin="10">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="Auto"/>
-			<ColumnDefinition Width="Auto"/>
+			<ColumnDefinition Width="*"/>
 		</Grid.ColumnDefinitions>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<ComboBox Grid.Row="0" Grid.Column="0" x:Name="CbxWin32" 
-		          SelectedIndex="0" HorizontalAlignment="Left" Margin="5"/>
+		<ComboBox Grid.Row="0" Grid.Column="0" x:Name="CbxWin32" MinWidth="300"
+		          SelectedIndex="0" HorizontalAlignment="Left" Margin="5" ItemsSource="{Binding Source={StaticResource Win32}}"/>
+		<TextBox x:Name="TxtWin32Info" Grid.Row="1" Grid.Column="0"/>
 	</Grid>
 </Window>
