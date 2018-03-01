@@ -6,7 +6,7 @@
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="Retriever"
-		SizeToContent="WidthAndHeight"
+		SizeToContent="WidthAndHeight" ResizeMode="NoResize"
 		WindowStartupLocation="Manual" 
 		Left="50" Top="0"
 		x:Name="RetrieverWindow" KeyUp="KeyUpRecognize">
@@ -16,7 +16,6 @@
 				<ResourceDictionary Source="Style.xaml"/>
 			</ResourceDictionary.MergedDictionaries>
 		</ResourceDictionary>
-		
 	</Window.Resources>
 
 	<Grid>
@@ -40,8 +39,6 @@
 				<Separator/>
 				<MenuItem Header="Zrób mi kawę"/>
 			</MenuItem>
-			
-
 		</Menu>
 			
 
@@ -87,7 +84,7 @@
 		<!--Zakładka z zestawieniem danych z pliku z danymi rzeczywistymi-->
 		<TabItem Header="Zestawienie">
 			<!--Całość umieszczona w kontrolce ScrollViever dzięki której można przewijać stronę-->
-			<ScrollViewer HorizontalScrollBarVisibility="Visible" x:Name="Scroll">
+			<ScrollViewer  x:Name="Scroll">
 				<Grid x:Name="GridZestawienie">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="*"/>
